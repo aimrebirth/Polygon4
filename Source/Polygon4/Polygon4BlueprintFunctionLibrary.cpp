@@ -19,7 +19,25 @@
 #include "Polygon4.h"
 #include "Polygon4BlueprintFunctionLibrary.h"
 
+#include <Polygon4/Hotpatch.h>
+
+#include "Common.h"
 #include "Menu/MainMenu.h"
+
+void UPolygon4BlueprintFunctionLibrary::HotpatchEngine()
+{
+#ifdef WIN32
+    auto gd = FPaths::GameDir();
+    auto fgd = FPaths::ConvertRelativePathToFull(gd);
+    FPaths::CollapseRelativeDirectories(fgd);
+    auto dll = polygon4::prepare_module_for_hotload(*fgd, "Engine");
+    if (!LoadLibrary(dll.c_str()))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LoadLibrary(%s) is failed!"), dll.c_str());
+    }
+    //LoadLibraryA(polygon4::read_new_module_filename().c_str());
+#endif
+}
 
 void UPolygon4BlueprintFunctionLibrary::ShowMainMenu(APlayerController* PlayerController)
 {

@@ -23,12 +23,18 @@
 #include "Paths.h"
 #include "FileManagerGeneric.h"
 
+#include <Polygon4/Test.h>
+#include <Polygon4/Mods.h>
+
 #include "Common.h"
 
 #define LOCTEXT_NAMESPACE "MainMenu"
 
 void SMainMenu::Construct(const FArguments& InArgs)
 {
+    int value = polygon4::test();
+    GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::FromInt(value));
+
     APlayerController* PlayerController = InArgs._PlayerController;
     if (PlayerController)
     {

@@ -18,13 +18,31 @@
 
 #include "Polygon4.h"
 
-#include <polygon4/dll.h>
+#include <fstream>
 
-extern "C" DLL_EXPORT
-void __cdecl InitMemory(void **alloc, void **free)
+#include <Polygon4/Hotpatch.h>
+
+#include "Common.h"
+#include "Polygon4BlueprintFunctionLibrary.h"
+
+class FPolygon4ModuleImpl : public FDefaultGameModuleImpl
 {
-    *alloc = (void*)&FMemory::Malloc;
-    *free  = (void*)&FMemory::Free;
-}
+public:
+	virtual void StartupModule() override
+	{
+#ifdef WIN32
+        std::string fn = polygon4::read_orig_module_filename_store();
+        std::ofstream ofile(fn);
+        if (ofile)
+            ofile << "Engine.x64.dll";
+        ofile.close();
+#endif
+    }
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Polygon4, "Polygon4" );
+	virtual void ShutdownModule() override
+	{
+	}
+};
+
+IMPLEMENT_PRIMARY_GAME_MODULE( FPolygon4ModuleImpl, Polygon4, "Polygon4" );
+

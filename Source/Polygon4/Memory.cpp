@@ -16,29 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "Polygon4.h"
 
-#include "Kismet/BlueprintFunctionLibrary.h"
-#include "Polygon4BlueprintFunctionLibrary.generated.h"
+#include <polygon4/dll.h>
 
-/**
- * Blueprint Function Library
- */
-UCLASS()
-class POLYGON4_API UPolygon4BlueprintFunctionLibrary : public UBlueprintFunctionLibrary
+extern "C" DLL_EXPORT
+void __cdecl InitMemory(void **alloc, void **free)
 {
-	GENERATED_BODY()
-	
-public:
-    /**
-     * Show mod selector
-     */
-	UFUNCTION(BlueprintCallable, Category="Polygon4|Tools")
-	static void HotpatchEngine();
+    *alloc = (void*)&FMemory::Malloc;
+    *free  = (void*)&FMemory::Free;
+}
 
-    /**
-     * Show mod selector
-     */
-	UFUNCTION(BlueprintCallable, Category="Polygon4")
-	static void ShowMainMenu(APlayerController* PlayerController);
-};

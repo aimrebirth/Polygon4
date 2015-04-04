@@ -20,6 +20,6 @@ public class Polygon4EditorTarget : TargetRules
 		ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.AddRange( new string[] { "Polygon4" } );
+		OutExtraModuleNames.AddRange(new string[] { "Polygon4" });
 	}
 }

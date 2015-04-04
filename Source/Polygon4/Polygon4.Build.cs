@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Diagnostics;
 
 using UnrealBuildTool;
 
@@ -17,6 +18,8 @@ public class Polygon4 : ModuleRules
         get { return Path.GetFullPath(Path.Combine(ModulePath, "../../ThirdParty/")); }
     }
 
+    private static int NumberOfCalls = 0;
+
 	public Polygon4(TargetInfo Target)
 	{
 		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
@@ -25,34 +28,127 @@ public class Polygon4 : ModuleRules
         LoadCoreModule(Target, "Engine");
 	}
 
-    public bool LoadCoreModule(TargetInfo Target, string Name)
+    bool CopyLibrary(string src, string dst, bool overwrite)
     {
-        bool isLibrarySupported = false;
-
-        if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32))
+        bool copied = true;
+        string[] ext = { ".dll", ".pdb" };
+        try
         {
-            isLibrarySupported = true;
-
-            string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
-            string LibrariesPath = Path.Combine(ThirdPartyPath, Name, "lib");
-
-            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, Name + "." + PlatformString + ".lib"));
-
-            string src = Path.Combine(LibrariesPath, Name + "." + PlatformString + ".dll");
-            string dst = Path.Combine(ModulePath, "../../Binaries/", Target.Platform.ToString()) + "/" + Path.GetFileName(src);
-
-            try { File.Copy(src, dst, true); } catch (System.Exception) {}
-
-            /*System.Console.WriteLine(Target.Platform);
-            System.Console.WriteLine(Target.Configuration);
-            System.Console.WriteLine(Target.Type);*/
+            foreach (var e in ext)
+            {
+                File.Copy(src + e, dst + e, overwrite);
+            }
         }
-
-        if (isLibrarySupported)
+        catch (System.Exception)
         {
-            PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
+            copied = false;
         }
+        return copied;
+    }
 
-        return isLibrarySupported;
+    bool RemoveLibrary(string dst)
+    {
+        bool removed = true;
+        string dll = dst + ".dll";
+        string pdb = dst + ".pdb";
+        if (File.Exists(dll))
+        {
+            try
+            {
+                string msg = "Deleting old hot reload file: \"{0}\".";
+                File.Delete(dll);
+                System.Console.WriteLine(msg, dll);
+                File.Delete(pdb);
+                System.Console.WriteLine(msg, pdb);
+            }
+            catch (System.Exception)
+            {
+                removed = false;
+            }
+        }
+        return removed;
+    }
+
+    bool RemoveLogs(string dst)
+    {
+        bool removed = true;
+        string log_debug = dst + ".log.debug";
+        string log_trace = dst + ".log.trace";
+        try
+        {
+            File.Delete(log_debug);
+        }
+        catch (System.Exception)
+        {
+            removed = false;
+        }
+        try
+        {
+            File.Delete(log_trace);
+        }
+        catch (System.Exception)
+        {
+            removed = false;
+        }
+        return removed;
+    }
+
+    public void LoadCoreModule(TargetInfo Target, string Name)
+    {
+        if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
+            return;
+
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
+
+        string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
+        string BaseDir = Path.Combine(ThirdPartyPath, Name, "lib");
+        BaseDir = Path.GetFullPath(BaseDir);
+
+        string base_name = Name + "." + PlatformString;
+        int base_name_id = 0;
+
+        PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
+
+        string dst_base_name = Path.Combine(ModulePath, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
+        dst_base_name = Path.GetFullPath(dst_base_name);
+
+        string src = Path.Combine(BaseDir, base_name);
+        string dst = dst_base_name;
+
+        if (Target.Type != TargetRules.TargetType.Editor)
+            return;
+
+        if (NumberOfCalls++ > 0)
+            return;
+
+        bool copied = CopyLibrary(src, dst, true);
+
+        if (copied)
+        {
+            // try remove previous dll, pdb
+            base_name_id = 1;
+            while (true)
+            {
+                dst = dst_base_name;
+                if (base_name_id > 0)
+                    dst = dst_base_name + "." + base_name_id.ToString();
+                if (!RemoveLibrary(dst))
+                    break;
+                if (base_name_id++ > 1000)
+                    break;
+            }
+            // try remove previous logs
+            base_name_id = 0;
+            while (true)
+            {
+                dst = dst_base_name;
+                if (base_name_id > 0)
+                    dst = dst_base_name + "." + base_name_id.ToString();
+                if (!RemoveLogs(dst))
+                    break;
+                if (base_name_id++ > 1000)
+                    break;
+            }
+        }
     }
 }

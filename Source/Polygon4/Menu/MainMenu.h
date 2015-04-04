@@ -20,7 +20,10 @@
 
 #include "SlateBasics.h"
 
-#include <Polygon4/Mods.h>
+namespace polygon4
+{
+    class Mod;
+}
  
 class SMainMenu : public SCompoundWidget
 {
