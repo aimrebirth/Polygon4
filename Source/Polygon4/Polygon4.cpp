@@ -30,6 +30,8 @@ class FPolygon4ModuleImpl : public FDefaultGameModuleImpl
 public:
 	virtual void StartupModule() override
 	{
+        FDefaultGameModuleImpl::StartupModule();
+
 #ifdef WIN32
         std::string fn = polygon4::read_orig_module_filename_store();
         std::ofstream ofile(fn);
@@ -41,6 +43,7 @@ public:
 
 	virtual void ShutdownModule() override
 	{
+        FDefaultGameModuleImpl::ShutdownModule();
 	}
 };
 

@@ -31,7 +31,7 @@ void UPolygon4BlueprintFunctionLibrary::HotpatchEngine()
     auto fgd = FPaths::ConvertRelativePathToFull(gd);
     FPaths::CollapseRelativeDirectories(fgd);
     auto dll = polygon4::prepare_module_for_hotload(*fgd, "Engine");
-    if (!LoadLibrary(dll.c_str()))
+    if (!dll.empty() && !LoadLibrary(dll.c_str()))
     {
         UE_LOG(LogTemp, Warning, TEXT("LoadLibrary(%s) is failed!"), dll.c_str());
     }
