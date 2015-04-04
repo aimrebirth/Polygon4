@@ -12,5 +12,8 @@ Content
 Intermediate
 Saved
 
+# ThirdParty
+ThirdParty/boost
+
 # uproject
 *.uproject
