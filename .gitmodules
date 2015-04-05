@@ -1,6 +1,3 @@
 [submodule "ThirdParty/Engine"]
 	path = ThirdParty/Engine
 	url = https://github.com/aimrebirth/Engine.git
-[submodule "ThirdParty/Bootstrap"]
-	path = ThirdParty/Bootstrap
-	url = https://github.com/aimrebirth/Bootstrap.git
