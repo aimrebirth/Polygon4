@@ -28,10 +28,22 @@ public class Polygon4 : ModuleRules
         LoadCoreModule(Target, "Engine");
 	}
 
+    void MakeDir(string dst)
+    {
+        try
+        {
+            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(dst));
+        }
+        catch (System.Exception)
+        {
+        }
+    }
+
     bool CopyLibrary(string src, string dst, bool overwrite)
     {
         bool copied = true;
         string[] ext = { ".dll", ".pdb" };
+        MakeDir(dst);
         try
         {
             foreach (var e in ext)
