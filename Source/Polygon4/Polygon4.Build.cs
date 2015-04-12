@@ -127,8 +127,8 @@ public class Polygon4 : ModuleRules
         string src = Path.Combine(BaseDir, base_name);
         string dst = dst_base_name;
 
-        if (Target.Type != TargetRules.TargetType.Editor)
-            return;
+        //if (Target.Type != TargetRules.TargetType.Editor)
+        //    return;
 
         if (NumberOfCalls++ > 0)
             return;

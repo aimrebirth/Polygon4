@@ -16,14 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
+#pragma once
 
-#include <polygon4/dll.h>
+#include "SlateBasics.h"
 
-extern "C" DLL_EXPORT
-void __cdecl InitMemory(void **alloc, void **free)
+namespace polygon4
 {
-    *alloc = (void*)&FMemory::Malloc;
-    *free  = (void*)&FMemory::Free;
+    class Mod;
 }
 
+typedef TSharedPtr<polygon4::Mod> ListItem;
+
+class SModListView : public SListView<ListItem>
+{
+    typedef SListView<ListItem> ParentType;
+
+	SLATE_BEGIN_ARGS(SModListView){}
+	SLATE_END_ARGS()
+
+    TArray<ListItem> AvailableMods;
+    int Padding = 20;
+ 
+public:
+	void Construct(const FArguments& InArgs);
+
+    TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);
+};

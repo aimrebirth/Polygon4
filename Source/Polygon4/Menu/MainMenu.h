@@ -20,22 +20,31 @@
 
 #include "SlateBasics.h"
 
-namespace polygon4
-{
-    class Mod;
-}
- 
 class SMainMenu : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(SMainMenu){}
         SLATE_ARGUMENT(APlayerController*, PlayerController)
 	SLATE_END_ARGS()
 
-    typedef TSharedPtr<polygon4::Mod> ListItem;
-    TArray<ListItem> AvailableMods;
+    typedef TSharedPtr<class SModListView> SModsListView;
+
+    SModsListView ModsListView;
+    APlayerController* PlayerController;
+    TSharedPtr<STextBlock> MessageLine;
+    int Padding = 20;
  
 public:
 	void Construct(const FArguments& InArgs);
 
-    TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);
+private:
+    template <typename F>
+    SVerticalBox::FSlot& MainMenuButton(FText Text, F function) const;
+
+    FReply OnNewGame();
+    FReply OnLoadGame();
+    FReply OnReloadMods();
+    FReply OnExit();
+
+    FReply PrintError(const FText& Text);
+    void ClearError();
 };

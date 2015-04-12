@@ -18,27 +18,33 @@
 
 #pragma once
 
-#include "Kismet/BlueprintFunctionLibrary.h"
-#include "Polygon4BlueprintFunctionLibrary.generated.h"
+#include "GameFramework/GameMode.h"
+
+#include <string>
+
+
+#include "MenuGameMode.generated.h"
 
 /**
- * Blueprint Function Library
+ * 
  */
 UCLASS()
-class POLYGON4_API UPolygon4BlueprintFunctionLibrary : public UBlueprintFunctionLibrary
+class POLYGON4_API AMenuGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
 public:
-    /**
-     * Show mod selector
-     */
-	UFUNCTION(BlueprintCallable, Category="Polygon4|Tools")
-	static void HotpatchEngine();
+    ~AMenuGameMode();
 
-    /**
-     * Show mod selector
-     */
-	UFUNCTION(BlueprintCallable, Category="Polygon4")
-	static void ShowMainMenu(APlayerController* PlayerController);
+public:
+    void BeginPlay();
+	
+private:
+    TSharedPtr<class SMainMenu> MainMenu;
+    void ShowMainMenu();
+
+private: /* API */
+    void OpenLevel(std::string level);
+	
+	
 };

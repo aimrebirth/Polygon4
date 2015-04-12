@@ -19,12 +19,10 @@
 #include "Polygon4.h"
 
 #include "MainMenu.h"
+#include "ModListView.h"
 
-#include "Paths.h"
-#include "FileManagerGeneric.h"
-
-#include <Polygon4/Test.h>
 #include <Polygon4/Mods.h>
+#include <Polygon4/Test.h>
 
 #include "Common.h"
 
@@ -35,34 +33,21 @@ void SMainMenu::Construct(const FArguments& InArgs)
     int value = polygon4::test();
     GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::FromInt(value));
 
-    APlayerController* PlayerController = InArgs._PlayerController;
+    PlayerController = InArgs._PlayerController;
     if (PlayerController)
     {
         PlayerController->bShowMouseCursor = true;
     }
 
-    polygon4::Mods mods = polygon4::enumerateMods(FString(FPaths::GameContentDir() + "Mods/").GetCharArray().GetData());
-    AvailableMods = MakeTArrayTSharedPtr(mods);
+    // create message line
+    MessageLine = SNew(STextBlock)
+        .ShadowColorAndOpacity(FLinearColor::Black)
+        .ColorAndOpacity(FLinearColor::Red)
+        .ShadowOffset(FIntPoint(-1, 1))
+        .Font(FSlateFontInfo("Veranda", 30));
 
     // create Mods List View
-    auto ListView = SNew(SListView<ListItem>)
-        .SelectionMode(ESelectionMode::SingleToggle)
-        .AllowOverscroll(EAllowOverscroll::No)
-        .ItemHeight(40)
-        .ListItemsSource( &AvailableMods )
-        .OnGenerateRow(this, &SMainMenu::OnGenerateWidgetForList)
-        .HeaderRow(
-            SNew(SHeaderRow)
-            + SHeaderRow::Column("Mod")
-            .DefaultLabel(LOCTEXT("ModsLabel", "Available Mods"))
-            .VAlignHeader(EVerticalAlignment::VAlign_Center)
-            .HAlignHeader(EHorizontalAlignment::HAlign_Center)
-            .VAlignCell(EVerticalAlignment::VAlign_Center)
-            .HAlignCell(EHorizontalAlignment::HAlign_Center)
-            )
-        ;
-
-    auto Padding = 40;
+    ModsListView = SNew(SModListView);
 
     // Create GUI
 	ChildSlot
@@ -80,7 +65,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Veranda", 72))
+				.Font(FSlateFontInfo("Veranda", 100))
 				.Text(FText::FromString("Polygon-4"))
 			]
             // Other
@@ -96,97 +81,117 @@ void SMainMenu::Construct(const FArguments& InArgs)
                 .AutoWidth()
                 [
 			        SNew(SVerticalBox)
-                    // New Game
-                    + SVerticalBox::Slot()
-			        .VAlign(VAlign_Top)
-			        .HAlign(HAlign_Center)
-                    .Padding(Padding)
-                    [
-                        SNew(SButton)
-                        [
-				            SNew(STextBlock)
-				            .ShadowColorAndOpacity(FLinearColor::Black)
-				            .ColorAndOpacity(FLinearColor::White)
-				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo("Veranda", 72))
-				            .Text(LOCTEXT("NewGameButtonLabel", "New Game"))
-                        ]
-                    ]
-                    // Load Game
-                    + SVerticalBox::Slot()
-			        .VAlign(VAlign_Top)
-			        .HAlign(HAlign_Center)
-                    .Padding(Padding)
-                    [
-                        SNew(SButton)
-                        [
-				            SNew(STextBlock)
-				            .ShadowColorAndOpacity(FLinearColor::Black)
-				            .ColorAndOpacity(FLinearColor::White)
-				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo("Veranda", 72))
-				            .Text(LOCTEXT("LoadGameButtonLabel", "Load Game"))
-                        ]
-                    ]
-                    // Exit Game
-                    + SVerticalBox::Slot()
-			        .VAlign(VAlign_Top)
-			        .HAlign(HAlign_Center)
-                    .Padding(Padding)
-                    [
-                        SNew(SButton)
-                        .OnClicked_Lambda([PlayerController]()->FReply{ if (PlayerController) PlayerController->ConsoleCommand("quit"); return FReply::Handled(); })
-                        [
-				            SNew(STextBlock)
-				            .ShadowColorAndOpacity(FLinearColor::Black)
-				            .ColorAndOpacity(FLinearColor::White)
-				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo("Veranda", 72))
-				            .Text(LOCTEXT("ExitGameButtonLabel", "Exit Game"))
-                        ]
-                    ]
+                    + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
+                    + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
+                    + MainMenuButton(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"), &SMainMenu::OnReloadMods)
+                    + MainMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SMainMenu::OnExit)
                 ]
-                // List View
+                // right part of the screen
                 + SHorizontalBox::Slot()
 			    .VAlign(VAlign_Fill)
 			    .HAlign(HAlign_Fill)
-                .Padding(Padding)
                 [
-                    ListView
+			        SNew(SVerticalBox)
+                    // label
+                    + SVerticalBox::Slot()
+			        .VAlign(VAlign_Top)
+			        .HAlign(HAlign_Center)
+                    .Padding(Padding)
+                    .AutoHeight()
+                    [
+				        SNew(STextBlock)
+				        .ShadowColorAndOpacity(FLinearColor::Black)
+				        .ColorAndOpacity(FLinearColor::White)
+				        .ShadowOffset(FIntPoint(-1, 1))
+				        .Font(FSlateFontInfo("Veranda", 50))
+				        .Text(LOCTEXT("ModsLabel", "Available Mods"))
+                    ]
+                    // List View
+                    + SVerticalBox::Slot()
+			        .VAlign(VAlign_Fill)
+			        .HAlign(HAlign_Fill)
+                    .Padding(Padding)
+                    [
+                        ModsListView.ToSharedRef()
+                    ]
+                    // Text line
+                    + SVerticalBox::Slot()
+			        .VAlign(VAlign_Bottom)
+			        .HAlign(HAlign_Center)
+                    .Padding(Padding)
+                    [
+                        MessageLine.ToSharedRef()
+                    ]
                 ]
             ]
 		];
 }
 
-TSharedRef<ITableRow> SMainMenu::OnGenerateWidgetForList( ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable )
+template <typename F>
+SVerticalBox::FSlot& SMainMenu::MainMenuButton(FText Text, F function) const
 {
-    class SButtonRowWidget : public STableRow<ListItem>
-    {
-        ListItem Item;
+    return
+        SVerticalBox::Slot()
+			.VAlign(VAlign_Top)
+			.HAlign(HAlign_Center)
+            .Padding(Padding)
+            [
+                SNew(SButton)
+                .OnClicked(this, function)
+                [
+                    SNew(STextBlock)
+                    .ShadowColorAndOpacity(FLinearColor::Black)
+                    .ColorAndOpacity(FLinearColor::White)
+                    .ShadowOffset(FIntPoint(-1, 1))
+                    .Font(FSlateFontInfo("Veranda", 40))
+                    .Text(Text)
+                ]
+            ]
+        ;
+}
 
-    public:
-        SLATE_BEGIN_ARGS(SButtonRowWidget){}
-        SLATE_END_ARGS()
+FReply SMainMenu::OnNewGame()
+{
+    auto selected = ModsListView->GetSelectedItems();
+    if (!selected.Num())
+        return PrintError(LOCTEXT("ModNotSelected", "Please, select a modification from the list"));
+    ClearError();
+    if (!selected[0]->newGame())
+        return PrintError(LOCTEXT("NewGameFailed", "Cannot start a New Game. See logs for more information"));
+    return FReply::Handled();
+}
 
-        void Construct(const FArguments& InArgs, ListItem InItem)
-        {
-            Item = InItem;
-        }
+FReply SMainMenu::OnLoadGame()
+{
+    auto selected = ModsListView->GetSelectedItems();
+    if (!selected.Num())
+        return PrintError(LOCTEXT("ModNotSelected", "Please, select a modification from the list"));
+    ClearError();
+    //if (!selected[0]->loadGame(L"1"))
+    //    return PrintError(LOCTEXT("LoadGameFailed", "Cannot start a New Game. See logs for more information"));
+    return FReply::Handled();
+}
 
-	    virtual TSharedRef<SWidget> AsWidget() override
-	    {
-		    return 
-                //SNew(SButton)
-            //[
-                SNew(STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo("Veranda", 24))
-                .Text(FText::FromString(Item->getName().c_str()))
-            //]
-            ;
-	    }
-    };
-    return SNew(SButtonRowWidget, InItem);
+FReply SMainMenu::OnReloadMods()
+{
+    ClearError();
+    return FReply::Handled();
+}
+
+FReply SMainMenu::OnExit()
+{
+    if (PlayerController)
+        PlayerController->ConsoleCommand("quit");
+    return FReply::Handled();
+}
+
+FReply SMainMenu::PrintError(const FText& Text)
+{
+    MessageLine->SetText(Text);
+    return FReply::Unhandled();
+}
+
+void SMainMenu::ClearError()
+{
+    MessageLine->SetText(FText::FromString(FString()));
 }

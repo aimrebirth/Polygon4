@@ -29,7 +29,12 @@ class POLYGON4_API APolygon4GameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+public:
+    ~APolygon4GameMode();
+
+public:
+    void BeginPlay();
 	
-	
-	
+private:
+    void ShowMenu();
 };

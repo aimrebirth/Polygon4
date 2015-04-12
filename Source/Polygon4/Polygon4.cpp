@@ -23,7 +23,6 @@
 #include <Polygon4/Hotpatch.h>
 
 #include "Common.h"
-#include "Polygon4BlueprintFunctionLibrary.h"
 
 class FPolygon4ModuleImpl : public FDefaultGameModuleImpl
 {
@@ -33,11 +32,18 @@ public:
         FDefaultGameModuleImpl::StartupModule();
 
 #ifdef WIN32
-        std::string fn = polygon4::read_orig_module_filename_store();
-        std::ofstream ofile(fn);
-        if (ofile)
-            ofile << "Engine.x64.dll";
-        ofile.close();
+        {
+            std::string fn = polygon4::read_orig_module_filename_store();
+            std::ofstream ofile(fn);
+            if (ofile)
+                ofile << "Engine.x64.dll";
+        }
+        {
+            std::string fn = polygon4::read_ver_module_filename_store();
+            std::ofstream ofile(fn);
+            if (ofile)
+                ofile << -1;
+        }
 #endif
     }
 

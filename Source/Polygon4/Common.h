@@ -20,9 +20,7 @@
 
 #include "Engine.h"
 
-#include <codecvt>
-#include <locale>
-#include <string>
+#include <Polygon4/Common.h>
 
 template <typename T>
 TSharedPtr<T> MakeTSharedPtr(const T &value)
@@ -46,22 +44,4 @@ TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_con
     for (auto &v : stl_container)
         array.Add(MakeTSharedPtr(v));
     return array;
-}
-
-inline std::wstring to_wstring(const char *s)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.from_bytes(s);
-}
-
-inline std::wstring to_wstring(const std::string &s)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.from_bytes(s.c_str());
-}
-
-inline std::string to_string(const std::wstring &s)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.to_bytes(s.c_str());
 }
