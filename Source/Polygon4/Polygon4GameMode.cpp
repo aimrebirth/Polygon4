@@ -19,22 +19,42 @@
 #include "Polygon4.h"
 #include "Polygon4GameMode.h"
 
+#include "Glider.h"
+
+#include <Polygon4/API.h>
+
+APolygon4GameMode::APolygon4GameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+    UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::APolygon4GameMode()"));
+
+    DefaultPawnClass = AGlider::StaticClass();
+}
+
 APolygon4GameMode::~APolygon4GameMode()
 {
+    UNREGISTER_API(SpawnPlayer);
+
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::~APolygon4GameMode()"));
 }
 
 void APolygon4GameMode::BeginPlay()
 {
     Super::BeginPlay();
+    
+    REGISTER_API(SpawnPlayer, std::bind(&APolygon4GameMode::SpawnPlayer, this, std::placeholders::_1, std::placeholders::_2));
+
+    API_CALL(OnOpenLevel);
 
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::BeginPlay()"));
-
-    //InputComponent->BindAction("Exit", IE_Pressed, this, &APolygon4GameMode::ShowMenu);
-    //InputComponent->BindAction("Pause", IE_Pressed, this, &APolygon4GameMode::ShowMenu);
 }
 
 void APolygon4GameMode::ShowMenu()
 {
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::ShowMenu()"));
+}
+
+void APolygon4GameMode::SpawnPlayer(polygon4::Vector v, polygon4::Rotation r)
+{
+    GetWorld()->SpawnActor<AGlider>(FVector(v.x, v.y, v.z), FRotator(r.pitch, r.yaw, r.roll));
 }

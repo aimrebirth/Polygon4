@@ -82,8 +82,9 @@ void SMainMenu::Construct(const FArguments& InArgs)
                 [
 			        SNew(SVerticalBox)
                     + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
-                    + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
-                    + MainMenuButton(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"), &SMainMenu::OnReloadMods)
+                    + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnNotImplemented)
+                    + MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
+                    + MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
                     + MainMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SMainMenu::OnExit)
                 ]
                 // right part of the screen
@@ -114,11 +115,30 @@ void SMainMenu::Construct(const FArguments& InArgs)
                     [
                         ModsListView.ToSharedRef()
                     ]
+                    // Reload Button
+                    + SVerticalBox::Slot()
+			        .VAlign(VAlign_Bottom)
+			        .HAlign(HAlign_Center)
+                    .Padding(Padding)
+                    .AutoHeight()
+                    [
+                        SNew(SButton)
+                        .OnClicked(this, &SMainMenu::OnReloadMods)
+                        [
+                            SNew(STextBlock)
+                            .ShadowColorAndOpacity(FLinearColor::Black)
+                            .ColorAndOpacity(FLinearColor::White)
+                            .ShadowOffset(FIntPoint(-1, 1))
+                            .Font(FSlateFontInfo("Veranda", 40))
+                            .Text(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"))
+                        ]
+                    ]
                     // Text line
                     + SVerticalBox::Slot()
 			        .VAlign(VAlign_Bottom)
 			        .HAlign(HAlign_Center)
                     .Padding(Padding)
+                    .AutoHeight()
                     [
                         MessageLine.ToSharedRef()
                     ]
@@ -175,6 +195,7 @@ FReply SMainMenu::OnLoadGame()
 FReply SMainMenu::OnReloadMods()
 {
     ClearError();
+    ModsListView->ReloadMods();
     return FReply::Handled();
 }
 
@@ -194,4 +215,19 @@ FReply SMainMenu::PrintError(const FText& Text)
 void SMainMenu::ClearError()
 {
     MessageLine->SetText(FText::FromString(FString()));
+}
+
+FReply SMainMenu::OnAuthors()
+{
+    return FReply::Handled();
+}
+
+FReply SMainMenu::OnOptions()
+{
+    return FReply::Handled();
+}
+
+FReply SMainMenu::OnNotImplemented()
+{
+    return PrintError(LOCTEXT("NotImplemented", "Not Implemented"));
 }

@@ -18,32 +18,17 @@
 
 #pragma once
 
-#include "GameFramework/GameMode.h"
-
-#include <string>
-
-#include <Polygon4/API.h>
-
-#include "MenuGameMode.generated.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "GliderMovement.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class POLYGON4_API AMenuGameMode : public AGameMode
+class POLYGON4_API UGliderMovement : public UFloatingPawnMovement
 {
 	GENERATED_BODY()
-	
-public:
-    ~AMenuGameMode();
 
 public:
-    void BeginPlay();
-	
-private:
-    TSharedPtr<class SMainMenu> MainMenu;
-    void ShowMainMenu();
-
-private: /* API */
-    void OpenLevel(std::string level);
+    virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;  
 };

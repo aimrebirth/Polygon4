@@ -20,7 +20,6 @@
 #include "MenuGameMode.h"
 
 #include <Polygon4/Hotpatch.h>
-#include <Polygon4/API.h>
 
 #include "Common.h"
 #include "Menu/MainMenu.h"
@@ -68,16 +67,16 @@ void AMenuGameMode::BeginPlay()
 #ifdef WITH_EDITOR
     HotpatchEngine();
 #endif
-
-    polygon4::API api;
-    api.OpenLevel = std::bind(&AMenuGameMode::OpenLevel, this, std::placeholders::_1);
-    polygon4::InitAPI(api);
+    
+    REGISTER_API(OpenLevel, std::bind(&AMenuGameMode::OpenLevel, this, std::placeholders::_1));
 
     ShowMainMenu();
 }
 
 AMenuGameMode::~AMenuGameMode()
 {
+    UNREGISTER_API(OpenLevel);
+
     UE_LOG(LogTemp, Warning, TEXT("AMenuGameMode::~AMenuGameMode()"));
 }
 

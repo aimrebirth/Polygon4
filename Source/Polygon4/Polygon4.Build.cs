@@ -104,7 +104,7 @@ public class Polygon4 : ModuleRules
         }
         return removed;
     }
-
+    
     public void LoadCoreModule(TargetInfo Target, string Name)
     {
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)

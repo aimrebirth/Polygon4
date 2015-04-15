@@ -33,13 +33,13 @@ public:
 
 #ifdef WIN32
         {
-            std::string fn = polygon4::read_orig_module_filename_store();
+            std::string fn = polygon4::read_orig_module_filename_store().string();
             std::ofstream ofile(fn);
             if (ofile)
                 ofile << "Engine.x64.dll";
         }
         {
-            std::string fn = polygon4::read_ver_module_filename_store();
+            std::string fn = polygon4::read_ver_module_filename_store().string();
             std::ofstream ofile(fn);
             if (ofile)
                 ofile << -1;

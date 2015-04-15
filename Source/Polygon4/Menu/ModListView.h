@@ -39,6 +39,7 @@ class SModListView : public SListView<ListItem>
  
 public:
 	void Construct(const FArguments& InArgs);
+    void ReloadMods();
 
     TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);
 };

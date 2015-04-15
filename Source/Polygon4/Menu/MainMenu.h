@@ -43,7 +43,10 @@ private:
     FReply OnNewGame();
     FReply OnLoadGame();
     FReply OnReloadMods();
+    FReply OnOptions();
+    FReply OnAuthors();
     FReply OnExit();
+    FReply OnNotImplemented();
 
     FReply PrintError(const FText& Text);
     void ClearError();

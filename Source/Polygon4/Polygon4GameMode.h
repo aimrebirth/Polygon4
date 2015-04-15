@@ -19,6 +19,9 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
+
+#include <Polygon4/API.h>
+
 #include "Polygon4GameMode.generated.h"
 
 /**
@@ -30,6 +33,7 @@ class POLYGON4_API APolygon4GameMode : public AGameMode
 	GENERATED_BODY()
 	
 public:
+	APolygon4GameMode(const FObjectInitializer& ObjectInitializer);
     ~APolygon4GameMode();
 
 public:
@@ -37,4 +41,7 @@ public:
 	
 private:
     void ShowMenu();
+
+private: /* API */
+    void SpawnPlayer(polygon4::Vector v, polygon4::Rotation r);
 };

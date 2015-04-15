@@ -31,10 +31,7 @@
 
 void SModListView::Construct(const FArguments& InArgs)
 {
-    std::wstring s1 = FString(FPaths::GameContentDir() + "ModsData/").GetCharArray().GetData();
-    std::wstring s2 = FString(FPaths::GameContentDir() + "Mods/").GetCharArray().GetData();
-    auto mods = polygon4::enumerateMods(s1, s2);
-    AvailableMods = MakeTArrayTSharedPtr(mods);
+    ReloadMods();
 
     auto ListViewColumn = [](FName Name, FText Text)
     {
@@ -49,7 +46,7 @@ void SModListView::Construct(const FArguments& InArgs)
 
     ParentType::FArguments args;
     args
-        .SelectionMode(ESelectionMode::SingleToggle)
+        .SelectionMode(ESelectionMode::Single)
         .AllowOverscroll(EAllowOverscroll::No)
         .ItemHeight(40)
         .ListItemsSource( &AvailableMods )
@@ -65,6 +62,23 @@ void SModListView::Construct(const FArguments& InArgs)
             )
         ;
     ParentType::Construct(args);
+}
+
+void SModListView::ReloadMods()
+{
+    bool Empty = AvailableMods.Num() == 0;
+
+    std::wstring s1 = FString(FPaths::GameDir() + "Mods/").GetCharArray().GetData();
+    std::wstring s2 = FString(FPaths::GameContentDir() + "Mods/").GetCharArray().GetData();
+    auto mods = polygon4::enumerateMods(s1, s2);
+    AvailableMods = MakeTArrayTSharedPtr(mods);
+
+    if (!Empty)
+    {
+        ClearSelection();
+        ReGenerateItems(PanelGeometryLastTick);
+        ItemsSource = &AvailableMods;
+    }
 }
 
 TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable )
