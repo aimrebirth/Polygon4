@@ -18,33 +18,22 @@
 
 #pragma once
 
-#include "GameFramework/GameMode.h"
-
-#include <Polygon4/API.h>
-
-#include "Polygon4GameMode.generated.h"
+#include "GameFramework/HUD.h"
+#include "GliderHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class POLYGON4_API APolygon4GameMode : public AGameMode
+class POLYGON4_API AGliderHUD : public AHUD
 {
 	GENERATED_BODY()
 	
-public:
-	APolygon4GameMode(const FObjectInitializer& ObjectInitializer);
-    ~APolygon4GameMode();
-
-    void ShowMenu();
-
-public:
-    virtual void BeginPlay() override;
-	
 private:
-    bool paused = false;
-    TSharedPtr<class SPauseMenu> PauseMenu;
+    UTexture2D* CrosshairTex;
+	
+public:
+    AGliderHUD(const FObjectInitializer& ObjectInitializer);
 
-private: /* API */
-    void SpawnPlayer(polygon4::Vector v, polygon4::Rotation r);
+	virtual void DrawHUD() override;
 };

@@ -24,7 +24,7 @@
 enum EGliderView
 {
     FPS,
-    FPSWeapons,
+    //FPSWeapons,
     TPS,
 
     Max
@@ -69,11 +69,22 @@ public:
     //virtual UPawnMovementComponent* GetMovementComponent() const override;
 
 private:
+    // data
     float RunningTime;
+    float time1 = 0.0f;
+    float time2 = 0.0f;
+    bool LeftGun = true;
+
+    UClass *b1 = 0;
+    UClass *b2 = 0;
 
     FVector CurrentVelocity;
     bool boost = false;
 
+    bool FireLight = false;
+    bool FireHeavy = false;
+
+    // functions
     void Move(float AxisValue);
     void Strafe(float AxisValue);
 
@@ -88,5 +99,8 @@ private:
     void BoostOn();
     void BoostOff();
 
-    void ShowMenu();
+    void FireLightOn();
+    void FireLightOff();
+    void FireHeavyOn();
+    void FireHeavyOff();
 };

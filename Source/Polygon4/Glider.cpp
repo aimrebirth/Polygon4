@@ -55,7 +55,7 @@ AGlider::AGlider()
     ThirdPersonCameraComponent->SetRelativeLocation(FVector(-100.0f, 0.0f, 50.0f));
     ThirdPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
     ThirdPersonCameraComponent->bUsePawnControlRotation = false;
-    ThirdPersonCameraComponent->AttachTo(RootComponent);
+    ThirdPersonCameraComponent->AttachTo(FirstPersonCameraComponent);
 
     // set our turn rates for input
 	BaseTurnRate = 45.f;
@@ -66,13 +66,19 @@ AGlider::AGlider()
     bUseControllerRotationRoll = false;
 
     UpdateView();
+
+    static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
+    if (light.Object)
+        b1 = light.Object;
+    static ConstructorHelpers::FObjectFinder<UClass> heavy(TEXT("Class'/Game/Mods/Common/Projectiles/HeavyProjectile.HeavyProjectile_C'"));
+    if (heavy.Object)
+        b2 = heavy.Object;
 }
 
 // Called when the game starts or when spawned
 void AGlider::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 /*UPawnMovementComponent* AGlider::GetMovementComponent() const
@@ -81,10 +87,51 @@ void AGlider::BeginPlay()
 }*/
 
 // Called every frame
-void AGlider::Tick( float DeltaTime )
+void AGlider::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+    Super::Tick(DeltaTime);
+
+    float rpm1 = 60.f / 400.0f;
+    float rpm2 = 60.f / 60.0f;
     
+    const auto GunOffsetLeft    = FVector(150.0f, -100.0f, 0.0f);
+    const auto GunOffsetRight   = FVector(150.0f, 100.0f, 0.0f);
+    const auto GunOffsetTop     = FVector(150.0f, 0.0f, 100.0f);
+    
+    const FRotator SpawnRotation = GetControlRotation();
+
+    const FVector SpawnLocationLeft = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetLeft);
+    const FVector SpawnLocationRight = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetRight);
+    const FVector SpawnLocationTop = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetTop);
+
+    time1 -= DeltaTime;
+    time2 -= DeltaTime;
+
+    if (FireLight)
+    {
+        if (time1 < 0)
+        {
+            if (b1)
+            {
+                if (LeftGun)
+                GetWorld()->SpawnActor(b1, &SpawnLocationLeft, &SpawnRotation);
+                else
+                GetWorld()->SpawnActor(b1, &SpawnLocationRight, &SpawnRotation);
+                LeftGun = !LeftGun;
+            }
+            time1 = rpm1;
+        }
+    }
+    if (FireHeavy)
+    {
+        if (time2 < 0)
+        {
+            if (b2)
+                GetWorld()->SpawnActor(b2, &SpawnLocationTop, &SpawnRotation);
+            time2 = rpm2;
+        }
+    }
+
     /*FVector NewLocation = GetActorLocation();
     float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
     NewLocation.Z += DeltaHeight * 1.0f;       //Scale our height by a factor of 20
@@ -104,8 +151,6 @@ void AGlider::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
     
-    InputComponent->BindAction("Exit", IE_Pressed, this, &AGlider::ShowMenu);
-    InputComponent->BindAction("Pause", IE_Pressed, this, &AGlider::ShowMenu);
     InputComponent->BindAction("View", IE_Pressed, this, &AGlider::ChangeView);
 
     InputComponent->BindAxis("Move", this, &AGlider::Move);
@@ -121,10 +166,16 @@ void AGlider::SetupPlayerInputComponent(class UInputComponent* InputComponent)
     
     InputComponent->BindAction("Boost", IE_Pressed, this, &AGlider::BoostOn);
     InputComponent->BindAction("Boost", IE_Released, this, &AGlider::BoostOff);
+    
+    InputComponent->BindAction("FireLight", IE_Pressed, this, &AGlider::FireLightOn);
+    InputComponent->BindAction("FireLight", IE_Released, this, &AGlider::FireLightOff);
+    InputComponent->BindAction("FireHeavy", IE_Pressed, this, &AGlider::FireHeavyOn);
+    InputComponent->BindAction("FireHeavy", IE_Released, this, &AGlider::FireHeavyOff);
 }
 
 void AGlider::Move(float AxisValue)
 {
+    AxisValue *= 10;
     if (Controller != NULL && AxisValue != 0.0f)
     {
         FRotator Rotation = Controller->GetControlRotation();
@@ -139,6 +190,7 @@ void AGlider::Move(float AxisValue)
 
 void AGlider::Strafe(float AxisValue)
 {
+    AxisValue *= 10;
     if (Controller != NULL && AxisValue != 0.0f)
     {
         const FRotator Rotation = Controller->GetControlRotation();
@@ -152,10 +204,6 @@ void AGlider::Strafe(float AxisValue)
 }
 
 void AGlider::Jump()
-{
-}
-
-void AGlider::ShowMenu()
 {
 }
 
@@ -194,11 +242,34 @@ void AGlider::UpdateView()
     switch (GliderView)
     {
     case FPS:
-    case FPSWeapons:
+    //case FPSWeapons:
+        FirstPersonCameraComponent->SetActive(true);
+        ThirdPersonCameraComponent->SetActive(false);
         VisibleComponent->SetOwnerNoSee(true);
         break;
     case TPS:
+        FirstPersonCameraComponent->SetActive(false);
+        ThirdPersonCameraComponent->SetActive(true);
         VisibleComponent->SetOwnerNoSee(false);
         break;
     }
+}
+void AGlider::FireLightOn()
+{
+    FireLight = true;
+}
+
+void AGlider::FireLightOff()
+{
+    FireLight = false;
+}
+
+void AGlider::FireHeavyOn()
+{
+    FireHeavy = true;
+}
+
+void AGlider::FireHeavyOff()
+{
+    FireHeavy = false;
 }

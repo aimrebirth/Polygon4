@@ -22,7 +22,7 @@
 #include <Polygon4/Hotpatch.h>
 
 #include "Common.h"
-#include "Menu/MainMenu.h"
+#include "UI/Menu/MainMenu.h"
 
 static void HotpatchEngine()
 {

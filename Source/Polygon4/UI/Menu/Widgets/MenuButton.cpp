@@ -16,35 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "Polygon4.h"
 
-#include "GameFramework/GameMode.h"
+#include "MenuButton.h"
 
-#include <Polygon4/API.h>
-
-#include "Polygon4GameMode.generated.h"
-
-/**
- * 
- */
-UCLASS()
-class POLYGON4_API APolygon4GameMode : public AGameMode
+void SMenuButton::Construct(const FArguments& InArgs)
 {
-	GENERATED_BODY()
-	
-public:
-	APolygon4GameMode(const FObjectInitializer& ObjectInitializer);
-    ~APolygon4GameMode();
-
-    void ShowMenu();
-
-public:
-    virtual void BeginPlay() override;
-	
-private:
-    bool paused = false;
-    TSharedPtr<class SPauseMenu> PauseMenu;
-
-private: /* API */
-    void SpawnPlayer(polygon4::Vector v, polygon4::Rotation r);
-};
+    Text = InArgs._Text;
+    ParentType::Construct(InArgs._ParentArguments);
+    
+    ChildSlot
+        [
+            SNew(STextBlock)
+            .ShadowColorAndOpacity(FLinearColor::Black)
+            .ColorAndOpacity(FLinearColor::White)
+            .ShadowOffset(FIntPoint(-1, 1))
+            .Font(FSlateFontInfo("Veranda", 40))
+            .Text(Text)
+        ];
+}

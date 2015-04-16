@@ -19,10 +19,10 @@
 #include "Polygon4.h"
 
 #include "MainMenu.h"
-#include "ModListView.h"
+#include "Widgets/ModListView.h"
+#include "Widgets/MenuButton.h"
 
 #include <Polygon4/Mods.h>
-#include <Polygon4/Test.h>
 
 #include "Common.h"
 
@@ -30,9 +30,6 @@
 
 void SMainMenu::Construct(const FArguments& InArgs)
 {
-    int value = polygon4::test();
-    GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::FromInt(value));
-
     PlayerController = InArgs._PlayerController;
     if (PlayerController)
     {
@@ -156,16 +153,9 @@ SVerticalBox::FSlot& SMainMenu::MainMenuButton(FText Text, F function) const
 			.HAlign(HAlign_Center)
             .Padding(Padding)
             [
-                SNew(SButton)
-                .OnClicked(this, function)
-                [
-                    SNew(STextBlock)
-                    .ShadowColorAndOpacity(FLinearColor::Black)
-                    .ColorAndOpacity(FLinearColor::White)
-                    .ShadowOffset(FIntPoint(-1, 1))
-                    .Font(FSlateFontInfo("Veranda", 40))
-                    .Text(Text)
-                ]
+                SNew(SMenuButton)
+                .Text(Text)
+                .ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))
             ]
         ;
 }

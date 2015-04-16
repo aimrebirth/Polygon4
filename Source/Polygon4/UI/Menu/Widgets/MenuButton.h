@@ -18,33 +18,23 @@
 
 #pragma once
 
-#include "GameFramework/GameMode.h"
+#include "SlateBasics.h"
 
-#include <Polygon4/API.h>
-
-#include "Polygon4GameMode.generated.h"
-
-/**
- * 
- */
-UCLASS()
-class POLYGON4_API APolygon4GameMode : public AGameMode
+class SMenuButton : public SButton
 {
-	GENERATED_BODY()
-	
 public:
-	APolygon4GameMode(const FObjectInitializer& ObjectInitializer);
-    ~APolygon4GameMode();
+    typedef SButton ParentType;
+    typedef ParentType::FArguments FParentArguments;
 
-    void ShowMenu();
-
-public:
-    virtual void BeginPlay() override;
-	
 private:
-    bool paused = false;
-    TSharedPtr<class SPauseMenu> PauseMenu;
+	SLATE_BEGIN_ARGS(SMenuButton){}
+        SLATE_ARGUMENT(FText, Text)
+        SLATE_ARGUMENT(FParentArguments, ParentArguments)
+	SLATE_END_ARGS()
+ 
+public:
+	void Construct(const FArguments& InArgs);
 
-private: /* API */
-    void SpawnPlayer(polygon4::Vector v, polygon4::Rotation r);
+private:
+    FText Text;
 };
