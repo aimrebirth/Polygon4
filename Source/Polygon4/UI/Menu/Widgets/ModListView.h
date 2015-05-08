@@ -20,12 +20,9 @@
 
 #include "SlateBasics.h"
 
-namespace polygon4
-{
-    class Mod;
-}
+#include <Polygon4/Engine.h>
 
-typedef TSharedPtr<polygon4::Mod> ListItem;
+typedef TSharedPtr<polygon4::Modification> ListItem;
 
 class SModListView : public SListView<ListItem>
 {

@@ -22,7 +22,7 @@
 #include "Widgets/ModListView.h"
 #include "Widgets/MenuButton.h"
 
-#include <Polygon4/Mods.h>
+#include <Polygon4/Modification.h>
 
 #include "Common.h"
 
@@ -101,7 +101,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				        .ShadowColorAndOpacity(FLinearColor::Black)
 				        .ColorAndOpacity(FLinearColor::White)
 				        .ShadowOffset(FIntPoint(-1, 1))
-				        .Font(FSlateFontInfo("Veranda", 50))
+				        .Font(FSlateFontInfo("Veranda", 30))
 				        .Text(LOCTEXT("ModsLabel", "Available Mods"))
                     ]
                     // List View

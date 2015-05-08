@@ -111,6 +111,7 @@ public class Polygon4 : ModuleRules
             return;
 
         PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "dep/dbmgr/include"));
 
         string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
         string BaseDir = Path.Combine(ThirdPartyPath, Name, "lib");

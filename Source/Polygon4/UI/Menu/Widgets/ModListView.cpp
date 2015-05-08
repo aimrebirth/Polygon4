@@ -23,7 +23,8 @@
 #include "Paths.h"
 #include "FileManagerGeneric.h"
 
-#include <Polygon4/Mods.h>
+#include <Polygon4/Engine.h>
+#include <Polygon4/Modification.h>
 
 #include "Common.h"
 
@@ -69,9 +70,8 @@ void SModListView::ReloadMods()
     bool Empty = AvailableMods.Num() == 0;
 
     std::wstring s1 = FString(FPaths::GameDir() + "Mods/").GetCharArray().GetData();
-    std::wstring s2 = FString(FPaths::GameContentDir() + "Mods/").GetCharArray().GetData();
-    auto mods = polygon4::enumerateMods(s1, s2);
-    AvailableMods = MakeTArrayTSharedPtr(mods);
+	auto engine = polygon4::Engine::createEngine(s1);
+	AvailableMods = MakeTArrayTSharedPtr(engine->getModifications().set());
 
     if (!Empty)
     {
@@ -103,27 +103,27 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
             FString ItemText;
             if (ColumnName == "Name")
             {
-                ItemText = Item->getName().wstring().c_str();
+                ItemText = Item->data->getName().wstring().c_str();
             }
             else if (ColumnName == "Dir")
             {
-                ItemText = Item->getDir().wstring().c_str();
+				ItemText = Item->data->directory.wstring().c_str();
             }
             else if (ColumnName == "Author")
             {
-                ItemText = Item->getAuthor().wstring().c_str();
+				ItemText = Item->data->author.wstring().c_str();
             }
             else if (ColumnName == "Version")
             {
-                ItemText = Item->getVersion().wstring().c_str();
+                ItemText = std::to_wstring(Item->data->version).c_str();
             }
             else if (ColumnName == "DateCreated")
             {
-                ItemText = Item->getCreated().wstring().c_str();
+				ItemText = Item->data->date_created.wstring().c_str();
             }
             else if (ColumnName == "DateModified")
             {
-                ItemText = Item->getModified().wstring().c_str();
+				ItemText = Item->data->date_modified.wstring().c_str();
             }
             else
             {

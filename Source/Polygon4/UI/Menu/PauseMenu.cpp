@@ -22,7 +22,7 @@
 #include "Widgets/MenuButton.h"
 #include "../../Polygon4GameMode.h"
 
-#include <Polygon4/Mods.h>
+#include <Polygon4/Modification.h>
 
 #include "Common.h"
 
