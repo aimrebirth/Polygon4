@@ -55,7 +55,7 @@ void AMenuGameMode::ShowMainMenu()
 void AMenuGameMode::OpenLevel(std::string level)
 {
     MainMenu->SetVisibility(EVisibility::Hidden);
-    GetWorld()->ServerTravel(level.c_str());
+    GetWorld()->ServerTravel(FString("/Game/Mods/") + level.c_str());
 }
 
 void AMenuGameMode::BeginPlay()
@@ -68,6 +68,7 @@ void AMenuGameMode::BeginPlay()
     HotpatchEngine();
 #endif
     
+    REGISTER_API(GetModsDir, [](polygon4::String &s){ s = GET_MODS_DIR; });
     REGISTER_API(OpenLevel, std::bind(&AMenuGameMode::OpenLevel, this, std::placeholders::_1));
 
     ShowMainMenu();

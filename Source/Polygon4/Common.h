@@ -22,6 +22,8 @@
 
 #include <Polygon4/Common.h>
 
+#define GET_MODS_DIR (FPaths::GameDir() + "Mods/").GetCharArray().GetData()
+
 template <typename T>
 TSharedPtr<T> MakeTSharedPtr(const T &value)
 {

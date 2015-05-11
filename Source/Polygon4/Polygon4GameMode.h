@@ -46,5 +46,6 @@ private:
     TSharedPtr<class SPauseMenu> PauseMenu;
 
 private: /* API */
-    void SpawnPlayer(polygon4::Vector v, polygon4::Rotation r);
+    void SpawnMechanoid(polygon4::Ptr<polygon4::detail::Mechanoid> mechanoid);
+    void SpawnStaticObjects(polygon4::Ptr<polygon4::detail::Map> map);
 };

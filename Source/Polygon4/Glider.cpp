@@ -132,7 +132,7 @@ void AGlider::Tick(float DeltaTime)
         }
     }
 
-    /*FVector NewLocation = GetActorLocation();
+    FVector NewLocation = GetActorLocation();
     float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
     NewLocation.Z += DeltaHeight * 1.0f;       //Scale our height by a factor of 20
     RunningTime += DeltaTime;
@@ -143,7 +143,7 @@ void AGlider::Tick(float DeltaTime)
     {
         FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
         SetActorLocation(NewLocation);
-    }*/
+    }
 }
 
 // Called to bind functionality to input
@@ -175,7 +175,7 @@ void AGlider::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 void AGlider::Move(float AxisValue)
 {
-    AxisValue *= 10;
+    AxisValue *= 100;
     if (Controller != NULL && AxisValue != 0.0f)
     {
         FRotator Rotation = Controller->GetControlRotation();
@@ -190,7 +190,7 @@ void AGlider::Move(float AxisValue)
 
 void AGlider::Strafe(float AxisValue)
 {
-    AxisValue *= 10;
+    AxisValue *= 100;
     if (Controller != NULL && AxisValue != 0.0f)
     {
         const FRotator Rotation = Controller->GetControlRotation();

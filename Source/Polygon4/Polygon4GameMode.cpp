@@ -37,7 +37,7 @@ APolygon4GameMode::APolygon4GameMode(const FObjectInitializer& ObjectInitializer
 
 APolygon4GameMode::~APolygon4GameMode()
 {
-    UNREGISTER_API(SpawnPlayer);
+    UNREGISTER_API(SpawnMechanoid);
 
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::~APolygon4GameMode()"));
 }
@@ -54,10 +54,11 @@ void APolygon4GameMode::BeginPlay()
         InputComponent->BindAction("Exit", IE_Pressed, this, &APolygon4GameMode::ShowMenu).bExecuteWhenPaused = true;
         InputComponent->BindAction("Pause", IE_Pressed, this, &APolygon4GameMode::ShowMenu).bExecuteWhenPaused = true;
     }
-    
-    REGISTER_API(SpawnPlayer, std::bind(&APolygon4GameMode::SpawnPlayer, this, std::placeholders::_1, std::placeholders::_2));
 
-    API_CALL(OnOpenLevel);
+    REGISTER_API(SpawnStaticObjects, std::bind(&APolygon4GameMode::SpawnStaticObjects, this, std::placeholders::_1));
+    REGISTER_API(SpawnMechanoid, std::bind(&APolygon4GameMode::SpawnMechanoid, this, std::placeholders::_1));
+
+    API_CALL(OnOpenLevel, GetWorld()->GetCurrentLevel()->URL.ToString().GetCharArray().GetData());
 
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::BeginPlay()"));
 }
@@ -93,7 +94,35 @@ void APolygon4GameMode::ShowMenu()
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::ShowMenu()"));
 }
 
-void APolygon4GameMode::SpawnPlayer(polygon4::Vector v, polygon4::Rotation r)
+void APolygon4GameMode::SpawnMechanoid(polygon4::Ptr<polygon4::detail::Mechanoid> mechanoid)
 {
-    GetWorld()->SpawnActor<AGlider>(FVector(v.x, v.y, v.z), FRotator(r.pitch, r.yaw, r.roll));
+    FVector pos(mechanoid->coordinate->x, mechanoid->coordinate->y, mechanoid->coordinate->z);
+    FRotator rot(mechanoid->coordinate->pitch, mechanoid->coordinate->yaw, mechanoid->coordinate->roll);
+    GetWorld()->SpawnActor<AGlider>(pos, rot);
+}
+
+void APolygon4GameMode::SpawnStaticObjects(polygon4::Ptr<polygon4::detail::Map> map)
+{
+    for (auto &building : map->buildings)
+    {
+        auto c = StaticLoadClass(AActor::StaticClass(), 0, TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'"));
+        FVector pos(
+            building->coordinate->x * map->x_k + map->x_b,
+            building->coordinate->y * map->y_k + map->y_b,
+            building->coordinate->z * map->z_k + map->z_b
+            );
+        FRotator rot(0, 0, 0);
+        GetWorld()->SpawnActor<AActor>(c, pos, rot);
+    }
+    for (auto &object : map->objects)
+    {
+        auto c = StaticLoadClass(AActor::StaticClass(), 0, TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'"));
+        FVector pos(
+            object->coordinate->x * map->x_k + map->x_b,
+            object->coordinate->y * map->y_k + map->y_b,
+            object->coordinate->z * map->z_k + map->z_b
+            );
+        FRotator rot(0, 0, 0);
+        GetWorld()->SpawnActor<AActor>(c, pos, rot);
+    }
 }

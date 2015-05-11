@@ -69,8 +69,7 @@ void SModListView::ReloadMods()
 {
     bool Empty = AvailableMods.Num() == 0;
 
-    std::wstring s1 = FString(FPaths::GameDir() + "Mods/").GetCharArray().GetData();
-	auto engine = polygon4::Engine::createEngine(s1);
+    auto engine = polygon4::Engine::createEngine(GET_MODS_DIR);
 	AvailableMods = MakeTArrayTSharedPtr(engine->getModifications().set());
 
     if (!Empty)
