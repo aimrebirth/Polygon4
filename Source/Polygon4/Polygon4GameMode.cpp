@@ -96,8 +96,8 @@ void APolygon4GameMode::ShowMenu()
 
 void APolygon4GameMode::SpawnMechanoid(polygon4::Ptr<polygon4::detail::Mechanoid> mechanoid)
 {
-    FVector pos(mechanoid->coordinate->x, mechanoid->coordinate->y, mechanoid->coordinate->z);
-    FRotator rot(mechanoid->coordinate->pitch, mechanoid->coordinate->yaw, mechanoid->coordinate->roll);
+    FVector pos(mechanoid->x, mechanoid->y, mechanoid->z);
+    FRotator rot(mechanoid->pitch, mechanoid->yaw, mechanoid->roll);
     GetWorld()->SpawnActor<AGlider>(pos, rot);
 }
 
@@ -105,24 +105,16 @@ void APolygon4GameMode::SpawnStaticObjects(polygon4::Ptr<polygon4::detail::Map> 
 {
     for (auto &building : map->buildings)
     {
-        auto c = StaticLoadClass(AActor::StaticClass(), 0, TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'"));
-        FVector pos(
-            building->coordinate->x * map->x_k + map->x_b,
-            building->coordinate->y * map->y_k + map->y_b,
-            building->coordinate->z * map->z_k + map->z_b
-            );
-        FRotator rot(0, 0, 0);
+        auto c = LoadClass(building->building->resource);
+        FVector pos(building->x, building->y, building->z);
+        FRotator rot(building->pitch, building->yaw, building->roll);
         GetWorld()->SpawnActor<AActor>(c, pos, rot);
     }
     for (auto &object : map->objects)
     {
-        auto c = StaticLoadClass(AActor::StaticClass(), 0, TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'"));
-        FVector pos(
-            object->coordinate->x * map->x_k + map->x_b,
-            object->coordinate->y * map->y_k + map->y_b,
-            object->coordinate->z * map->z_k + map->z_b
-            );
-        FRotator rot(0, 0, 0);
+        auto c = LoadClass(object->object->resource);
+        FVector pos(object->x, object->y, object->z);
+        FRotator rot(object->pitch, object->yaw, object->roll);
         GetWorld()->SpawnActor<AActor>(c, pos, rot);
     }
 }

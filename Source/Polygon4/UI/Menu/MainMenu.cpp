@@ -24,8 +24,6 @@
 
 #include <Polygon4/Modification.h>
 
-#include "Common.h"
-
 #define LOCTEXT_NAMESPACE "MainMenu"
 
 void SMainMenu::Construct(const FArguments& InArgs)

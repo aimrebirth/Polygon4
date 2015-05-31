@@ -24,8 +24,6 @@
 
 #include <Polygon4/Modification.h>
 
-#include "Common.h"
-
 #define LOCTEXT_NAMESPACE "PauseMenu"
 
 void SPauseMenu::Construct(const FArguments& InArgs)

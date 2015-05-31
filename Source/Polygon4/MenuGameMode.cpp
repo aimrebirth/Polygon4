@@ -21,7 +21,6 @@
 
 #include <Polygon4/Hotpatch.h>
 
-#include "Common.h"
 #include "UI/Menu/MainMenu.h"
 
 static void HotpatchEngine()

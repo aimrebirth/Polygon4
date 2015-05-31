@@ -20,3 +20,38 @@
 
 #include "Engine.h"
 
+#include <Polygon4/Common.h>
+
+#define GET_MODS_DIR (FPaths::GameDir() + "Mods/").GetCharArray().GetData()
+
+template <typename T>
+TSharedPtr<T> MakeTSharedPtr(const T &value)
+{
+    return MakeShareable(new T(value));
+}
+
+template <class T, class U>
+TArray<U> MakeTArray(const T &stl_container)
+{
+    TArray<U> array;
+    for (auto &v : stl_container)
+        array.Add(v);
+    return array;
+}
+
+template <class T>
+TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_container)
+{
+    TArray<TSharedPtr<typename T::value_type>> array;
+    for (auto &v : stl_container)
+        array.Add(MakeTSharedPtr(v));
+    return array;
+}
+
+inline UClass* LoadClass(const TCHAR* Name)
+{
+    auto c = StaticLoadClass(AActor::StaticClass(), 0, Name);
+    if (c)
+        return c;
+    return StaticLoadClass(AActor::StaticClass(), 0, TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'"));
+}

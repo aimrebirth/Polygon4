@@ -22,8 +22,6 @@
 
 #include <Polygon4/Hotpatch.h>
 
-#include "Common.h"
-
 class FPolygon4ModuleImpl : public FDefaultGameModuleImpl
 {
 public:
