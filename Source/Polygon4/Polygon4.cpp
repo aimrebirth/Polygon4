@@ -51,5 +51,16 @@ public:
 	}
 };
 
+UClass* LoadClass(const TCHAR* Name)
+{
+    if (Name == 0)
+        Name = L"NONAME";
+    auto c = StaticLoadClass(AActor::StaticClass(), 0, Name);
+    if (c)
+        return c;
+    return StaticLoadClass(AActor::StaticClass(), 0, DUMMY_OBJECT);
+}
+
 IMPLEMENT_PRIMARY_GAME_MODULE( FPolygon4ModuleImpl, Polygon4, "Polygon4" );
 
+DEFINE_LOG_CATEGORY(Polygon4);

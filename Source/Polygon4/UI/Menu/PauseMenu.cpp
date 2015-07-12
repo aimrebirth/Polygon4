@@ -40,7 +40,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
         .ShadowColorAndOpacity(FLinearColor::Black)
         .ColorAndOpacity(FLinearColor::Red)
         .ShadowOffset(FIntPoint(-1, 1))
-        .Font(FSlateFontInfo("Veranda", 30));
+        .Font(FSlateFontInfo("Verdana", 30));
 
     // Create GUI
 	ChildSlot
@@ -58,7 +58,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Veranda", 100))
+				.Font(FSlateFontInfo("Verdana", 100))
 				.Text(FText::FromString("Polygon-4"))
 			]
             // Other

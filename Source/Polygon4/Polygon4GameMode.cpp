@@ -19,8 +19,13 @@
 #include "Polygon4.h"
 #include "Polygon4GameMode.h"
 
+#include "Landscape.h"
+
 #include "Glider.h"
 #include "GliderHUD.h"
+
+#include "Building.h"
+#include "StaticObject.h"
 
 #include "UI/Menu/PauseMenu.h"
 
@@ -57,7 +62,7 @@ void APolygon4GameMode::BeginPlay()
 
     REGISTER_API(SpawnStaticObjects, std::bind(&APolygon4GameMode::SpawnStaticObjects, this, std::placeholders::_1));
     REGISTER_API(SpawnMechanoid, std::bind(&APolygon4GameMode::SpawnMechanoid, this, std::placeholders::_1));
-
+    
     API_CALL(OnOpenLevel, GetWorld()->GetCurrentLevel()->URL.ToString().GetCharArray().GetData());
 
     UE_LOG(LogTemp, Warning, TEXT("APolygon4GameMode::BeginPlay()"));
@@ -103,18 +108,53 @@ void APolygon4GameMode::SpawnMechanoid(polygon4::Ptr<polygon4::detail::Mechanoid
 
 void APolygon4GameMode::SpawnStaticObjects(polygon4::Ptr<polygon4::detail::Map> map)
 {
+    TActorIterator<ALandscape> landscapeIterator(GetWorld());
+    ALandscape* landscape = *landscapeIterator;
+
+    auto worldScale = landscape->GetActorScale() / 100.0f;
+
     for (auto &building : map->buildings)
     {
-        auto c = LoadClass(building->building->resource);
-        FVector pos(building->x, building->y, building->z);
+        auto o = LoadObject<UStaticMesh>(0, building->building->resource.wstring().c_str());
+        FVector pos(building->x * 10 * worldScale.X + map->bx, building->y * 10 * worldScale.Y + map->by, building->z * 10);
         FRotator rot(building->pitch, building->yaw, building->roll);
-        GetWorld()->SpawnActor<AActor>(c, pos, rot);
+        AActor *a = 0;
+        if (o)
+        {
+            auto obj = GetWorld()->SpawnActor<ABuilding>(ABuilding::StaticClass(), pos, rot);
+            obj->setStaticMesh(o);
+            FVector scale(building->building->scale, building->building->scale, building->building->scale);
+            obj->SetActorScale3D(scale);
+            a = obj;
+        }
+        else
+        {
+            auto c = LoadClass(0);
+            a = GetWorld()->SpawnActor<AActor>(c, pos, rot);
+        }
+        if (a)
+            a->SetActorLabel(building->building->getName().wstring().c_str());
     }
     for (auto &object : map->objects)
     {
-        auto c = LoadClass(object->object->resource);
-        FVector pos(object->x, object->y, object->z);
+        auto o = LoadObject<UStaticMesh>(0, object->object->resource.wstring().c_str());
+        FVector pos(object->x * 10 * worldScale.X + map->bx, object->y * 10 * worldScale.Y + map->by, object->z * 10);
         FRotator rot(object->pitch, object->yaw, object->roll);
-        GetWorld()->SpawnActor<AActor>(c, pos, rot);
+        AActor *a = 0;
+        if (o)
+        {
+            auto obj = GetWorld()->SpawnActor<AStaticObject>(AStaticObject::StaticClass(), pos, rot);
+            obj->setStaticMesh(o);
+            FVector scale(object->object->scale, object->object->scale, object->object->scale);
+            obj->SetActorScale3D(scale);
+            a = obj;
+        }
+        else
+        {
+            auto c = LoadClass(0);
+            a = GetWorld()->SpawnActor<AActor>(c, pos, rot);
+        }
+        if (a)
+            a->SetActorLabel(object->object->getName().wstring().c_str());
     }
 }

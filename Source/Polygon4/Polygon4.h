@@ -24,6 +24,9 @@
 
 #define GET_MODS_DIR (FPaths::GameDir() + "Mods/").GetCharArray().GetData()
 
+#define DUMMY_OBJECT TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'")
+#define DUMMY_BUILDING DUMMY_OBJECT
+
 template <typename T>
 TSharedPtr<T> MakeTSharedPtr(const T &value)
 {
@@ -48,10 +51,6 @@ TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_con
     return array;
 }
 
-inline UClass* LoadClass(const TCHAR* Name)
-{
-    auto c = StaticLoadClass(AActor::StaticClass(), 0, Name);
-    if (c)
-        return c;
-    return StaticLoadClass(AActor::StaticClass(), 0, TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'"));
-}
+UClass* LoadClass(const TCHAR* Name);
+
+DECLARE_LOG_CATEGORY_EXTERN(Polygon4, Log, All);

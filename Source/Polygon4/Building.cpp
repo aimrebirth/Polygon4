@@ -18,20 +18,24 @@
 
 #include "Polygon4.h"
 
-#include "MenuButton.h"
+#include "Building.h"
 
-void SMenuButton::Construct(const FArguments& InArgs)
+ABuilding::ABuilding()
 {
-    Text = InArgs._Text;
-    ParentType::Construct(InArgs._ParentArguments);
+	PrimaryActorTick.bCanEverTick = false;
+
+    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+    VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
+    VisibleComponent->AttachTo(RootComponent);
     
-    ChildSlot
-        [
-            SNew(STextBlock)
-            .ShadowColorAndOpacity(FLinearColor::Black)
-            .ColorAndOpacity(FLinearColor::White)
-            .ShadowOffset(FIntPoint(-1, 1))
-            .Font(FSlateFontInfo("Verdana", 40))
-            .Text(Text)
-        ];
+    // enable after correct map coordinates
+    //RootComponent->SetMobility(EComponentMobility::Stationary);
+}
+
+void ABuilding::setStaticMesh(UStaticMesh *mesh)
+{
+    if (mesh)
+    {
+        VisibleComponent->SetStaticMesh(mesh);
+    }
 }

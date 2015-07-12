@@ -112,7 +112,7 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
             }
             else if (ColumnName == "Version")
             {
-                ItemText = std::to_wstring(Item->data->version).c_str();
+                ItemText = Item->data->version.wstring().c_str();
             }
             else if (ColumnName == "DateCreated")
             {
@@ -131,7 +131,7 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
                 .ShadowColorAndOpacity(FLinearColor::Black)
                 .ColorAndOpacity(FLinearColor::White)
                 .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo("Veranda", 24))
+                .Font(FSlateFontInfo("Verdana", 24))
                 .Text(FText::FromString(ItemText))
                 .ColorAndOpacity(FSlateColor(FLinearColor(FColor(0, 0, 0, 255))))
                 ;

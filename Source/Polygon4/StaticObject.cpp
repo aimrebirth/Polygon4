@@ -18,20 +18,24 @@
 
 #include "Polygon4.h"
 
-#include "MenuButton.h"
+#include "StaticObject.h"
 
-void SMenuButton::Construct(const FArguments& InArgs)
+AStaticObject::AStaticObject()
 {
-    Text = InArgs._Text;
-    ParentType::Construct(InArgs._ParentArguments);
-    
-    ChildSlot
-        [
-            SNew(STextBlock)
-            .ShadowColorAndOpacity(FLinearColor::Black)
-            .ColorAndOpacity(FLinearColor::White)
-            .ShadowOffset(FIntPoint(-1, 1))
-            .Font(FSlateFontInfo("Verdana", 40))
-            .Text(Text)
-        ];
+	PrimaryActorTick.bCanEverTick = false;
+
+    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+    VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
+    VisibleComponent->AttachTo(RootComponent);
+
+    // enable after correct map coordinates
+    //RootComponent->SetMobility(EComponentMobility::Stationary);
+}
+
+void AStaticObject::setStaticMesh(UStaticMesh *mesh)
+{
+    if (mesh)
+    {
+        VisibleComponent->SetStaticMesh(mesh);
+    }
 }

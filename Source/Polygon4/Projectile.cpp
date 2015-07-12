@@ -24,7 +24,7 @@ AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)
 {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(15.0f);
+	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 
@@ -52,8 +52,11 @@ AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)
 
 void AProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if ((OtherActor != this) && (OtherComp != NULL) &&
-        (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry()))
+    if ((OtherActor != this &&
+        (OtherComp != NULL) &&
+        (OtherActor != Owner) &&
+        (OtherComp != Owner) &&
+        (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry())))
 	{
         if (OtherComp->IsSimulatingPhysics())
 		    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());

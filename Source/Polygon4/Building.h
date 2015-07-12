@@ -16,22 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
+#pragma once
 
-#include "MenuButton.h"
+#include "GameFramework/Actor.h"
+#include "Building.generated.h"
 
-void SMenuButton::Construct(const FArguments& InArgs)
+UCLASS()
+class POLYGON4_API ABuilding : public AActor
 {
-    Text = InArgs._Text;
-    ParentType::Construct(InArgs._ParentArguments);
-    
-    ChildSlot
-        [
-            SNew(STextBlock)
-            .ShadowColorAndOpacity(FLinearColor::Black)
-            .ColorAndOpacity(FLinearColor::White)
-            .ShadowOffset(FIntPoint(-1, 1))
-            .Font(FSlateFontInfo("Verdana", 40))
-            .Text(Text)
-        ];
-}
+	GENERATED_BODY()
+
+    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+    UStaticMeshComponent* VisibleComponent;
+
+public:
+	// Sets default values for this pawn's properties
+	ABuilding();
+
+    void setStaticMesh(UStaticMesh *mesh);
+
+private:
+};

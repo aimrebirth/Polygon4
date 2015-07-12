@@ -25,8 +25,8 @@
 
 static void HotpatchEngine()
 {
-    UE_LOG(LogTemp, Warning, TEXT("UPolygon4BlueprintFunctionLibrary::HotpatchEngine()"));
 #ifdef WIN32
+    UE_LOG(LogTemp, Warning, TEXT("UPolygon4BlueprintFunctionLibrary::HotpatchEngine()"));
     auto gd = FPaths::GameDir();
     auto fgd = FPaths::ConvertRelativePathToFull(gd);
     FPaths::CollapseRelativeDirectories(fgd);
@@ -63,7 +63,7 @@ void AMenuGameMode::BeginPlay()
 
     UE_LOG(LogTemp, Warning, TEXT("AMenuGameMode::BeginPlay()"));
 
-#ifdef WITH_EDITOR
+#if !IS_MONOLITHIC
     HotpatchEngine();
 #endif
     

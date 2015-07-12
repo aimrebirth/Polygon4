@@ -22,7 +22,7 @@ public class Polygon4 : ModuleRules
 
 	public Polygon4(TargetInfo Target)
 	{
-		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape" });
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         LoadCoreModule(Target, "Engine");
@@ -111,7 +111,8 @@ public class Polygon4 : ModuleRules
             return;
 
         PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
-        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "dep/dbmgr/include"));
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "DatabaseManager/include"));
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "../../AIM/DatabaseManager/include"));
 
         string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
         string BaseDir = Path.Combine(ThirdPartyPath, Name, "lib");

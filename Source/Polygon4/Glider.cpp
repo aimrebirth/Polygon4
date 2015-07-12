@@ -17,7 +17,9 @@
  */
 
 #include "Polygon4.h"
+
 #include "Glider.h"
+#include "Projectile.h"
 
 #include "GliderMovement.h"
 
@@ -49,10 +51,10 @@ AGlider::AGlider()
     FirstPersonCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
     FirstPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
     FirstPersonCameraComponent->bUsePawnControlRotation = true;
-    FirstPersonCameraComponent->AttachTo(RootComponent);
+    FirstPersonCameraComponent->AttachTo(VisibleComponent);
 
     ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TPSCamera"));
-    ThirdPersonCameraComponent->SetRelativeLocation(FVector(-100.0f, 0.0f, 50.0f));
+    ThirdPersonCameraComponent->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
     ThirdPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
     ThirdPersonCameraComponent->bUsePawnControlRotation = false;
     ThirdPersonCameraComponent->AttachTo(FirstPersonCameraComponent);
@@ -64,6 +66,8 @@ AGlider::AGlider()
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
     bUseControllerRotationRoll = false;
+
+    VisibleComponent->SetSimulatePhysics(true);
 
     UpdateView();
 
@@ -91,6 +95,8 @@ void AGlider::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    RootComponent->SetWorldRotation(GetControlRotation());
+
     float rpm1 = 60.f / 400.0f;
     float rpm2 = 60.f / 60.0f;
     
@@ -114,9 +120,15 @@ void AGlider::Tick(float DeltaTime)
             if (b1)
             {
                 if (LeftGun)
-                GetWorld()->SpawnActor(b1, &SpawnLocationLeft, &SpawnRotation);
+                {
+                    AProjectile *p = (AProjectile *)GetWorld()->SpawnActor(b1, &SpawnLocationLeft, &SpawnRotation);
+                    //p->SetOwner(VisibleComponent);
+                }
                 else
-                GetWorld()->SpawnActor(b1, &SpawnLocationRight, &SpawnRotation);
+                {
+                    AProjectile *p = (AProjectile *)GetWorld()->SpawnActor(b1, &SpawnLocationRight, &SpawnRotation);
+                    //p->SetOwner(VisibleComponent->StaticMesh);
+                }
                 LeftGun = !LeftGun;
             }
             time1 = rpm1;

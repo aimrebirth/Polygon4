@@ -35,8 +35,16 @@ class POLYGON4_API AProjectile : public AActor
 	UPROPERTY(EditAnywhere, Category = Power, meta = (AllowPrivateAccess = "true"))
 	float Impulse = 100.0f;
 
+private:
+    UObject *Owner = 0;
+
 public:	
     AProjectile(const FObjectInitializer& ObjectInitializer);
+
+    void SetOwner(UObject *Owner)
+    {
+        this->Owner = Owner;
+    }
     
 	UFUNCTION()
 	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

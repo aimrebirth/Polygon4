@@ -43,7 +43,7 @@ class POLYGON4_API AGlider : public APawn
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* ThirdPersonCameraComponent;
     
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
     
     UPROPERTY()

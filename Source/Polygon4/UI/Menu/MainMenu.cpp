@@ -39,7 +39,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
         .ShadowColorAndOpacity(FLinearColor::Black)
         .ColorAndOpacity(FLinearColor::Red)
         .ShadowOffset(FIntPoint(-1, 1))
-        .Font(FSlateFontInfo("Veranda", 30));
+        .Font(FSlateFontInfo("Verdana", 30));
 
     // create Mods List View
     ModsListView = SNew(SModListView);
@@ -60,7 +60,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Veranda", 100))
+				.Font(FSlateFontInfo("Verdana", 100))
 				.Text(FText::FromString("Polygon-4"))
 			]
             // Other
@@ -99,7 +99,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				        .ShadowColorAndOpacity(FLinearColor::Black)
 				        .ColorAndOpacity(FLinearColor::White)
 				        .ShadowOffset(FIntPoint(-1, 1))
-				        .Font(FSlateFontInfo("Veranda", 30))
+				        .Font(FSlateFontInfo("Verdana", 30))
 				        .Text(LOCTEXT("ModsLabel", "Available Mods"))
                     ]
                     // List View
@@ -124,7 +124,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
                             .ShadowColorAndOpacity(FLinearColor::Black)
                             .ColorAndOpacity(FLinearColor::White)
                             .ShadowOffset(FIntPoint(-1, 1))
-                            .Font(FSlateFontInfo("Veranda", 40))
+                            .Font(FSlateFontInfo("Verdana", 40))
                             .Text(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"))
                         ]
                     ]
