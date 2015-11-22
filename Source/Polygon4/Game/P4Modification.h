@@ -16,26 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
+#pragma once
 
-#include "Building.h"
+#include <Polygon4/Modification.h>
 
-ABuilding::ABuilding()
+struct ModificationDesc
 {
-	PrimaryActorTick.bCanEverTick = false;
+    FString Name;
+    FString Dir;
+    FString Author;
+    FString Version;
+    FString DateCreated;
+    FString DateModified;
 
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-    VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
-    VisibleComponent->AttachTo(RootComponent);
-    
-    // enable after correct map coordinates
-    //RootComponent->SetMobility(EComponentMobility::Stationary);
-}
+    polygon4::IModification* modification;
+};
 
-void ABuilding::setStaticMesh(UStaticMesh *mesh)
+class P4Modification : public polygon4::Modification
 {
-    if (mesh)
-    {
-        VisibleComponent->SetStaticMesh(mesh);
-    }
-}
+    using Base = polygon4::Modification;
+
+public:
+    P4Modification(const polygon4::detail::Modification &rhs);
+
+    virtual void initChildren() override;
+};

@@ -41,9 +41,9 @@ private:
 public:	
     AProjectile(const FObjectInitializer& ObjectInitializer);
 
-    void SetOwner(UObject *Owner)
+    void SetOwner(UObject *OtherOwner)
     {
-        this->Owner = Owner;
+        Owner = OtherOwner;
     }
     
 	UFUNCTION()

@@ -24,10 +24,10 @@ class SPauseMenu : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(SPauseMenu){}
         SLATE_ARGUMENT(APlayerController*, PlayerController)
-        SLATE_ARGUMENT(class APolygon4GameMode*, GameMode)
+        SLATE_ARGUMENT(class AP4GameMode*, GameMode)
 	SLATE_END_ARGS()
 
-    class APolygon4GameMode *GameMode;
+    class AP4GameMode *GameMode;
     APlayerController* PlayerController;
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;

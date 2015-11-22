@@ -19,7 +19,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
-#include "Glider.generated.h"
+#include "P4Glider.generated.h"
 
 enum EGliderView
 {
@@ -31,7 +31,7 @@ enum EGliderView
 };
 
 UCLASS()
-class POLYGON4_API AGlider : public APawn
+class POLYGON4_API AP4Glider : public APawn
 {
 	GENERATED_BODY()
         
@@ -50,7 +50,11 @@ class POLYGON4_API AGlider : public APawn
     class UGliderMovement* MovementComponent;
 
     int GliderView = EGliderView::FPS;
+
 public:
+    UPROPERTY(VisibleAnywhere, Category = Mechanoid)
+    FString TextID;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseTurnRate;
@@ -61,11 +65,11 @@ public:
 
 public:
 	// Sets default values for this pawn's properties
-	AGlider();
+	AP4Glider();
 
 	virtual void BeginPlay() override;	
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
     //virtual UPawnMovementComponent* GetMovementComponent() const override;
 
 private:

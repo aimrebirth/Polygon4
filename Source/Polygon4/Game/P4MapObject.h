@@ -16,14 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
-#include "MenuGameMode.h"
+#pragma once
 
-#include <Game/P4Engine.h>
+#include "GameFramework/Actor.h"
+#include <Polygon4/DataManager/Types.h>
+#include "P4MapObject.generated.h"
 
-void AMenuGameMode::BeginPlay()
+UCLASS()
+class POLYGON4_API AP4Object : public AActor
 {
-    GP4Engine->StartEngine();
-    GP4Engine->ShowMainMenu();
-    Super::BeginPlay();
-}
+	GENERATED_BODY()
+
+    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+    UStaticMeshComponent* VisibleComponent;
+
+public:
+    AP4Object();
+
+    void setStaticMesh(UStaticMesh *mesh);
+};
+
+class P4MapObject : public polygon4::detail::MapObject
+{
+    using Base = polygon4::detail::MapObject;
+
+public:
+    P4MapObject(const polygon4::detail::MapObject &rhs);
+
+    virtual bool spawn() override;
+
+private:
+    AP4Object *Object;
+};

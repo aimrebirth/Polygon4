@@ -18,34 +18,17 @@
 
 #pragma once
 
-#include "GameFramework/GameMode.h"
+#include <Polygon4/Map.h>
 
-#include <Polygon4/API.h>
-
-#include "Polygon4GameMode.generated.h"
-
-/**
- * 
- */
-UCLASS()
-class POLYGON4_API APolygon4GameMode : public AGameMode
+class P4Map : public polygon4::Map
 {
-	GENERATED_BODY()
-	
-public:
-	APolygon4GameMode(const FObjectInitializer& ObjectInitializer);
-    ~APolygon4GameMode();
-
-    void ShowMenu();
+    using Base = polygon4::Map;
 
 public:
-    virtual void BeginPlay() override;
-	
-private:
-    bool paused = false;
-    TSharedPtr<class SPauseMenu> PauseMenu;
+    P4Map(const polygon4::detail::Map &rhs);
 
-private: /* API */
-    void SpawnMechanoid(polygon4::Ptr<polygon4::detail::Mechanoid> mechanoid);
-    void SpawnStaticObjects(polygon4::Ptr<polygon4::detail::Map> map);
+    virtual void initChildren() override;
+
+protected:
+    virtual bool loadLevel() override;
 };

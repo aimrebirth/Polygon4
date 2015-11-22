@@ -17,13 +17,29 @@
  */
 
 #include "Polygon4.h"
-#include "MenuGameMode.h"
+#include "P4Map.h"
 
-#include <Game/P4Engine.h>
+#include "P4GameInstance.h"
+#include "P4Engine.h"
 
-void AMenuGameMode::BeginPlay()
+#include "P4MapBuilding.h"
+#include "P4MapObject.h"
+
+P4Map::P4Map(const polygon4::detail::Map &rhs)
+    : Base(rhs)
 {
-    GP4Engine->StartEngine();
-    GP4Engine->ShowMainMenu();
-    Super::BeginPlay();
+}
+
+void P4Map::initChildren()
+{
+    initObjects<P4MapObject>();
+    initBuildings<P4MapBuilding>();
+    //initGoods<>();
+}
+
+bool P4Map::loadLevel()
+{
+    auto world = GP4Engine->GetWorld();
+    world->ServerTravel(to_string(resource).c_str());
+    return true;
 }

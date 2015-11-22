@@ -20,9 +20,9 @@
 
 #include "PauseMenu.h"
 #include "Widgets/MenuButton.h"
-#include "../../Polygon4GameMode.h"
 
-#include <Polygon4/Modification.h>
+#include <P4GameMode.h>
+#include <Game/P4Modification.h>
 
 #define LOCTEXT_NAMESPACE "PauseMenu"
 

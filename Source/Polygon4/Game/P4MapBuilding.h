@@ -16,26 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
+#pragma once
 
-#include "StaticObject.h"
+#include "GameFramework/Actor.h"
+#include <Polygon4/DataManager/Types.h>
+#include "P4MapBuilding.generated.h"
 
-AStaticObject::AStaticObject()
+UCLASS()
+class POLYGON4_API AP4Building : public AActor
 {
-	PrimaryActorTick.bCanEverTick = false;
+	GENERATED_BODY()
 
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-    VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
-    VisibleComponent->AttachTo(RootComponent);
+    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+    UStaticMeshComponent* VisibleComponent;
 
-    // enable after correct map coordinates
-    //RootComponent->SetMobility(EComponentMobility::Stationary);
-}
+public:
+    AP4Building();
 
-void AStaticObject::setStaticMesh(UStaticMesh *mesh)
+    void setStaticMesh(UStaticMesh *mesh);
+};
+
+class P4MapBuilding : public polygon4::detail::MapBuilding
 {
-    if (mesh)
-    {
-        VisibleComponent->SetStaticMesh(mesh);
-    }
-}
+    using Base = polygon4::detail::MapBuilding;
+
+public:
+    P4MapBuilding(const polygon4::detail::MapBuilding &rhs);
+
+    virtual bool spawn() override;
+
+private:
+    AP4Building *Building;
+};

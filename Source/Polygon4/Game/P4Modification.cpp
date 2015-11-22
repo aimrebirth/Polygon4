@@ -16,24 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "Polygon4.h"
 
-#include "GameFramework/Actor.h"
-#include "StaticObject.generated.h"
+#include "P4GameInstance.h"
+#include "P4Engine.h"
+#include "P4Modification.h"
+#include "P4Map.h"
 
-UCLASS()
-class POLYGON4_API AStaticObject : public AActor
+#include "UI/Menu/MainMenu.h"
+
+P4Modification::P4Modification(const polygon4::detail::Modification &rhs)
+    : Base(rhs)
 {
-	GENERATED_BODY()
+}
 
-    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* VisibleComponent;
-
-public:
-	// Sets default values for this pawn's properties
-	AStaticObject();
-
-    void setStaticMesh(UStaticMesh *mesh);
-
-private:
-};
+void P4Modification::initChildren()
+{
+    initMaps<P4Map>();
+    //initMechanoids<>();
+}

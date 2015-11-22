@@ -8,7 +8,7 @@ public class Polygon4EditorTarget : TargetRules
 	public Polygon4EditorTarget(TargetInfo Target)
 	{
         Type = TargetType.Editor;
-	}
+    }
 
 	//
 	// TargetRules interface.
@@ -20,6 +20,6 @@ public class Polygon4EditorTarget : TargetRules
 		ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.AddRange(new string[] { "Polygon4" });
+		OutExtraModuleNames.Add("Polygon4");
 	}
 }

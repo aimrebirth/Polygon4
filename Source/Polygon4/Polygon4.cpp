@@ -29,19 +29,21 @@ public:
 	{
         FDefaultGameModuleImpl::StartupModule();
 
+#if !IS_MONOLITHIC
 #ifdef WIN32
         {
-            std::string fn = polygon4::read_orig_module_filename_store().string();
+            auto fn = to_string(polygon4::read_orig_module_filename_store());
             std::ofstream ofile(fn);
             if (ofile)
                 ofile << "Engine.x64.dll";
         }
         {
-            std::string fn = polygon4::read_ver_module_filename_store().string();
-            std::ofstream ofile(fn);
-            if (ofile)
-                ofile << -1;
+            auto gd = FPaths::GameDir();
+            auto fgd = FPaths::ConvertRelativePathToFull(gd);
+            FPaths::CollapseRelativeDirectories(fgd);
+            polygon4::write_module_last_write_time(*fgd, "Engine");
         }
+#endif
 #endif
     }
 

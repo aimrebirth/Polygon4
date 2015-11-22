@@ -9,13 +9,13 @@ Binaries
 Build
 Config
 Content
+DerivedDataCache
 Mods
 Intermediate
 Saved
 
 # ThirdParty
-ThirdParty/boost
-ThirdParty/swig
+ThirdParty
 
 # uproject
 *.uproject

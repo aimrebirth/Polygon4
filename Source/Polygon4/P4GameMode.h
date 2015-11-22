@@ -18,22 +18,23 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
-#include "Building.generated.h"
+#include "GameFramework/GameMode.h"
+#include "P4GameMode.generated.h"
 
 UCLASS()
-class POLYGON4_API ABuilding : public AActor
+class POLYGON4_API AP4GameMode : public AGameMode
 {
 	GENERATED_BODY()
+	
+public:
+    AP4GameMode(const FObjectInitializer& ObjectInitializer);
 
-    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* VisibleComponent;
+    void ShowMenu();
 
 public:
-	// Sets default values for this pawn's properties
-	ABuilding();
-
-    void setStaticMesh(UStaticMesh *mesh);
-
+    virtual void BeginPlay() override;
+	
 private:
+    bool paused = false;
+    TSharedPtr<class SPauseMenu> PauseMenu;
 };

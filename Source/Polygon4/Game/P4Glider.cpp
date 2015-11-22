@@ -18,12 +18,12 @@
 
 #include "Polygon4.h"
 
-#include "Glider.h"
+#include "P4Glider.h"
 #include "Projectile.h"
 
 #include "GliderMovement.h"
 
-AGlider::AGlider()
+AP4Glider::AP4Glider()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -39,10 +39,10 @@ AGlider::AGlider()
     	
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> GliderMesh(TEXT("/Game/Mods/Common/Gliders/Hawk/GLD_M1_BASE"));
-    if (GliderMesh.Succeeded())
+    //static ConstructorHelpers::FObjectFinder<UStaticMesh> GliderMesh(TEXT("/Game/Mods/Common/Gliders/Hawk/GLD_M1_BASE"));
+    //if (GliderMesh.Succeeded())
     {
-        VisibleComponent->SetStaticMesh(GliderMesh.Object);
+        //VisibleComponent->SetStaticMesh(GliderMesh.Object);
         VisibleComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
     }
     VisibleComponent->AttachTo(RootComponent);
@@ -80,18 +80,18 @@ AGlider::AGlider()
 }
 
 // Called when the game starts or when spawned
-void AGlider::BeginPlay()
+void AP4Glider::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-/*UPawnMovementComponent* AGlider::GetMovementComponent() const
+/*UPawnMovementComponent* AP4Glider::GetMovementComponent() const
 {
     return MovementComponent;
 }*/
 
 // Called every frame
-void AGlider::Tick(float DeltaTime)
+void AP4Glider::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
@@ -148,44 +148,44 @@ void AGlider::Tick(float DeltaTime)
     float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
     NewLocation.Z += DeltaHeight * 1.0f;       //Scale our height by a factor of 20
     RunningTime += DeltaTime;
-    SetActorLocation(NewLocation);
 
     // move
     if (!CurrentVelocity.IsZero())
     {
-        FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
-        SetActorLocation(NewLocation);
+        NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
     }
+
+    SetActorLocation(NewLocation);
 }
 
 // Called to bind functionality to input
-void AGlider::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
-	Super::SetupPlayerInputComponent(InputComponent);
+	Super::SetupPlayerInputComponent(InInputComponent);
     
-    InputComponent->BindAction("View", IE_Pressed, this, &AGlider::ChangeView);
+    InInputComponent->BindAction("View", IE_Pressed, this, &AP4Glider::ChangeView);
 
-    InputComponent->BindAxis("Move", this, &AGlider::Move);
-    InputComponent->BindAxis("Strafe", this, &AGlider::Strafe);
+    InInputComponent->BindAxis("Move", this, &AP4Glider::Move);
+    InInputComponent->BindAxis("Strafe", this, &AP4Glider::Strafe);
     
-    //InputComponent->BindAxis("Turn", this, &AGlider::Turn);
-	//InputComponent->BindAxis("LookUp", this, &AGlider::LookUp);
-    InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-    InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+    //InInputComponent->BindAxis("Turn", this, &AP4Glider::Turn);
+	//InInputComponent->BindAxis("LookUp", this, &AP4Glider::LookUp);
+    InInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+    InInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
-    InputComponent->BindAction("Jump", IE_Pressed, this, &AGlider::Jump);
-    //InputComponent->BindAction("Jump", IE_Released, this, &AGlider::Jump);
+    InInputComponent->BindAction("Jump", IE_Pressed, this, &AP4Glider::Jump);
+    //InInputComponent->BindAction("Jump", IE_Released, this, &AP4Glider::Jump);
     
-    InputComponent->BindAction("Boost", IE_Pressed, this, &AGlider::BoostOn);
-    InputComponent->BindAction("Boost", IE_Released, this, &AGlider::BoostOff);
+    InInputComponent->BindAction("Boost", IE_Pressed, this, &AP4Glider::BoostOn);
+    InInputComponent->BindAction("Boost", IE_Released, this, &AP4Glider::BoostOff);
     
-    InputComponent->BindAction("FireLight", IE_Pressed, this, &AGlider::FireLightOn);
-    InputComponent->BindAction("FireLight", IE_Released, this, &AGlider::FireLightOff);
-    InputComponent->BindAction("FireHeavy", IE_Pressed, this, &AGlider::FireHeavyOn);
-    InputComponent->BindAction("FireHeavy", IE_Released, this, &AGlider::FireHeavyOff);
+    InInputComponent->BindAction("FireLight", IE_Pressed, this, &AP4Glider::FireLightOn);
+    InInputComponent->BindAction("FireLight", IE_Released, this, &AP4Glider::FireLightOff);
+    InInputComponent->BindAction("FireHeavy", IE_Pressed, this, &AP4Glider::FireHeavyOn);
+    InInputComponent->BindAction("FireHeavy", IE_Released, this, &AP4Glider::FireHeavyOff);
 }
 
-void AGlider::Move(float AxisValue)
+void AP4Glider::Move(float AxisValue)
 {
     AxisValue *= 100;
     if (Controller != NULL && AxisValue != 0.0f)
@@ -200,7 +200,7 @@ void AGlider::Move(float AxisValue)
     }
 }
 
-void AGlider::Strafe(float AxisValue)
+void AP4Glider::Strafe(float AxisValue)
 {
     AxisValue *= 100;
     if (Controller != NULL && AxisValue != 0.0f)
@@ -215,41 +215,41 @@ void AGlider::Strafe(float AxisValue)
     }
 }
 
-void AGlider::Jump()
+void AP4Glider::Jump()
 {
 }
 
-void AGlider::BoostOn()
+void AP4Glider::BoostOn()
 {
     boost = true;
 }
 
-void AGlider::BoostOff()
+void AP4Glider::BoostOff()
 {
     boost = false;
 }
     
-void AGlider::Turn(float AxisValue)
+void AP4Glider::Turn(float AxisValue)
 {
     FRotator NewRotation = GetActorRotation();
     NewRotation.Yaw += AxisValue;
     SetActorRotation(NewRotation);
 }
 
-void AGlider::LookUp(float AxisValue)
+void AP4Glider::LookUp(float AxisValue)
 {
     FRotator NewRotation = GetActorRotation();
     NewRotation.Pitch += AxisValue;
     SetActorRotation(NewRotation);
 }
 
-void AGlider::ChangeView()
+void AP4Glider::ChangeView()
 {
     GliderView = (GliderView + 1) % EGliderView::Max;
     UpdateView();
 }
 
-void AGlider::UpdateView()
+void AP4Glider::UpdateView()
 {
     switch (GliderView)
     {
@@ -266,22 +266,22 @@ void AGlider::UpdateView()
         break;
     }
 }
-void AGlider::FireLightOn()
+void AP4Glider::FireLightOn()
 {
     FireLight = true;
 }
 
-void AGlider::FireLightOff()
+void AP4Glider::FireLightOff()
 {
     FireLight = false;
 }
 
-void AGlider::FireHeavyOn()
+void AP4Glider::FireHeavyOn()
 {
     FireHeavy = true;
 }
 
-void AGlider::FireHeavyOff()
+void AP4Glider::FireHeavyOff()
 {
     FireHeavy = false;
 }

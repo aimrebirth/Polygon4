@@ -16,14 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
-#include "MenuGameMode.h"
+#pragma once
 
-#include <Game/P4Engine.h>
+#include "Engine/GameInstance.h"
+#include "P4GameInstance.generated.h"
 
-void AMenuGameMode::BeginPlay()
+class P4Engine;
+
+UCLASS()
+class POLYGON4_API UP4GameInstance : public UGameInstance
 {
-    GP4Engine->StartEngine();
-    GP4Engine->ShowMainMenu();
-    Super::BeginPlay();
-}
+	GENERATED_BODY()
+
+public:
+    virtual void Init() override;
+    virtual void Shutdown() override;
+    virtual void StartGameInstance() override;
+
+    //std::shared_ptr<P4Engine> GetEngine() const { return Engine; }
+
+private:
+    std::shared_ptr<P4Engine> Engine;
+};

@@ -1,4 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ * Polygon-4
+ * Copyright (C) 2015 lzwdgc
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 using System;
 using System.IO;
@@ -11,6 +27,7 @@ public class Polygon4 : ModuleRules
     private string ModulePath
     {
         get { return Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name)); }
+        //get { return Path.GetDirectoryName(RulesCompiler.GetFileNameFromType(this.GetType())); }
     }
 
     private string ThirdPartyPath
@@ -44,16 +61,18 @@ public class Polygon4 : ModuleRules
         bool copied = true;
         string[] ext = { ".dll", ".pdb" };
         MakeDir(dst);
-        try
+        foreach (var e in ext)
         {
-            foreach (var e in ext)
+            //System.Console.WriteLine("Copying " + (src + e));
+            try
             {
                 File.Copy(src + e, dst + e, overwrite);
             }
-        }
-        catch (System.Exception)
-        {
-            copied = false;
+            catch (System.Exception)
+            {
+                System.Console.WriteLine("Cannot copy " + (src + e));
+                copied = false;
+            }
         }
         return copied;
     }
@@ -107,12 +126,14 @@ public class Polygon4 : ModuleRules
     
     public void LoadCoreModule(TargetInfo Target, string Name)
     {
+        //System.Console.WriteLine("Enter LoadCoreModule");
+
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
         PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
-        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "DatabaseManager/include"));
-        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "../../AIM/DatabaseManager/include"));
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "DataManager/include"));
+        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "../../DataManager/include"));
 
         string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
         string BaseDir = Path.Combine(ThirdPartyPath, Name, "lib");
@@ -131,15 +152,15 @@ public class Polygon4 : ModuleRules
 
         //if (Target.Type != TargetRules.TargetType.Editor)
         //    return;
-
+        
         if (NumberOfCalls++ > 0)
             return;
-
+        
         bool copied = CopyLibrary(src, dst, true);
 
         if (copied)
         {
-            // try remove previous dll, pdb
+            // try to remove previous dll, pdb
             base_name_id = 1;
             while (true)
             {
@@ -151,7 +172,7 @@ public class Polygon4 : ModuleRules
                 if (base_name_id++ > 1000)
                     break;
             }
-            // try remove previous logs
+            // try to remove previous logs
             base_name_id = 0;
             while (true)
             {

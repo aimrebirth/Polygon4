@@ -19,31 +19,13 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
-
-#include <string>
-
-#include <Polygon4/API.h>
-
 #include "MenuGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class POLYGON4_API AMenuGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
 public:
-    ~AMenuGameMode();
-
-public:
-    void BeginPlay();
-	
-private:
-    TSharedPtr<class SMainMenu> MainMenu;
-    void ShowMainMenu();
-
-private: /* API */
-    void OpenLevel(std::string level);
+    virtual void BeginPlay() override;
 };

@@ -20,23 +20,25 @@
 
 #include "SlateBasics.h"
 
-#include <Polygon4/Engine.h>
+#include <Game/P4Modification.h>
 
-typedef TSharedPtr<polygon4::Modification> ListItem;
+typedef TSharedPtr<ModificationDesc> ListItem;
 
 class SModListView : public SListView<ListItem>
 {
+    SLATE_BEGIN_ARGS(SModListView) {}
+        SLATE_ARGUMENT(APlayerController*, PlayerController)
+    SLATE_END_ARGS()
+
     typedef SListView<ListItem> ParentType;
 
-	SLATE_BEGIN_ARGS(SModListView){}
-	SLATE_END_ARGS()
-
+    APlayerController* PlayerController;
     TArray<ListItem> AvailableMods;
     int Padding = 20;
  
 public:
 	void Construct(const FArguments& InArgs);
-    void ReloadMods();
+    void ReloadMods(bool reload = true);
 
     TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);
 };

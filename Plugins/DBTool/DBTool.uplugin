@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "DBTool",
+	"Description": "Provides an ability to access Polygon4 database from UE4",
+	"Category": "Polygon4",
+	"CreatedBy": "lzwdgc",
+	"CreatedByURL": "http://aim-fans.ru",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"Modules": [
+		{
+			"Name": "DBTool",
+			"Type": "Developer",
+			"LoadingPhase": "Default"
+		}
+	],
+	"EnabledByDefault": false,
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": false
+}

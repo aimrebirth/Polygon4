@@ -22,7 +22,7 @@
 #include "Widgets/ModListView.h"
 #include "Widgets/MenuButton.h"
 
-#include <Polygon4/Modification.h>
+#include <Game/P4Modification.h>
 
 #define LOCTEXT_NAMESPACE "MainMenu"
 
@@ -42,7 +42,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
         .Font(FSlateFontInfo("Verdana", 30));
 
     // create Mods List View
-    ModsListView = SNew(SModListView);
+    ModsListView = SNew(SModListView).PlayerController(PlayerController);
 
     // Create GUI
 	ChildSlot
@@ -77,7 +77,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
                 [
 			        SNew(SVerticalBox)
                     + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
-                    + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnNotImplemented)
+                    + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
                     + MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
                     + MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
                     + MainMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SMainMenu::OnExit)
@@ -164,7 +164,7 @@ FReply SMainMenu::OnNewGame()
     if (!selected.Num())
         return PrintError(LOCTEXT("ModNotSelected", "Please, select a modification from the list"));
     ClearError();
-    if (!selected[0]->newGame())
+    if (!selected[0]->modification->newGame())
         return PrintError(LOCTEXT("NewGameFailed", "Cannot start a New Game. See logs for more information"));
     return FReply::Handled();
 }
@@ -175,8 +175,8 @@ FReply SMainMenu::OnLoadGame()
     if (!selected.Num())
         return PrintError(LOCTEXT("ModNotSelected", "Please, select a modification from the list"));
     ClearError();
-    //if (!selected[0]->loadGame(L"1"))
-    //    return PrintError(LOCTEXT("LoadGameFailed", "Cannot start a New Game. See logs for more information"));
+    if (!selected[0]->modification->loadGame(L"1"))
+        return PrintError(LOCTEXT("LoadGameFailed", "Cannot load game. See logs for more information"));
     return FReply::Handled();
 }
 

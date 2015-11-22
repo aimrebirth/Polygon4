@@ -8,7 +8,7 @@ public class Polygon4Target : TargetRules
 	public Polygon4Target(TargetInfo Target)
 	{
         Type = TargetType.Game;
-	}
+    }
 
 	//
 	// TargetRules interface.
@@ -20,6 +20,6 @@ public class Polygon4Target : TargetRules
 		ref List<string> OutExtraModuleNames
 		)
 	{
-        OutExtraModuleNames.AddRange(new string[] { "Polygon4" });
+        OutExtraModuleNames.Add("Polygon4");
 	}
 }

@@ -23,14 +23,16 @@
 #include "Paths.h"
 #include "FileManagerGeneric.h"
 
-#include <Polygon4/Engine.h>
-#include <Polygon4/Modification.h>
+#include <Game/P4Modification.h>
+#include <Game/P4Engine.h>
 
 #define LOCTEXT_NAMESPACE "MainMenu"
 
 void SModListView::Construct(const FArguments& InArgs)
 {
-    ReloadMods();
+    PlayerController = InArgs._PlayerController;
+
+    ReloadMods(false);
 
     auto ListViewColumn = [](FName Name, FText Text)
     {
@@ -63,18 +65,20 @@ void SModListView::Construct(const FArguments& InArgs)
     ParentType::Construct(args);
 }
 
-void SModListView::ReloadMods()
+void SModListView::ReloadMods(bool reload)
 {
     bool Empty = AvailableMods.Num() == 0;
 
-    auto engine = polygon4::Engine::createEngine(GET_MODS_DIR);
-	AvailableMods = MakeTArrayTSharedPtr(engine->getModifications().set());
+    if (!reload || GP4Engine->reloadMods())
+    {
+        AvailableMods = GP4Engine->GetModificationDescriptors();
+    }
 
     if (!Empty)
     {
         ClearSelection();
         ReGenerateItems(PanelGeometryLastTick);
-        ItemsSource = &AvailableMods;
+        RequestListRefresh();
     }
 }
 
@@ -84,7 +88,6 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
     {
         ListItem Item;
 
-    public:
         SLATE_BEGIN_ARGS(SButtonRowWidget){}
         SLATE_END_ARGS()
 
@@ -100,27 +103,27 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
             FString ItemText;
             if (ColumnName == "Name")
             {
-                ItemText = Item->data->getName().wstring().c_str();
+                ItemText = Item->Name;
             }
             else if (ColumnName == "Dir")
             {
-				ItemText = Item->data->directory.wstring().c_str();
+				ItemText = Item->Dir;
             }
             else if (ColumnName == "Author")
             {
-				ItemText = Item->data->author.wstring().c_str();
+				ItemText = Item->Author;
             }
             else if (ColumnName == "Version")
             {
-                ItemText = Item->data->version.wstring().c_str();
+                ItemText = Item->Version;
             }
             else if (ColumnName == "DateCreated")
             {
-				ItemText = Item->data->date_created.wstring().c_str();
+				ItemText = Item->DateCreated;
             }
             else if (ColumnName == "DateModified")
             {
-				ItemText = Item->data->date_modified.wstring().c_str();
+				ItemText = Item->DateModified;
             }
             else
             {
