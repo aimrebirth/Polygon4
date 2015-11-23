@@ -44,7 +44,6 @@ void SDBToolTreeView::Construct(const FArguments& InArgs)
 {
     P4RootItem = InArgs._RootItem;
     TableView = InArgs._TableView;
-    Schema = InArgs._Schema;
     Storage = InArgs._Storage;
     RootItem = MakeShareable(new TreeItem());
     RootItem->Build(P4RootItem.get());
@@ -97,7 +96,7 @@ void SDBToolTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type Select
         TableView->ResetTable();
         return;
     }
-    TableView->RefreshTable(Item.Get(), Schema);
+    TableView->RefreshTable(Item.Get());
     Item->UpdateName();
 }
 

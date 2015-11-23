@@ -39,7 +39,7 @@ struct TreeItem
     {
         if (!P4Item)
             return;
-        Name = FInternationalization::ForUseOnlyByLocMacroAndGraphNodeTextLiterals_CreateText(to_wstring(P4Item->name).c_str(), L"DBTool", to_wstring(P4Item->name).c_str());
+        Name = FText::FromString(to_wstring(polygon4::tr(to_string(P4Item->name).c_str())).c_str());
         if (Widget.IsValid())
             Widget->SetText(Name);
     }
@@ -52,7 +52,6 @@ class SDBToolTreeView : public STreeView<TSharedPtr<TreeItem>>
     SLATE_BEGIN_ARGS(SDBToolTreeView) {}
         SLATE_ARGUMENT(TSharedPtr<SDBToolTableView>, TableView)
         SLATE_ARGUMENT(SPtrP4TreeItem, RootItem)
-        SLATE_ARGUMENT(const polygon4::DatabaseSchema*, Schema)
         SLATE_ARGUMENT(std::shared_ptr<polygon4::detail::Storage>, Storage)
     SLATE_END_ARGS()
 
@@ -71,7 +70,6 @@ private:
     TSharedPtr<SDBToolTableView> TableView;
     ListItem RootItem;
     SPtrP4TreeItem P4RootItem;
-    const polygon4::DatabaseSchema* Schema;
     std::shared_ptr<polygon4::detail::Storage> Storage;
 
     void OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInfo);

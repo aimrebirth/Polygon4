@@ -23,8 +23,7 @@
 POLYGON4_UNREAL_MEMORY_STUB
 
 #include <Polygon4/DataManager/Database.h>
-#include <Polygon4/DataManager/DatabaseSchema.h>
-#include <Polygon4/DataManager/Helpers.h>
+#include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>
 #include <Polygon4/DataManager/StorageImpl.h>
 #include <Polygon4/DataManager/Types.h>
@@ -39,6 +38,9 @@ FDBToolModule *GDBToolModule;
 void FDBToolModule::StartupModule()
 {
     GDBToolModule = this;
+
+    // no need for explicit load
+    //Polygon4InitMm("Engine.x64.dll");
 
 	FDBToolStyle::Initialize();
 	FDBToolStyle::ReloadTextures();
@@ -109,12 +111,19 @@ void FDBToolModule::StartupModule()
     }
     if (!LoadDB())
         return;
-
-    schema = database->getSchema();
 }
 
 void FDBToolModule::ShutdownModule()
 {
+    // try to comment this as dll will autounloaded at the end
+    // no need to explicit unload
+    //TableView.Reset();
+    //TreeView.Reset();
+    //database.reset();
+    //storage.reset();
+    // no need to explicit unload
+    //Polygon4ResetMm("Engine.x64.dll");
+
 	FDBToolStyle::Shutdown();
 	FDBToolCommands::Unregister();
     FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(DBToolTabName);
@@ -169,7 +178,6 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
                         SAssignNew(TreeView, SDBToolTreeView)
                         .RootItem(RootItem)
                         .TableView(TableView)
-                        .Schema(schema.get())
                         .Storage(storage)
                     ]
                 ]
@@ -339,7 +347,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
 
     auto MapName = GWorld->GetOuter()->GetName();
     auto modification = (Modification *)Item->P4Item->object;
-    Ptr<Map> map;
+    IdPtr<Map> map;
     Text name = MapName.GetCharArray().GetData();
     for (auto &m : modification->maps)
     {

@@ -21,7 +21,7 @@
 #include "SlateBasics.h"
 
 #include <Polygon4/DataManager/Types.h>
-#include <Polygon4/DataManager/DatabaseSchema.h>
+#include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>
 
 struct TreeItem;
@@ -31,9 +31,9 @@ struct RowData
 {
     TreeItem *Item;
     polygon4::TreeItem *Data;
-    const polygon4::DatabaseSchema *Schema;
-    const polygon4::Table *Table;
-    const polygon4::Column *Column;
+    //const polygon4::DatabaseSchema *Schema;
+    //const polygon4::Table *Table;
+    Variable Var;
 };
 
 class SDBToolTableView : public SListView<TSharedPtr<RowData>>
@@ -53,7 +53,7 @@ private:
 public:
     void Construct(const FArguments& InArgs);
     void ResetTable();
-    void RefreshTable(TreeItem *Item, const polygon4::DatabaseSchema *schema);
+    void RefreshTable(TreeItem *Item);
 
 private:
     TSharedRef<ITableRow> OnGenerateRow(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);

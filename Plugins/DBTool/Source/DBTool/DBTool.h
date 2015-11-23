@@ -48,7 +48,6 @@ private:
 private:
     std::shared_ptr<polygon4::Database> database;
     std::shared_ptr<polygon4::detail::Storage> storage;
-    std::shared_ptr<const polygon4::DatabaseSchema> schema;
     bool dataChanged = false;
 
     bool LoadDB();

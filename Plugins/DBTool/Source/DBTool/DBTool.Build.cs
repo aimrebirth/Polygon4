@@ -87,5 +87,6 @@ public class DBTool : ModuleRules
         string base_name = Name + "." + PlatformString;
 
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
+        PublicDelayLoadDLLs.Add(base_name + ".dll");
     }
 }

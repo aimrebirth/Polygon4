@@ -44,6 +44,7 @@ public:
 
     void StartEngine() { P4EngineState = EP4EngineState::Started; }
     bool IsStarted() const { return P4EngineState == EP4EngineState::Started; }
+    void Exit();
 
     UP4GameInstance* GetP4GameInstance() const { return P4GameInstance; }
     UWorld* GetWorld() const;

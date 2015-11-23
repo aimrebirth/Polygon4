@@ -22,6 +22,7 @@
 #include "Widgets/ModListView.h"
 #include "Widgets/MenuButton.h"
 
+#include <Game/P4Engine.h>
 #include <Game/P4Modification.h>
 
 #define LOCTEXT_NAMESPACE "MainMenu"
@@ -29,6 +30,8 @@
 void SMainMenu::Construct(const FArguments& InArgs)
 {
     PlayerController = InArgs._PlayerController;
+    Engine = InArgs._Engine;
+
     if (PlayerController)
     {
         PlayerController->bShowMouseCursor = true;
@@ -189,8 +192,7 @@ FReply SMainMenu::OnReloadMods()
 
 FReply SMainMenu::OnExit()
 {
-    if (PlayerController)
-        PlayerController->ConsoleCommand("quit");
+    Engine->Exit();
     return FReply::Handled();
 }
 

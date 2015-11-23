@@ -66,7 +66,10 @@ TSharedPtr<SMainMenu> P4Engine::GetMainMenu()
 {
     if (MainMenu.IsValid())
         return MainMenu;
-    return MainMenu = SNew(SMainMenu).PlayerController(GetWorld()->GetFirstPlayerController());
+    return MainMenu = SNew(SMainMenu)
+        .PlayerController(GetWorld()->GetFirstPlayerController())
+        .Engine(this)
+        ;
 }
 
 void P4Engine::ShowMainMenu()
@@ -98,4 +101,12 @@ void P4Engine::OnLevelLoaded()
 UWorld* P4Engine::GetWorld() const
 {
     return P4GameInstance->GetWorld();
+}
+
+void P4Engine::Exit()
+{
+    auto world = GetWorld();
+    auto c = world->GetFirstPlayerController();
+    if (c)
+        c->ConsoleCommand("quit");
 }

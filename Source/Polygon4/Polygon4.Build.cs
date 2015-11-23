@@ -141,8 +141,9 @@ public class Polygon4 : ModuleRules
 
         string base_name = Name + "." + PlatformString;
         int base_name_id = 0;
-
+        
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
+        PublicDelayLoadDLLs.Add(base_name + ".dll");
 
         string dst_base_name = Path.Combine(ModulePath, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
         dst_base_name = Path.GetFullPath(dst_base_name);

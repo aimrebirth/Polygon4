@@ -25,26 +25,8 @@
 
 #include <Polygon4/DataManager/Common.h>
 #include <Polygon4/DataManager/StorageImpl.h>
-#include <Polygon4/DataManager/Helpers.h>
 
 #define LOCTEXT_NAMESPACE "DBTool"
-
-FText getColumnTypeString(polygon4::ColumnType type)
-{
-    using polygon4::ColumnType;
-    switch (type)
-    {
-    case ColumnType::Integer:
-        return LOCTEXT("INTEGER", "Integer");
-    case ColumnType::Real:
-        return LOCTEXT("REAL", "Real");
-    case ColumnType::Text:
-        return LOCTEXT("TEXT", "Text");
-    case ColumnType::Blob:
-        return LOCTEXT("BLOB", "Blob");
-    }
-    return FText::GetEmpty();
-}
 
 void SDBToolTableView::Construct(const FArguments& InArgs)
 {
@@ -107,13 +89,13 @@ void SDBToolTableView::ResetTable()
     RequestListRefresh();
 }
 
-void SDBToolTableView::RefreshTable(TreeItem *Item, const polygon4::DatabaseSchema *schema)
+void SDBToolTableView::RefreshTable(TreeItem *Item)
 {
-    auto &table = schema->tables.find(to_string(polygon4::detail::getTableNameByType(Item->P4Item->type)))->second;
+    auto &table = Item->P4Item->object->getClass();
     TArray<ListItem> NewData;
-    for (auto &col : table.columns)
-        NewData.Add(MakeShareable(new RowData{ Item, Item->P4Item.get(), schema, &table, &col.second }));
-    NewData.Sort([](const auto &i1, const auto i2) { return i1->Column->id < i2->Column->id; });
+    for (auto &v : table.getVariables())
+        NewData.Add(MakeShareable(new RowData{ Item, Item->P4Item.get(), v }));
+    NewData.Sort([](const auto &i1, const auto i2) { return i1->Var.getId() < i2->Var.getId(); });
     Data = NewData;
 
     ClearSelection();
@@ -132,20 +114,21 @@ void SButtonRowWidget::Construct(const FArguments& InArgs, const TSharedRef<STab
 
 TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& ColumnName)
 {
-    auto Column = Item->Column;
-    auto value = Item->Data->object->getVariableString(Column->id);
+    auto &table = Item->Data->object->getClass();
+    auto &var = Item->Var;
+    auto value = Item->Data->object->getVariableString(var.getId());
     auto Value = FText::FromString(to_wstring(value).c_str());
     TSharedPtr<SWidget> Widget;
 
     if (ColumnName == "Name")
     {
         SAssignNew(Widget, STextBlock)
-            .Text(FText::FromString(Column->name.c_str()))
+            .Text(FText::FromString(var.getName().c_str()))
             ;
     }
     else if (ColumnName == "Type")
     {
-        auto type = Column->fk ? FText::GetEmpty() : getColumnTypeString(Column->type);
+        auto type = var.isFk() ? FText::GetEmpty() : FText::FromString(to_wstring(polygon4::tr(var.getType()->getDataType())).c_str());
         SAssignNew(Widget, STextBlock)
             .Text(type)
             ;
@@ -153,7 +136,7 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
     else if (ColumnName == "Value")
     {
         bool enabled = true;
-        if (Column->id == 0 && Column->name == "id" && Column->type == polygon4::ColumnType::Integer)
+        if (var.isId())
             enabled = false;
 
         auto EditableTextBox = [&]()
@@ -165,13 +148,9 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
             return ValidatedEditableTextBox;
         };
 
-        if (Column->fk)
+        if (var.isFk())
         {
-            std::string s1 = removeId(Column->name);
-            std::string s2 = Item->Table->name;
-            std::transform(s1.begin(), s1.end(), s1.begin(), tolower);
-            std::transform(s2.begin(), s2.end(), s2.begin(), tolower);
-            if (s2.find(s1) == 0)
+            if (table.getParent() && var.getType()->getCppName() == table.getParent()->getCppName())
             {
                 enabled = false;
                 Widget = EditableTextBox();
@@ -180,19 +159,22 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
             {
                 using namespace polygon4::detail;
 
-                auto table_type = getTableType(Item->Table->name);
-                auto type = getTableType(Column->fk->table_name);
+                auto table_type = Item->Data->object->getType();
+                auto type = Item->Data->object->getVariableType(var.getId());
 
                 polygon4::detail::OrderedObjectMap m;
 
                 // prevent printing objects from other maps
-                auto f = [](auto m, auto mb) { return m->map == mb->map; };
+                auto f = [](auto m, auto mo) { return m->map == mo->map; };
+                auto f2 = [](auto m, auto mo) { return m->modification == mo->modification && m->map == mo->map; };
                 if (type == EObjectType::MapBuilding)
                     m = getOrderedMapForObject<MapBuilding>(Storage, (Mechanoid *)Item->Data->object, f);
                 else if (type == EObjectType::MapGood)
                     m = getOrderedMapForObject<MapGood>(Storage, (Mechanoid *)Item->Data->object, f);
                 else if (type == EObjectType::MapObject)
                     m = getOrderedMapForObject<MapObject>(Storage, (Mechanoid *)Item->Data->object, f);
+                else if (type == EObjectType::ModificationMap)
+                    m = getOrderedMapForObject<ModificationMap>(Storage, (Mechanoid *)Item->Data->object, f2);
                 else
                     m = Storage->getOrderedMap(type);
 
@@ -201,20 +183,13 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
                     for (auto it = m.cbegin(); it != m.cend(); )
                     {
                         polygon4::detail::String *s = (polygon4::detail::String *)it->second;
-                        if (s->table && (s->table->getId() != static_cast<int>(table_type) || s->table->getId() == static_cast<int>(EObjectType::Any)))
+                        if (s->object != table_type|| s->object == EObjectType::Any)
                             m.erase(it++);
                         else
                             ++it;
                     }
                 }
-                if (type == EObjectType::Table)
-                {
-                    decltype(m) m2;
-                    for (auto it = m.cbegin(); it != m.cend(); it++)
-                        m2.insert(std::make_pair(it->first, it->second));
-                    m = m2;
-                }
-
+                
                 TSharedRef<SDBToolTextComboBox> cb = SNew(SDBToolTextComboBox).ParentData(Item.Get());
                 auto &Items = cb->Items;
 
@@ -239,6 +214,57 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
                 Widget = StaticCastSharedRef<SWidget>(cb);
             }
         }
+        /*else if (var.getDataType() == DataType::Bool)
+        {
+            auto chkb = new QCheckBox;
+            chkb->setChecked(value == "1");
+            connect(chkb, &QCheckBox::stateChanged, [chkb, var, data](int state)
+            {
+                data->object->setVariableString(var.getId(), chkb->isChecked() ? "1" : "0");
+            });
+
+            QWidget* wdg = new QWidget;
+            QHBoxLayout layout(wdg);
+            layout.addSpacing(3);
+            layout.addWidget(chkb);
+            layout.setAlignment(Qt::AlignLeft);
+            layout.setMargin(0);
+            wdg->setLayout(&layout);
+
+            tableWidget->setCellWidget(var.getId(), col_id++, wdg);
+            tableWidget->repaint();
+        }
+        else if (var.getDataType() == DataType::Enum)
+        {
+            QComboBox *cb = new QComboBox;
+            auto n = var.getType()->getCppName();
+            int val = std::stoi(to_string(value).c_str());
+            auto m = getOrderedMap(n);
+            bool found = false;
+            for (auto &v : m)
+            {
+                cb->addItem(v.first.toQString(), (uint64_t)v.second);
+                if (val == v.second)
+                {
+                    cb->setCurrentIndex(cb->count() - 1);
+                    found = true;
+                }
+            }
+            if (!found)
+            {
+                cb->addItem("");
+                cb->setCurrentIndex(cb->count() - 1);
+            }
+            connect(cb, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, [cb, var, this](int index)
+            {
+                auto data = (TreeItem *)currentTreeWidgetItem->data(0, Qt::UserRole).toULongLong();
+                auto cb_data = cb->currentData().toInt();
+                data->object->setVariableString(var.getId(), std::to_string(cb_data));
+                data->name = data->object->getName();
+                currentTreeWidgetItemChanged(currentTreeWidgetItem, 0);
+            });
+            tableWidget->setCellWidget(var.getId(), col_id, cb);
+        }*/
         else
         {
             Widget = EditableTextBox();
@@ -256,7 +282,7 @@ void SValidatedEditableTextBox::Construct(const FArguments& InArgs)
 {
     Item = InArgs._Item;
 
-    auto value = Item->Data->object->getVariableString(Item->Column->id);
+    auto value = Item->Data->object->getVariableString(Item->Var.getId());
     auto Value = FText::FromString(to_wstring(value).c_str());
 
     ParentType::FArguments args;
@@ -273,7 +299,7 @@ void SValidatedEditableTextBox::OnTextCommited(const FText &NewText, ETextCommit
 {
     try
     {
-        Item->Data->object->setVariableString(Item->Column->id, NewText.ToString().GetCharArray().GetData());
+        Item->Data->object->setVariableString(Item->Var.getId(), NewText.ToString().GetCharArray().GetData());
         Item->Data->update();
         Item->Item->UpdateName();
         GDBToolModule->SetDataChanged();
@@ -281,22 +307,21 @@ void SValidatedEditableTextBox::OnTextCommited(const FText &NewText, ETextCommit
     catch (std::exception &e)
     {
         UE_LOG(LogTemp, Warning, TEXT("Cannot parse value of type '%s': %s"),
-            getColumnTypeString(Item->Column->type).ToString().GetCharArray().GetData(),
+            to_string(polygon4::tr(Item->Var.getType()->getDataType())).c_str(),
             e.what());
     }
 }
 
 FReply SValidatedEditableTextBox::OnKeyDownHandler(const FGeometry &Geometry, const FKeyEvent &KeyEvent)
 {
-    using polygon4::ColumnType;
     auto c = KeyEvent.GetCharacter();
-    switch (Item->Column->type)
+    switch (Item->Var.getDataType())
     {
-    case ColumnType::Integer:
+    case DataType::Integer:
         if (!isdigit(c))
             return FReply::Unhandled();
         break;
-    case ColumnType::Real:
+    case DataType::Real:
         if (!isdigit(c) || c != '.')
             return FReply::Unhandled();
         break;

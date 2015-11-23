@@ -53,8 +53,8 @@ void SDBToolTextComboBox::OnSelectionChanged(ListItem InItem, ESelectInfo::Type 
     auto cb_data = InItem->Object;
     if (cb_data)
     {
-        bool same = data->object->getVariableString(ParentData->Column->id) == cb_data->getName();
-        data->object->setVariableString(ParentData->Column->id, cb_data);
+        bool same = data->object->getVariableString(ParentData->Var.getId()) == cb_data->getName();
+        data->object->setVariableString(ParentData->Var.getId(), cb_data);
         data->update();
         ParentData->Item->UpdateName();
         if (!same)
