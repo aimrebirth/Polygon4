@@ -24,6 +24,7 @@
 void SDBToolTextComboBox::Construct(const FArguments& InArgs)
 {
     ParentData = InArgs._ParentData;
+    TableView = InArgs._TableView;
 
     ParentType::FArguments args;
     args
@@ -48,6 +49,9 @@ void SDBToolTextComboBox::OnSelectionChanged(ListItem InItem, ESelectInfo::Type 
         SNew(STextBlock)
         .Text(InItem->Text)
     );
+    
+    if (!Initialized)
+        return;
 
     auto data = ParentData->Data;
     auto cb_data = InItem->Object;
@@ -57,6 +61,7 @@ void SDBToolTextComboBox::OnSelectionChanged(ListItem InItem, ESelectInfo::Type 
         data->object->setVariableString(ParentData->Var.getId(), cb_data);
         data->update();
         ParentData->Item->UpdateName();
+        TableView->RefreshTable(ParentData->Item);
         if (!same)
             GDBToolModule->SetDataChanged();
     }

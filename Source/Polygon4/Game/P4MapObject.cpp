@@ -49,7 +49,7 @@ bool P4MapObject::spawn()
 {
     auto World = GP4Engine->GetWorld();
     auto WorldScale = GP4Engine->GetWorldScale();
-    auto o = LoadObject<UStaticMesh>(0, to_wstring(object->resource).c_str());
+    auto o = LoadObject<UStaticMesh>(0, object->resource);
     FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
     FRotator rot(pitch, yaw, roll);
     if (o)
@@ -59,7 +59,7 @@ bool P4MapObject::spawn()
         FVector scale(object->scale, object->scale, object->scale);
         Object->SetActorScale3D(scale);
 #if WITH_EDITOR
-        Object->SetActorLabel(to_wstring(object->getName()).c_str());
+        Object->SetActorLabel(object->getName());
 #endif
     }
     else
@@ -67,7 +67,7 @@ bool P4MapObject::spawn()
         auto c = LoadClass(0);
         auto a = World->SpawnActor<AActor>(c, pos, rot);
 #if WITH_EDITOR
-        a->SetActorLabel(to_wstring(object->getName()).c_str());
+        a->SetActorLabel(object->getName());
 #endif
     }
     return true;

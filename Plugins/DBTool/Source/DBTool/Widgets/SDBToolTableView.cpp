@@ -77,6 +77,7 @@ TSharedRef<ITableRow> SDBToolTableView::OnGenerateRow(ListItem InItem, const TSh
     return
         SNew(SButtonRowWidget, OwnerTable, InItem)
         .Storage(Storage)
+        .TableView(this)
         ;
 }
 
@@ -107,6 +108,7 @@ void SDBToolTableView::RefreshTable(TreeItem *Item)
 void SButtonRowWidget::Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTable, ListItem InItem)
 {
     Storage = InArgs._Storage;
+    TableView = InArgs._TableView;
     Item = InItem;
 
     SMultiColumnTableRow<ListItem>::Construct(FSuperRowType::FArguments(), InOwnerTable);
@@ -114,21 +116,22 @@ void SButtonRowWidget::Construct(const FArguments& InArgs, const TSharedRef<STab
 
 TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& ColumnName)
 {
+    using namespace polygon4::detail;
+
     auto &table = Item->Data->object->getClass();
     auto &var = Item->Var;
-    auto value = Item->Data->object->getVariableString(var.getId());
-    auto Value = FText::FromString(to_wstring(value).c_str());
+    auto Value = Item->Data->object->getVariableString(var.getId());
     TSharedPtr<SWidget> Widget;
 
     if (ColumnName == "Name")
     {
         SAssignNew(Widget, STextBlock)
-            .Text(FText::FromString(var.getName().c_str()))
+            .Text(polygon4::tr(var.getName()).toFText())
             ;
     }
     else if (ColumnName == "Type")
     {
-        auto type = var.isFk() ? FText::GetEmpty() : FText::FromString(to_wstring(polygon4::tr(var.getType()->getDataType())).c_str());
+        auto type = FText::FromString(polygon4::tr(var.getType()->getDataType()));
         SAssignNew(Widget, STextBlock)
             .Text(type)
             ;
@@ -157,114 +160,138 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
             }
             else
             {
-                using namespace polygon4::detail;
+                bool set = false;
+                OrderedObjectMap m;
+                std::tie(set, m) = Item->Data->object->getOrderedObjectMap(var.getId(), Storage.get());
 
-                auto table_type = Item->Data->object->getType();
-                auto type = Item->Data->object->getVariableType(var.getId());
-
-                polygon4::detail::OrderedObjectMap m;
-
-                // prevent printing objects from other maps
-                auto f = [](auto m, auto mo) { return m->map == mo->map; };
-                auto f2 = [](auto m, auto mo) { return m->modification == mo->modification && m->map == mo->map; };
-                if (type == EObjectType::MapBuilding)
-                    m = getOrderedMapForObject<MapBuilding>(Storage, (Mechanoid *)Item->Data->object, f);
-                else if (type == EObjectType::MapGood)
-                    m = getOrderedMapForObject<MapGood>(Storage, (Mechanoid *)Item->Data->object, f);
-                else if (type == EObjectType::MapObject)
-                    m = getOrderedMapForObject<MapObject>(Storage, (Mechanoid *)Item->Data->object, f);
-                else if (type == EObjectType::ModificationMap)
-                    m = getOrderedMapForObject<ModificationMap>(Storage, (Mechanoid *)Item->Data->object, f2);
-                else
-                    m = Storage->getOrderedMap(type);
-
-                if (type == EObjectType::String)
+                bool enabled = set ? !m.empty() : true;
+                                
+                TSharedRef<SDBToolTextComboBox> cb = SNew(SDBToolTextComboBox)
+                    .ParentData(Item.Get())
+                    .TableView(TableView)
+                    ;
+                cb->SetEnabled(enabled);
+                if (enabled)
                 {
-                    for (auto it = m.cbegin(); it != m.cend(); )
+                    auto &Items = cb->Items;
+                    bool found = false;
+                    for (auto &v : m)
                     {
-                        polygon4::detail::String *s = (polygon4::detail::String *)it->second;
-                        if (s->object != table_type|| s->object == EObjectType::Any)
-                            m.erase(it++);
-                        else
-                            ++it;
+                        Items.Add(MakeShareable(new ComboBoxItem{
+                            FText::FromString(v.first),
+                            v.second
+                        }));
+                        if (!found && Value == v.second->getName())
+                        {
+                            cb->SetSelectedItem(Items.Last());
+                            found = true;
+                        }
                     }
-                }
-                
-                TSharedRef<SDBToolTextComboBox> cb = SNew(SDBToolTextComboBox).ParentData(Item.Get());
-                auto &Items = cb->Items;
-
-                bool found = false;
-                for (auto &v : m)
-                {
-                    Items.Add(MakeShareable(new ComboBoxItem{
-                        FText::FromString(to_wstring(v.first).c_str()),
-                        v.second
-                    }));
-                    if (!found && value == v.second->getName())
+                    if (!found)
                     {
+                        Items.Add(MakeShareable(new ComboBoxItem{ FText::GetEmpty(), nullptr }));
                         cb->SetSelectedItem(Items.Last());
-                        found = true;
                     }
-                }
-                if (!found)
-                {
-                    Items.Add(MakeShareable(new ComboBoxItem{ FText::GetEmpty(), nullptr }));
-                    cb->SetSelectedItem(Items.Last());
                 }
                 Widget = StaticCastSharedRef<SWidget>(cb);
+                cb->SetInitialized();
             }
         }
-        /*else if (var.getDataType() == DataType::Bool)
+        else if (var.getDataType() == DataType::Bool)
         {
-            auto chkb = new QCheckBox;
-            chkb->setChecked(value == "1");
-            connect(chkb, &QCheckBox::stateChanged, [chkb, var, data](int state)
+            TSharedRef<SCheckBox> cb = SNew(SCheckBox)
+                .OnCheckStateChanged_Lambda([var, Data = Item->Data](ECheckBoxState state)
             {
-                data->object->setVariableString(var.getId(), chkb->isChecked() ? "1" : "0");
+                Data->object->setVariableString(var.getId(), state == ECheckBoxState::Checked ? "1" : "0");
             });
+            cb->SetIsChecked(Value == "1" ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
 
-            QWidget* wdg = new QWidget;
-            QHBoxLayout layout(wdg);
-            layout.addSpacing(3);
-            layout.addWidget(chkb);
-            layout.setAlignment(Qt::AlignLeft);
-            layout.setMargin(0);
-            wdg->setLayout(&layout);
-
-            tableWidget->setCellWidget(var.getId(), col_id++, wdg);
-            tableWidget->repaint();
+            Widget = cb;
+            return SNew(SHorizontalBox)
+                + SHorizontalBox::Slot()
+                .Padding(10, 1)
+                .HAlign(HAlign_Center)
+                .VAlign(VAlign_Center)
+                [
+                    Widget.ToSharedRef()
+                ];
         }
         else if (var.getDataType() == DataType::Enum)
         {
-            QComboBox *cb = new QComboBox;
+            using cb_item_type = TSharedPtr<ComboBoxItem>;
+            using cb_item_array = TArray<cb_item_type>;
+            using cb_type = SComboBox<cb_item_type>;
+
+            TSharedPtr<cb_item_array> Items = MakeShareable(new cb_item_array);
+            cb_item_type SelectedItem;
+
             auto n = var.getType()->getCppName();
-            int val = std::stoi(to_string(value).c_str());
+            int val = std::stoi(Value.toString());
             auto m = getOrderedMap(n);
             bool found = false;
             for (auto &v : m)
             {
-                cb->addItem(v.first.toQString(), (uint64_t)v.second);
+                Items->Add(MakeShareable(new ComboBoxItem{
+                    v.first.toFText(),
+                    (polygon4::detail::IObjectBase *)(uint64_t)v.second
+                }));
                 if (val == v.second)
                 {
-                    cb->setCurrentIndex(cb->count() - 1);
+                    SelectedItem = Items->Last();
                     found = true;
                 }
             }
             if (!found)
             {
-                cb->addItem("");
-                cb->setCurrentIndex(cb->count() - 1);
+                Items->Add(MakeShareable(new ComboBoxItem{ FText::GetEmpty(), nullptr }));
+                SelectedItem = Items->Last();
             }
-            connect(cb, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, [cb, var, this](int index)
+
+            TSharedRef<cb_type> cb = SNew(cb_type)
+                .OptionsSource(Items.Get())
+                .InitiallySelectedItem(SelectedItem)
+                .OnSelectionChanged_Lambda([ParentData = Item.Get(), Items, var, this, Data = Item->Data]
+                    (const cb_item_type &Item, ESelectInfo::Type type)
             {
-                auto data = (TreeItem *)currentTreeWidgetItem->data(0, Qt::UserRole).toULongLong();
-                auto cb_data = cb->currentData().toInt();
-                data->object->setVariableString(var.getId(), std::to_string(cb_data));
-                data->name = data->object->getName();
-                currentTreeWidgetItemChanged(currentTreeWidgetItem, 0);
-            });
-            tableWidget->setCellWidget(var.getId(), col_id, cb);
-        }*/
+                int cb_data = (uint64_t)Item->Object;
+                Data->object->setVariableString(var.getId(), std::to_string(cb_data));
+                Data->update();
+                ParentData->Item->UpdateName();
+                TableView->RefreshTable(ParentData->Item);
+                GDBToolModule->SetDataChanged();
+            })
+                .OnGenerateWidget_Lambda([](const cb_item_type &InItem)
+            {
+                return
+                    SNew(STextBlock)
+                    .Text(InItem->Text);
+            })
+                .Content()
+                [
+                    SNew(STextBlock)
+                    .Text(SelectedItem->Text)
+                ]
+            ;
+
+            Widget = StaticCastSharedRef<SWidget>(cb);
+        }
+        else if (var.hasFlags({ fBigEdit }))
+        {
+            TSharedRef<SMultiLineEditableTextBox> tb = SNew(SMultiLineEditableTextBox)
+                .Text(Value.toFText())
+                .AutoWrapText(true)
+                .OnTextCommitted_Lambda([ParentData = Item.Get(), var, this, Data = Item->Data]
+                    (const FText &text, ETextCommit::Type type)
+            {
+                Data->object->setVariableString(var.getId(), text);
+                Data->name = Data->object->getName();
+                ParentData->Item->UpdateName();
+                TableView->RefreshTable(ParentData->Item);
+                GDBToolModule->SetDataChanged();
+            })
+                ;
+            Widget = StaticCastSharedRef<SWidget>(tb);
+        }
         else
         {
             Widget = EditableTextBox();
@@ -282,8 +309,7 @@ void SValidatedEditableTextBox::Construct(const FArguments& InArgs)
 {
     Item = InArgs._Item;
 
-    auto value = Item->Data->object->getVariableString(Item->Var.getId());
-    auto Value = FText::FromString(to_wstring(value).c_str());
+    auto Value = Item->Data->object->getVariableString(Item->Var.getId());
 
     ParentType::FArguments args;
     args
@@ -291,7 +317,7 @@ void SValidatedEditableTextBox::Construct(const FArguments& InArgs)
         .RevertTextOnEscape(true)
         .OnTextCommitted(this, &SValidatedEditableTextBox::OnTextCommited)
         .OnKeyDownHandler(this, &SValidatedEditableTextBox::OnKeyDownHandler)
-        .Text(Value);
+        .Text(Value.toFText());
     ParentType::Construct(args);
 }
 
@@ -307,7 +333,7 @@ void SValidatedEditableTextBox::OnTextCommited(const FText &NewText, ETextCommit
     catch (std::exception &e)
     {
         UE_LOG(LogTemp, Warning, TEXT("Cannot parse value of type '%s': %s"),
-            to_string(polygon4::tr(Item->Var.getType()->getDataType())).c_str(),
+            polygon4::tr(Item->Var.getType()->getDataType()).toString().c_str(),
             e.what());
     }
 }

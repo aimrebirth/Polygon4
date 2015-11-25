@@ -34,8 +34,8 @@ static void HotpatchEngine()
     auto gd = FPaths::GameDir();
     auto fgd = FPaths::ConvertRelativePathToFull(gd);
     FPaths::CollapseRelativeDirectories(fgd);
-    auto dll = to_wstring(polygon4::prepare_module_for_hotload(*fgd, "Engine"));
-    if (!dll.empty() && !LoadLibrary(dll.c_str()))
+    auto dll = polygon4::prepare_module_for_hotload(*fgd, "Engine");
+    if (!dll.empty() && !LoadLibraryW(dll.c_str()))
     {
         UE_LOG(LogTemp, Warning, TEXT("LoadLibrary(%s) is failed!"), dll.c_str());
     }

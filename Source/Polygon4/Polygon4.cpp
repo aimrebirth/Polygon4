@@ -32,7 +32,7 @@ public:
 #if !IS_MONOLITHIC
 #ifdef WIN32
         {
-            auto fn = to_string(polygon4::read_orig_module_filename_store());
+            auto fn = polygon4::read_orig_module_filename_store();
             std::ofstream ofile(fn);
             if (ofile)
                 ofile << "Engine.x64.dll";

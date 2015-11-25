@@ -31,8 +31,6 @@ struct RowData
 {
     TreeItem *Item;
     polygon4::TreeItem *Data;
-    //const polygon4::DatabaseSchema *Schema;
-    //const polygon4::Table *Table;
     Variable Var;
 };
 
@@ -63,11 +61,13 @@ class SButtonRowWidget : public SMultiColumnTableRow<SDBToolTableView::ListItem>
 {
     SLATE_BEGIN_ARGS(SButtonRowWidget) {}
         SLATE_ARGUMENT(std::shared_ptr<polygon4::detail::Storage>, Storage)
+        SLATE_ARGUMENT(SDBToolTableView*, TableView)
     SLATE_END_ARGS()
 
     using ListItem = SDBToolTableView::ListItem;
         
 private:
+    SDBToolTableView* TableView;
     std::shared_ptr<polygon4::detail::Storage> Storage;
     ListItem Item;
 

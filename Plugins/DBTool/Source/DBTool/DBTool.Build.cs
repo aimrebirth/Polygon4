@@ -79,6 +79,17 @@ public class DBTool : ModuleRules
         PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
         PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "DataManager/include"));
         PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "../../DataManager/include"));
+        if (Target.Platform == UnrealTargetPlatform.Win64 || Target.Platform == UnrealTargetPlatform.Win32)
+        {
+            if (Target.Platform == UnrealTargetPlatform.Win64)
+            {
+                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win64/gen/include"));
+            }
+            if (Target.Platform == UnrealTargetPlatform.Win32)
+            {
+                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win32/gen/include"));
+            }
+        }
 
         string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
         string BaseDir = Path.Combine(ThirdPartyPath, Name, "lib");

@@ -24,9 +24,9 @@ TSharedPtr<TreeItem> TreeItem::AddChild(const SPtrP4TreeItem &P4Item)
 {
     TSharedPtr<TreeItem> Item = MakeShareable(new TreeItem());
     Item->P4Item = P4Item;
-    Item->UpdateName();
     Item->Parent = this;
     Item->Build(P4Item.get());
+    Item->UpdateName();
     Children.Add(Item);
     return Item;
 }
@@ -38,6 +38,19 @@ void TreeItem::Build(P4TreeItem *Root)
     for (auto &c : Root->children)
         AddChild(c);
     Children.Sort([](const auto &i1, const auto &i2) { return i1->Name.CompareTo(i2->Name) < 0; });
+}
+
+void TreeItem::UpdateName()
+{
+    if (!P4Item)
+        return;
+    FString t = polygon4::tr(P4Item->name);
+    int cc = P4Item->child_count();
+    if (cc)
+        t += " [" + FString::FromInt(cc) + "]";
+    Name = FText::FromString(t);
+    if (Widget.IsValid())
+        Widget->SetText(Name);
 }
 
 void SDBToolTreeView::Construct(const FArguments& InArgs)
@@ -111,16 +124,20 @@ void SDBToolTreeView::AddRecord()
     auto Item = Item0.Get();
     while (1)
     {
-        if (Item->P4Item && Item->P4Item->object)
+        if ((Item->P4Item && Item->P4Item->object) || Item->P4Item->type == polygon4::detail::EObjectType::None)
             Item = Item->Parent;
         else
             break;
     }
     auto r = Storage->addRecord(Item->P4Item.get());
+    if (!r)
+        return;
     auto NewItem = Item->AddChild(r);
     auto index = Item->Children.IndexOfByKey(NewItem);
     GenerateWidgetForItem(NewItem, index, 0, 1.f);
     auto ParentItem = NewItem->Parent;
+    if (ParentItem)
+        ParentItem->UpdateName();
     while (ParentItem)
     {
         SetItemExpansion(MakeShareable(ParentItem, [](auto o) {}), true);
@@ -156,6 +173,7 @@ void SDBToolTreeView::DeleteRecord()
             SetSelection(Parent->Children[index], ESelectInfo::OnMouseClick);
         else
             SetSelection(MakeShareable(Parent, [](auto o) {}), ESelectInfo::OnMouseClick);
+        Parent->UpdateName();
     }
     RequestTreeRefresh();
     GDBToolModule->SetDataChanged();

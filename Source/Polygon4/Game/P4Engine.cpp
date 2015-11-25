@@ -50,12 +50,12 @@ TArray<TSharedPtr<struct ModificationDesc>> P4Engine::GetModificationDescriptors
     {
         auto &m = modification.second;
         auto d = TSharedPtr<ModificationDesc>(new ModificationDesc);
-        d->Name = to_wstring(m->getName()).c_str();
-        d->Dir = to_wstring(m->directory).c_str();
-        d->Author = to_wstring(m->author).c_str();
-        d->Version = to_wstring(m->version).c_str();
-        d->DateCreated = to_wstring(m->date_created).c_str();
-        d->DateModified = to_wstring(m->date_modified).c_str();
+        d->Name = m->getName().toFString();
+        d->Dir = m->directory.toFString();
+        d->Author = m->author.toFString();
+        d->Version = m->version.toFString();
+        d->DateCreated = m->date_created.toFString();
+        d->DateModified = m->date_modified.toFString();
         d->modification = m.get();
         mods.Add(d);
     }

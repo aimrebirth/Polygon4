@@ -169,7 +169,7 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
 			    SNew(SHorizontalBox)
                 // Tree view
                 + SHorizontalBox::Slot()
-                .FillWidth(0.25)
+                .FillWidth(0.4)
 			    .VAlign(VAlign_Fill)
                 [
                     SNew(SBorder)
@@ -297,7 +297,6 @@ bool FDBToolModule::SaveDB()
 
 void FDBToolModule::ReloadDB()
 {
-    //if (!SaveDB()) return;
     LoadDB();
 }
 
@@ -308,7 +307,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
     auto error = []()
     {
         TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("SaveMapMechanoidsError", "Select a valid modification")));
-        FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("SaveMapMechanoidsErrorMessage", "Please, select a valid modification or its child in object tree"), title.Get());
+        FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("SaveMapMechanoidsErrorMessage", "Please, select a valid modification or its child in the object tree"), title.Get());
     };
     auto error_text = [](const FText &Title, const FText &Text)
     {
@@ -339,6 +338,11 @@ void FDBToolModule::SaveMapMechanoidsToDB()
             break;
         Item = Item->Parent;
     }
+    if (!Item->Parent)
+    {
+        error();
+        return;
+    }
     if (!Item->P4Item->object || Item->P4Item->object->getType() != EObjectType::Modification)
     {
         error();
@@ -368,7 +372,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
     TMap<FString, Mechanoid*> mechanoids;
     for (auto &m : storage->mechanoids)
     {
-        FString s = to_string(m->text_id).c_str();
+        FString s = m->text_id;
         if (mechanoids.Contains(s))
         {
             error_text(
@@ -379,11 +383,14 @@ void FDBToolModule::SaveMapMechanoidsToDB()
         mechanoids.Add(s, m.second.get());
     }
 
+    bool updated = false;
     for (TActorIterator<AP4Glider> Itr(GWorld); Itr; ++Itr)
     {
         if (mechanoids.Contains(Itr->TextID))
         {
             auto m = mechanoids[Itr->TextID];
+            m->modification = modification;
+            m->map = map;
             auto Loc = Itr->GetActorLocation();
             auto Rot = Itr->GetActorRotation();
             m->x = Loc.X;
@@ -393,15 +400,20 @@ void FDBToolModule::SaveMapMechanoidsToDB()
             m->yaw = Rot.Yaw;
             m->roll = Rot.Roll;
             m->map = map;
+            
+            auto full_name = Itr->GetClass()->GetFullName();
+
             Itr->Destroy();
+            updated = true;
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Mechanoid: %s (%s) is not found in the database!"),
+            UE_LOG(LogTemp, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
                 Itr->TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
-
         }
     }
+    if (updated)
+        TableView->ResetTable();
 }
 
 void FDBToolModule::LoadMapMechanoidsFromDB()
@@ -439,7 +451,28 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
     }
 
     auto modificationMap = (ModificationMap *)Item->P4Item->object;
-    //modificationMap->
+    auto modification = modificationMap->modification;
+    auto &mechanoids = modification->mechanoids;
+
+    std::unordered_set<Mechanoid*> mapMechanoids;
+    for (auto &m : mechanoids)
+    {
+        if (m->map == modificationMap->map)
+            mapMechanoids.insert(m.second.get());
+    }
+
+    for (auto &m : mapMechanoids)
+    {
+        auto c = StaticLoadClass(AP4Glider::StaticClass(), 0,
+            m->configuration->glider->resource_blueprint,
+            m->configuration->glider->resource_blueprint);
+        if (c)
+        {
+            FVector loc{ m->x, m->y, m->z };
+            FRotator rot{ m->pitch, m->yaw, m->roll };
+            auto g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
+        }
+    }
 }
 
 void FDBToolModule::LoadMapHeightmap()

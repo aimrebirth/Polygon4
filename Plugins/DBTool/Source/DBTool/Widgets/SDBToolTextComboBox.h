@@ -23,6 +23,7 @@
 #include <Polygon4/DataManager/Types.h>
 
 struct RowData;
+class SDBToolTableView;
 
 struct ComboBoxItem
 {
@@ -34,6 +35,7 @@ class SDBToolTextComboBox : public SComboBox<TSharedPtr<ComboBoxItem>>
 {
     SLATE_BEGIN_ARGS(SDBToolTextComboBox) {}
         SLATE_ARGUMENT(RowData*, ParentData)
+        SLATE_ARGUMENT(SDBToolTableView*, TableView)
     SLATE_END_ARGS()
 
 private:
@@ -41,13 +43,17 @@ private:
     using ParentType = SComboBox<ListItem>;
 
     RowData* ParentData;
+    SDBToolTableView* TableView;
 
 public:
     TArray<ListItem> Items;
 
     void Construct(const FArguments& InArgs);
+    void SetInitialized(bool i = true) { Initialized = i; }
 
 private:
+    bool Initialized = false;
+
     TSharedRef<SWidget> OnGenerateWidget(ListItem InItem);
     void OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInfo);
 };

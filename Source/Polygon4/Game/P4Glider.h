@@ -52,7 +52,7 @@ class POLYGON4_API AP4Glider : public APawn
     int GliderView = EGliderView::FPS;
 
 public:
-    UPROPERTY(VisibleAnywhere, Category = Mechanoid)
+    UPROPERTY(EditAnywhere, Category = Mechanoid)
     FString TextID;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */

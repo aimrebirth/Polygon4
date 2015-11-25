@@ -35,14 +35,7 @@ struct TreeItem
 
     TSharedPtr<TreeItem> AddChild(const SPtrP4TreeItem &P4Item);
     void Build(P4TreeItem *Root);
-    void UpdateName()
-    {
-        if (!P4Item)
-            return;
-        Name = FText::FromString(to_wstring(polygon4::tr(to_string(P4Item->name).c_str())).c_str());
-        if (Widget.IsValid())
-            Widget->SetText(Name);
-    }
+    void UpdateName();
 };
 
 class SDBToolTableView;
