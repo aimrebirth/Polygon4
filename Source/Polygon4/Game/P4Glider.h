@@ -19,7 +19,20 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include <Polygon4/DataManager/Types.h>
 #include "P4Glider.generated.h"
+
+USTRUCT()
+struct FGliderData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditAnywhere)
+    FString TextID;
+
+    //UPROPERTY(EditAnywhere)
+    //TArray<FString> Clan;
+};
 
 enum EGliderView
 {
@@ -29,6 +42,8 @@ enum EGliderView
 
     Max
 };
+
+class P4Glider;
 
 UCLASS()
 class POLYGON4_API AP4Glider : public APawn
@@ -46,14 +61,14 @@ class POLYGON4_API AP4Glider : public APawn
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
     
-    UPROPERTY()
-    class UGliderMovement* MovementComponent;
+    //UPROPERTY()
+    //class UGliderMovement* MovementComponent;
 
     int GliderView = EGliderView::FPS;
 
 public:
     UPROPERTY(EditAnywhere, Category = Mechanoid)
-    FString TextID;
+    FGliderData Data;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -107,4 +122,9 @@ private:
     void FireLightOff();
     void FireHeavyOn();
     void FireHeavyOff();
+
+public:
+
+private:
+    P4Glider *Glider;
 };

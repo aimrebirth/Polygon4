@@ -24,6 +24,8 @@
 
 #include "P4MapBuilding.h"
 #include "P4MapObject.h"
+#include "P4Mechanoid.h"
+#include "P4Glider.h"
 
 P4Map::P4Map(const polygon4::detail::Map &rhs)
     : Base(rhs)
@@ -42,4 +44,10 @@ bool P4Map::loadLevel()
     auto world = GP4Engine->GetWorld();
     world->ServerTravel(resource);
     return true;
+}
+
+bool P4Map::spawnMechanoid(polygon4::detail::Mechanoid *m)
+{
+    auto p4m = replace<P4Mechanoid>(m);
+    return p4m->spawn();
 }

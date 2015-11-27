@@ -30,5 +30,6 @@ public:
     virtual void initChildren() override;
 
 protected:
-    virtual bool loadLevel() override;
+    virtual bool loadLevel() override final;
+    virtual bool spawnMechanoid(polygon4::detail::Mechanoid *) override final;
 };

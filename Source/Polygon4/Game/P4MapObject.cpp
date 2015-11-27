@@ -29,7 +29,11 @@ AP4Object::AP4Object()
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     VisibleComponent->AttachTo(RootComponent);
 
+#if WITH_EDITOR
+    RootComponent->SetMobility(EComponentMobility::Movable);
+#else
     RootComponent->SetMobility(EComponentMobility::Stationary);
+#endif
 }
 
 void AP4Object::setStaticMesh(UStaticMesh *mesh)
@@ -49,26 +53,30 @@ bool P4MapObject::spawn()
 {
     auto World = GP4Engine->GetWorld();
     auto WorldScale = GP4Engine->GetWorldScale();
-    auto o = LoadObject<UStaticMesh>(0, object->resource);
+
     FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
     FRotator rot(pitch, yaw, roll);
-    if (o)
+
+    if (!object->resource.empty())
     {
-        Object = World->SpawnActor<AP4Object>(AP4Object::StaticClass(), pos, rot);
-        Object->setStaticMesh(o);
-        FVector scale(object->scale, object->scale, object->scale);
-        Object->SetActorScale3D(scale);
+        auto o = LoadObject<UStaticMesh>(0, object->resource);
+        if (o)
+        {
+            Object = World->SpawnActor<AP4Object>(AP4Object::StaticClass(), pos, rot);
+            Object->setStaticMesh(o);
+            FVector scale(object->scale, object->scale, object->scale);
+            Object->SetActorScale3D(scale);
 #if WITH_EDITOR
-        Object->SetActorLabel(object->getName());
+            Object->SetActorLabel(object->getName());
 #endif
+            return true;
+        }
     }
-    else
-    {
-        auto c = LoadClass(0);
-        auto a = World->SpawnActor<AActor>(c, pos, rot);
+
+    auto c = LoadClass(0);
+    auto a = World->SpawnActor<AActor>(c, pos, rot);
 #if WITH_EDITOR
-        a->SetActorLabel(object->getName());
+    a->SetActorLabel(object->getName());
 #endif
-    }
     return true;
 }

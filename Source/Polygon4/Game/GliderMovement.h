@@ -21,9 +21,6 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GliderMovement.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class POLYGON4_API UGliderMovement : public UFloatingPawnMovement
 {

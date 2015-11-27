@@ -19,7 +19,6 @@
 #include "DBToolPrivatePCH.h"
 #include "SDBToolTableView.h"
 #include "SDBToolTreeView.h"
-#include "SDBToolTextComboBox.h"
 
 #include <algorithm>
 
@@ -118,6 +117,11 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
 {
     using namespace polygon4::detail;
 
+    using cb_item_type = TSharedPtr<ComboBoxItem>;
+    using cb_item_array = TArray<cb_item_type>;
+    using cb_item_array_ptr = TSharedPtr<cb_item_array>;
+    using cb_type = SComboBox<cb_item_type>;
+
     auto &table = Item->Data->object->getClass();
     auto &var = Item->Var;
     auto Value = Item->Data->object->getVariableString(var.getId());
@@ -126,7 +130,7 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
     if (ColumnName == "Name")
     {
         SAssignNew(Widget, STextBlock)
-            .Text(polygon4::tr(var.getName()).toFText())
+            .Text(polygon4::tr(var.getDisplayName()).toFText())
             ;
     }
     else if (ColumnName == "Type")
@@ -144,11 +148,29 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
 
         auto EditableTextBox = [&]()
         {
-            TSharedPtr<SWidget> ValidatedEditableTextBox;
-            SAssignNew(ValidatedEditableTextBox, SValidatedEditableTextBox)
+            TSharedPtr<SWidget> EditableTextBox;
+            SAssignNew(EditableTextBox, SEditableTextBox)
                 .IsEnabled(enabled)
-                .Item(Item);
-            return ValidatedEditableTextBox;
+                .RevertTextOnEscape(true)
+                .Text(Value.toFText())
+                .OnTextCommitted_Lambda([Item = Item](const FText &NewText, ETextCommit::Type Type)
+            {
+                try
+                {
+                    Item->Data->object->setVariableString(Item->Var.getId(), NewText);
+                    Item->Data->update();
+                    Item->Item->UpdateName();
+                    GDBToolModule->SetDataChanged();
+                }
+                catch (std::exception &e)
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Cannot parse value of type '%s': %s"),
+                        polygon4::tr(Item->Var.getDataType()).c_str(),
+                        polygon4::String(e.what()).c_str());
+                }
+            })
+                ;
+            return EditableTextBox;
         };
 
         if (var.isFk())
@@ -165,36 +187,60 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
                 std::tie(set, m) = Item->Data->object->getOrderedObjectMap(var.getId(), Storage.get());
 
                 bool enabled = set ? !m.empty() : true;
-                                
-                TSharedRef<SDBToolTextComboBox> cb = SNew(SDBToolTextComboBox)
-                    .ParentData(Item.Get())
-                    .TableView(TableView)
-                    ;
-                cb->SetEnabled(enabled);
-                if (enabled)
+                
+                cb_item_array_ptr Items = MakeShareable(new cb_item_array);
+                cb_item_type SelectedItem;
+
+                bool found = false;
+                for (auto &v : m)
                 {
-                    auto &Items = cb->Items;
-                    bool found = false;
-                    for (auto &v : m)
+                    Items->Add(MakeShareable(new ComboBoxItem{
+                        FText::FromString(v.first),
+                        v.second
+                    }));
+                    if (!found && Value == v.second->getName())
                     {
-                        Items.Add(MakeShareable(new ComboBoxItem{
-                            FText::FromString(v.first),
-                            v.second
-                        }));
-                        if (!found && Value == v.second->getName())
-                        {
-                            cb->SetSelectedItem(Items.Last());
-                            found = true;
-                        }
-                    }
-                    if (!found)
-                    {
-                        Items.Add(MakeShareable(new ComboBoxItem{ FText::GetEmpty(), nullptr }));
-                        cb->SetSelectedItem(Items.Last());
+                        SelectedItem = Items->Last();
+                        found = true;
                     }
                 }
+                if (!found)
+                {
+                    Items->Add(MakeShareable(new ComboBoxItem{ FText::GetEmpty(), nullptr }));
+                    SelectedItem = Items->Last();
+                }
+
+                TSharedRef<cb_type> cb = SNew(cb_type)
+                    .OptionsSource(Items.Get())
+                    .InitiallySelectedItem(SelectedItem)
+                    .OnSelectionChanged_Lambda([ParentData = Item.Get(), Items, var, this, Data = Item->Data]
+                        (const cb_item_type &InItem, ESelectInfo::Type type)
+                {
+                    auto data = ParentData->Data;
+                    auto cb_data = InItem->Object;
+                    if (cb_data)
+                    {
+                        data->object->setVariableString(ParentData->Var.getId(), cb_data);
+                        data->update();
+                        ParentData->Item->UpdateName();
+                        TableView->RefreshTable(ParentData->Item);
+                        GDBToolModule->SetDataChanged();
+                    }
+                })
+                    .OnGenerateWidget_Lambda([](const cb_item_type &InItem)
+                {
+                    return
+                        SNew(STextBlock)
+                        .Text(InItem->Text);
+                })
+                    .Content()
+                    [
+                        SNew(STextBlock)
+                        .Text(SelectedItem->Text)
+                    ]
+                ;
+
                 Widget = StaticCastSharedRef<SWidget>(cb);
-                cb->SetInitialized();
             }
         }
         else if (var.getDataType() == DataType::Bool)
@@ -218,11 +264,7 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
         }
         else if (var.getDataType() == DataType::Enum)
         {
-            using cb_item_type = TSharedPtr<ComboBoxItem>;
-            using cb_item_array = TArray<cb_item_type>;
-            using cb_type = SComboBox<cb_item_type>;
-
-            TSharedPtr<cb_item_array> Items = MakeShareable(new cb_item_array);
+            cb_item_array_ptr Items = MakeShareable(new cb_item_array);
             cb_item_type SelectedItem;
 
             auto n = var.getType()->getCppName();
@@ -303,58 +345,6 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
         [
             Widget.ToSharedRef()
         ];
-}
-
-void SValidatedEditableTextBox::Construct(const FArguments& InArgs)
-{
-    Item = InArgs._Item;
-
-    auto Value = Item->Data->object->getVariableString(Item->Var.getId());
-
-    ParentType::FArguments args;
-    args
-        //.SelectAllTextWhenFocused(true)
-        .RevertTextOnEscape(true)
-        .OnTextCommitted(this, &SValidatedEditableTextBox::OnTextCommited)
-        .OnKeyDownHandler(this, &SValidatedEditableTextBox::OnKeyDownHandler)
-        .Text(Value.toFText());
-    ParentType::Construct(args);
-}
-
-void SValidatedEditableTextBox::OnTextCommited(const FText &NewText, ETextCommit::Type Type)
-{
-    try
-    {
-        Item->Data->object->setVariableString(Item->Var.getId(), NewText.ToString().GetCharArray().GetData());
-        Item->Data->update();
-        Item->Item->UpdateName();
-        GDBToolModule->SetDataChanged();
-    }
-    catch (std::exception &e)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Cannot parse value of type '%s': %s"),
-            polygon4::tr(Item->Var.getType()->getDataType()).toString().c_str(),
-            e.what());
-    }
-}
-
-FReply SValidatedEditableTextBox::OnKeyDownHandler(const FGeometry &Geometry, const FKeyEvent &KeyEvent)
-{
-    auto c = KeyEvent.GetCharacter();
-    switch (Item->Var.getDataType())
-    {
-    case DataType::Integer:
-        if (!isdigit(c))
-            return FReply::Unhandled();
-        break;
-    case DataType::Real:
-        if (!isdigit(c) || c != '.')
-            return FReply::Unhandled();
-        break;
-    default:
-        break;
-    }
-    return FReply::Handled();
 }
 
 #undef LOCTEXT_NAMESPACE

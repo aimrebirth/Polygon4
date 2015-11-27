@@ -34,6 +34,12 @@ struct RowData
     Variable Var;
 };
 
+struct ComboBoxItem
+{
+    FText Text;
+    polygon4::detail::IObjectBase *Object;
+};
+
 class SDBToolTableView : public SListView<TSharedPtr<RowData>>
 {
     SLATE_BEGIN_ARGS(SDBToolTableView) {}
@@ -74,21 +80,4 @@ private:
 public:
     void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTable, ListItem InItem);
     virtual TSharedRef<SWidget> GenerateWidgetForColumn(const FName& ColumnName) override;
-};
-
-class SValidatedEditableTextBox : public SEditableTextBox
-{
-    SLATE_BEGIN_ARGS(SValidatedEditableTextBox) {}
-        SLATE_ARGUMENT(SDBToolTableView::ListItem, Item)
-    SLATE_END_ARGS()
-
-    using ParentType = SEditableTextBox;
-
-private:
-    SDBToolTableView::ListItem Item;
-
-public:
-    void Construct(const FArguments& InArgs);
-    void OnTextCommited(const FText &NewText, ETextCommit::Type Type);
-    FReply OnKeyDownHandler(const FGeometry &Geometry, const FKeyEvent &KeyEvent);
 };

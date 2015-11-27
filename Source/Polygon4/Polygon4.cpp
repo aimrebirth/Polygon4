@@ -55,8 +55,8 @@ public:
 
 UClass* LoadClass(const TCHAR* Name)
 {
-    if (Name == 0)
-        Name = L"NONAME";
+    if (Name == 0 || FString(Name).IsEmpty())
+        Name = DUMMY_OBJECT;
     auto c = StaticLoadClass(AActor::StaticClass(), 0, Name);
     if (c)
         return c;

@@ -29,13 +29,15 @@ AP4Glider::AP4Glider()
 	PrimaryActorTick.bCanEverTick = true;
     
     // Set this pawn to be controlled by the lowest-numbered player
-    AutoPossessPlayer = EAutoReceiveInput::Player0;
+    //AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     // Create a dummy root component we can attach things to.
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-    MovementComponent = CreateDefaultSubobject<UGliderMovement>(TEXT("CustomMovementComponent"));
-    MovementComponent->UpdatedComponent = RootComponent;
+    //MovementComponent = CreateDefaultSubobject<UGliderMovement>(TEXT("CustomMovementComponent"));
+    //MovementComponent->UpdatedComponent = RootComponent;
     	
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     
@@ -43,7 +45,7 @@ AP4Glider::AP4Glider()
     //if (GliderMesh.Succeeded())
     {
         //VisibleComponent->SetStaticMesh(GliderMesh.Object);
-        VisibleComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+        //VisibleComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
     }
     VisibleComponent->AttachTo(RootComponent);
 
@@ -57,17 +59,17 @@ AP4Glider::AP4Glider()
     ThirdPersonCameraComponent->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
     ThirdPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
     ThirdPersonCameraComponent->bUsePawnControlRotation = false;
-    ThirdPersonCameraComponent->AttachTo(FirstPersonCameraComponent);
+    ThirdPersonCameraComponent->AttachTo(RootComponent);
 
     // set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
     
-    bUseControllerRotationPitch = false;
-    bUseControllerRotationYaw = false;
-    bUseControllerRotationRoll = false;
+    //bUseControllerRotationPitch = false;
+    //bUseControllerRotationYaw = true;
+    //bUseControllerRotationRoll = true;
 
-    VisibleComponent->SetSimulatePhysics(true);
+    VisibleComponent->SetSimulatePhysics(false);
 
     UpdateView();
 
@@ -95,7 +97,10 @@ void AP4Glider::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    RootComponent->SetWorldRotation(GetControlRotation());
+    auto component_loc = VisibleComponent->GetComponentLocation();
+    auto ControlRotation = GetControlRotation();
+    ControlRotation.Roll = 0;
+    RootComponent->SetWorldRotation(ControlRotation);
 
     float rpm1 = 60.f / 400.0f;
     float rpm2 = 60.f / 60.0f;
@@ -104,7 +109,8 @@ void AP4Glider::Tick(float DeltaTime)
     const auto GunOffsetRight   = FVector(150.0f, 100.0f, 0.0f);
     const auto GunOffsetTop     = FVector(150.0f, 0.0f, 100.0f);
     
-    const FRotator SpawnRotation = GetControlRotation();
+    FRotator SpawnRotation = GetControlRotation();
+    SpawnRotation.Roll = 0;
 
     const FVector SpawnLocationLeft = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetLeft);
     const FVector SpawnLocationRight = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetRight);
@@ -191,10 +197,15 @@ void AP4Glider::Move(float AxisValue)
     if (Controller != NULL && AxisValue != 0.0f)
     {
         FRotator Rotation = Controller->GetControlRotation();
+        Rotation.Pitch = 0;
         const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
         AddMovementInput(Direction, AxisValue);
+
+        auto pc = Cast<UPrimitiveComponent>(GetRootComponent());
+        if (pc)
+            pc->AddForce(Direction);
     }
-    if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent))
+    //if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent))
     {
         //MovementComponent->AddInputVector(GetActorForwardVector() * AxisValue);
     }
@@ -209,7 +220,7 @@ void AP4Glider::Strafe(float AxisValue)
         const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
         AddMovementInput(Direction, AxisValue);
     }
-    if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent))
+    //if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent))
     {
         //MovementComponent->AddInputVector(GetActorRightVector() * AxisValue);
     }
@@ -266,6 +277,7 @@ void AP4Glider::UpdateView()
         break;
     }
 }
+
 void AP4Glider::FireLightOn()
 {
     FireLight = true;

@@ -29,6 +29,7 @@ POLYGON4_UNREAL_MEMORY_STUB
 #include <Polygon4/DataManager/Types.h>
 
 #include <Polygon4/Game/P4Glider.h>
+#include <Polygon4/Game/P4Mechanoid.h>
 
 static const FName DBToolTabName("DBTool");
 FDBToolModule *GDBToolModule;
@@ -386,9 +387,9 @@ void FDBToolModule::SaveMapMechanoidsToDB()
     bool updated = false;
     for (TActorIterator<AP4Glider> Itr(GWorld); Itr; ++Itr)
     {
-        if (mechanoids.Contains(Itr->TextID))
+        if (mechanoids.Contains(Itr->Data.TextID))
         {
-            auto m = mechanoids[Itr->TextID];
+            auto m = mechanoids[Itr->Data.TextID];
             m->modification = modification;
             m->map = map;
             auto Loc = Itr->GetActorLocation();
@@ -409,7 +410,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
-                Itr->TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
+                Itr->Data.TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
         }
     }
     if (updated)
@@ -422,8 +423,12 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
 
     auto error = []()
     {
-        TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("LoadMapMechanoidsError", "Select a valid modification map")));
-        FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("LoadMapMechanoidsErrorMessage", "Please, select a valid modification map"), title.Get());
+        TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("LoadMapMechanoidsError", "Select a valid modification")));
+        FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("LoadMapMechanoidsErrorMessage", "Please, select a valid modification"), title.Get());
+    };
+    auto error_text = [](const FText &Title, const FText &Text)
+    {
+        FMessageDialog::Open(EAppMsgType::Ok, Text, &Title);
     };
 
     auto Items = TreeView->GetSelectedItems();
@@ -444,34 +449,55 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
         error();
         return;
     }
-    if (!Item->P4Item->object || Item->P4Item->object->getType() != EObjectType::ModificationMap)
+    while (Item->Parent)
+    {
+        if (Item->P4Item->object && Item->P4Item->object->getType() == EObjectType::Modification)
+            break;
+        Item = Item->Parent;
+    }
+    if (!Item->Parent)
+    {
+        error();
+        return;
+    }
+    if (!Item->P4Item->object || Item->P4Item->object->getType() != EObjectType::Modification)
     {
         error();
         return;
     }
 
-    auto modificationMap = (ModificationMap *)Item->P4Item->object;
-    auto modification = modificationMap->modification;
-    auto &mechanoids = modification->mechanoids;
+    auto MapName = GWorld->GetOuter()->GetName();
+    auto modification = (Modification *)Item->P4Item->object;
+    IdPtr<Map> map;
+    Text name = MapName.GetCharArray().GetData();
+    for (auto &m : modification->maps)
+    {
+        if (m->map->resource == name)
+        {
+            map = m->map;
+            break;
+        }
+    }
+    if (!map)
+    {
+        error_text(
+            LOCTEXT("SaveMapMechanoidsMapNotFound", "Map is not found"),
+            FText::Format(LOCTEXT("SaveMapMechanoidsMapNotFoundText", "This map '{0}' is not included in selected modification"), FText::FromString(MapName)));
+        return;
+    }
 
+    auto &mechanoids = modification->mechanoids;
     std::unordered_set<Mechanoid*> mapMechanoids;
     for (auto &m : mechanoids)
     {
-        if (m->map == modificationMap->map)
+        if (m->map == map)
             mapMechanoids.insert(m.second.get());
     }
 
     for (auto &m : mapMechanoids)
     {
-        auto c = StaticLoadClass(AP4Glider::StaticClass(), 0,
-            m->configuration->glider->resource_blueprint,
-            m->configuration->glider->resource_blueprint);
-        if (c)
-        {
-            FVector loc{ m->x, m->y, m->z };
-            FRotator rot{ m->pitch, m->yaw, m->roll };
-            auto g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
-        }
+        auto p4m = m->replace<P4Mechanoid>(m);
+        p4m->spawn();
     }
 }
 

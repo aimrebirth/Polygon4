@@ -127,7 +127,7 @@ public class Polygon4 : ModuleRules
     public void LoadCoreModule(TargetInfo Target, string Name)
     {
         //System.Console.WriteLine("Enter LoadCoreModule");
-
+        
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
@@ -138,11 +138,11 @@ public class Polygon4 : ModuleRules
         {
             if (Target.Platform == UnrealTargetPlatform.Win64)
             {
-                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win64/gen/include"));
+                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win64/gen_RelWithDebInfo/include"));
             }
             if (Target.Platform == UnrealTargetPlatform.Win32)
             {
-                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win32/gen/include"));
+                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win32/gen_RelWithDebInfo/include"));
             }
         }
 

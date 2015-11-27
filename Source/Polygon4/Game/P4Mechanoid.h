@@ -16,23 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
+#pragma once
 
-#include "P4GameInstance.h"
-#include "P4Engine.h"
-#include "P4Modification.h"
-#include "P4Map.h"
-#include "P4Mechanoid.h"
+#include <Polygon4/Mechanoid.h>
 
-#include "UI/Menu/MainMenu.h"
-
-P4Modification::P4Modification(const polygon4::detail::Modification &rhs)
-    : Base(rhs)
+class POLYGON4_API P4Mechanoid : public polygon4::Mechanoid
 {
-}
+    using Base = polygon4::Mechanoid;
 
-void P4Modification::initChildren()
-{
-    initMaps<P4Map>();
-    initMechanoids<P4Mechanoid>();
-}
+public:
+    P4Mechanoid(const polygon4::detail::Mechanoid &rhs);
+
+    virtual bool spawn(bool player = false) override;
+};
