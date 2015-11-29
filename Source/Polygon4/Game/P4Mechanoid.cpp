@@ -31,6 +31,9 @@ P4Mechanoid::P4Mechanoid(const polygon4::detail::Mechanoid &rhs)
 
 bool P4Mechanoid::spawn(bool player)
 {
+    if (!enabled)
+        return false;
+
     FString resource = configuration->glider->resource;
     auto c = StaticLoadClass(AP4Glider::StaticClass(), nullptr, resource.GetCharArray().GetData());
     if (!c)
@@ -45,6 +48,8 @@ bool P4Mechanoid::spawn(bool player)
     FVector loc{ x, y, z };
     FRotator rot{ pitch, yaw, roll };
     auto g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
+    FVector scale(configuration->glider->scale, configuration->glider->scale, configuration->glider->scale);
+    g->SetActorScale3D(scale);
     g->Data.TextID = text_id.toFString();
 #if WITH_EDITOR
     g->SetActorLabel(g->Data.TextID);

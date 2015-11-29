@@ -23,43 +23,77 @@
 
 #include "GliderMovement.h"
 
+FPowerUpProperties::FPowerUpProperties()
+{
+    HoverInAir = true;
+    HoverAltitude = 250.0f;
+    GravityScale = 0.2f;
+    LiftSpring = 350000.0f;
+    LiftDamp = -128.0f;
+    SlowFall = false;
+    FallSpeed = 100.0f;
+    SelfRight = true;
+    AlphaTrack = 500000.0f;
+    AlphaDamp = -128.0f;
+}
+
 AP4Glider::AP4Glider()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
     
-    // Set this pawn to be controlled by the lowest-numbered player
     //AutoPossessPlayer = EAutoReceiveInput::Player0;
-
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-    // Create a dummy root component we can attach things to.
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+    //RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
     //MovementComponent = CreateDefaultSubobject<UGliderMovement>(TEXT("CustomMovementComponent"));
     //MovementComponent->UpdatedComponent = RootComponent;
-    	
+
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
-    
+    RootComponent = VisibleComponent;
+    Mesh = VisibleComponent;
+
+    JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
+    //JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundCue'/Game/Mods/Common/Sounds/Glider/jump_Cue.jump_Cue'"));
+    //if (!JumpSound)
+    //    JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("/Game/Mods/Common/Sounds/Glider/jump"));
+    if (JumpSound)
+    {
+        JumpSound->AttachParent = RootComponent;
+        JumpSound->bAutoActivate = false;
+    }
+
+        
     //static ConstructorHelpers::FObjectFinder<UStaticMesh> GliderMesh(TEXT("/Game/Mods/Common/Gliders/Hawk/GLD_M1_BASE"));
     //if (GliderMesh.Succeeded())
     {
         //VisibleComponent->SetStaticMesh(GliderMesh.Object);
         //VisibleComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
     }
-    VisibleComponent->AttachTo(RootComponent);
+    //VisibleComponent->SnapTo(RootComponent);
 
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
-    FirstPersonCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-    FirstPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+    //FirstPersonCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+    //FirstPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
     FirstPersonCameraComponent->bUsePawnControlRotation = true;
     FirstPersonCameraComponent->AttachTo(VisibleComponent);
 
+    SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraSpringArm"));
+    //SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
+    //SpringArm->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+    SpringArm->bUsePawnControlRotation = false;
+    SpringArm->AttachTo(RootComponent);
+    SpringArm->RelativeRotation = FRotator(-10.f, 0.f, 0.f);
+    SpringArm->TargetArmLength = 500.0f;
+    SpringArm->bEnableCameraLag = true;
+    SpringArm->CameraLagSpeed = 5.0f;
+
     ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TPSCamera"));
-    ThirdPersonCameraComponent->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
-    ThirdPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-    ThirdPersonCameraComponent->bUsePawnControlRotation = false;
-    ThirdPersonCameraComponent->AttachTo(RootComponent);
+    //ThirdPersonCameraComponent->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
+    //ThirdPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+    //ThirdPersonCameraComponent->bUsePawnControlRotation = false;
+    //ThirdPersonCameraComponent->AttachTo(RootComponent);
+    ThirdPersonCameraComponent->AttachTo(SpringArm, USpringArmComponent::SocketName);
 
     // set our turn rates for input
 	BaseTurnRate = 45.f;
@@ -67,9 +101,9 @@ AP4Glider::AP4Glider()
     
     //bUseControllerRotationPitch = false;
     //bUseControllerRotationYaw = true;
-    //bUseControllerRotationRoll = true;
+    //bUseControllerRotationRoll = false;
 
-    VisibleComponent->SetSimulatePhysics(false);
+    VisibleComponent->SetSimulatePhysics(true);
 
     UpdateView();
 
@@ -79,29 +113,34 @@ AP4Glider::AP4Glider()
     static ConstructorHelpers::FObjectFinder<UClass> heavy(TEXT("Class'/Game/Mods/Common/Projectiles/HeavyProjectile.HeavyProjectile_C'"));
     if (heavy.Object)
         b2 = heavy.Object;
+
+    JumpTimeout = ArmedTimedValue(1.5);
 }
 
-// Called when the game starts or when spawned
 void AP4Glider::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-/*UPawnMovementComponent* AP4Glider::GetMovementComponent() const
-{
-    return MovementComponent;
-}*/
+//UPawnMovementComponent* AP4Glider::GetMovementComponent() const
+//{
+//    return MovementComponent;
+//}
 
-// Called every frame
 void AP4Glider::Tick(float DeltaTime)
 {
+    // parent
     Super::Tick(DeltaTime);
 
-    auto component_loc = VisibleComponent->GetComponentLocation();
-    auto ControlRotation = GetControlRotation();
-    ControlRotation.Roll = 0;
-    RootComponent->SetWorldRotation(ControlRotation);
+    // timers
+    JumpTimeout += DeltaTime;
 
+    // trace
+    ZTraceResults = HoverTrace(50000);
+
+    //
+
+    //
     float rpm1 = 60.f / 400.0f;
     float rpm2 = 60.f / 60.0f;
     
@@ -109,7 +148,7 @@ void AP4Glider::Tick(float DeltaTime)
     const auto GunOffsetRight   = FVector(150.0f, 100.0f, 0.0f);
     const auto GunOffsetTop     = FVector(150.0f, 0.0f, 100.0f);
     
-    FRotator SpawnRotation = GetControlRotation();
+    FRotator SpawnRotation = GetActorRotation();
     SpawnRotation.Roll = 0;
 
     const FVector SpawnLocationLeft = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetLeft);
@@ -149,22 +188,91 @@ void AP4Glider::Tick(float DeltaTime)
             time2 = rpm2;
         }
     }
+    
 
-    FVector NewLocation = GetActorLocation();
-    float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
-    NewLocation.Z += DeltaHeight * 1.0f;       //Scale our height by a factor of 20
-    RunningTime += DeltaTime;
-
-    // move
-    if (!CurrentVelocity.IsZero())
+    float Altitude = FVector(GetActorLocation() - ZTraceResults.ImpactPoint).Size();
+    float g = 980;
+    if (Altitude > PowerUpProperties.HoverAltitude + 1000)
     {
-        NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
+        g = -g;
+    }
+    else if (Altitude > PowerUpProperties.HoverAltitude + 10)
+    {
+        g = (PowerUpProperties.HoverAltitude - Altitude) / 2;
+        //UE_LOG(LogTemp, Warning, TEXT("Altitude: %f"), Altitude);
+    }
+    else if (Altitude < PowerUpProperties.HoverAltitude)
+    {
+        g -= (Altitude - PowerUpProperties.HoverAltitude) * 2;
     }
 
-    SetActorLocation(NewLocation);
+    VisibleComponent->SetLinearDamping(1.0f);
+    VisibleComponent->SetAngularDamping(1.0f);
+    VisibleComponent->AddForce(FVector::UpVector * VisibleComponent->GetBodyInstance()->GetBodyMass() * g);
+
+
+
+
+    // Get the Compression Ratio of our invisible 'Spring'. This should always be between 1 and zero, and clamped to zero. */
+    /*float CompressionRatio;
+    float RatioA = Altitude / (PowerUpProperties.HoverAltitude * -1.0f);
+
+    if (RatioA < -1.0f)
+    {
+        CompressionRatio = 0.0f;
+    }
+    else
+    {
+        CompressionRatio = FMath::GetMappedRangeValueClamped(FVector2D(0.0, -1.0), FVector2D(1.0f, 0.0f), RatioA);
+    }
+
+    // Now add the spring force to the crate.
+    FVector SpringForce = FVector(0.0f, 0.0f, (CompressionRatio * PowerUpProperties.LiftSpring) + (PowerUpProperties.LiftDamp * Mesh->GetPhysicsLinearVelocity().Z));
+    Mesh->AddForce(SpringForce);
+
+    /* Now we need to apply angular torque to the create to try and make it follow the normal of the terrain/object it's 'landed' on. 
+    /* First, get the Normal of the ground and Normalize it, with a slight bias in the upwards direction. 
+    FVector TraceNormal = FVector(ZTraceResults.ImpactNormal.X, ZTraceResults.ImpactNormal.Y, ZTraceResults.ImpactNormal.Z * 2.0f);
+    TraceNormal.Normalize();
+
+    /* Use our value to set the 'Damping' Force from our 'AlphaDamp' value. We also do this in 'Z' to prevent cone-spinning. 
+    FVector Alpha;
+    Alpha.X = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().X;
+    Alpha.Y = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().Y;
+    Alpha.Z = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().Z;
+
+    /* Scale the speed of the self-righting based on our current compression ratio (more torque at the top of the springs length). 
+    float ScaledTrack = PowerUpProperties.AlphaTrack * (CompressionRatio * -1.0f);
+
+    /* Set the new Alpha Values, attempt to align with the Forward and Right vectors, which should then straighten our Up vector. 
+    //Alpha.X += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorForwardVector());
+    //Alpha.Y += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorRightVector());
+    Alpha.Z += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorUpVector());
+
+    // Apply the torque and scale it by the crate mass so our values stay slightly more sensible. (Torque is really weak by default). 
+    Mesh->AddTorque(Alpha * Mesh->GetMass());*/
+
+
+
+
+    auto component_loc = VisibleComponent->GetComponentLocation();
+    auto ControlRotation = GetControlRotation();
+    ControlRotation.Roll = 0;
+    RootComponent->SetWorldRotation(ControlRotation);
+    //Mesh->AddTorque(  * Mesh->GetMass());
+
+
+
+
+    
+
+    //Hover();
+    //VisibleComponent->SetWorldRotation(GetActorRotation());
+    //VisibleComponent->SetWorldLocation(GetActorLocation());
+
+    // at the end
 }
 
-// Called to bind functionality to input
 void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
 	Super::SetupPlayerInputComponent(InInputComponent);
@@ -193,17 +301,19 @@ void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponen
 
 void AP4Glider::Move(float AxisValue)
 {
-    AxisValue *= 100;
     if (Controller != NULL && AxisValue != 0.0f)
     {
-        FRotator Rotation = Controller->GetControlRotation();
-        Rotation.Pitch = 0;
-        const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
-        AddMovementInput(Direction, AxisValue);
+        AxisValue *= boost ? 2000 : 1000;
+        //FRotator Rotation = Controller->GetControlRotation();
+        //const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
+        //AddMovementInput(Direction, AxisValue);
+        
+        //AddMovementInput(GetActorForwardVector() * AxisValue);
+        Mesh->AddForce(GetActorForwardVector() * VisibleComponent->GetBodyInstance()->GetBodyMass() * AxisValue);
 
-        auto pc = Cast<UPrimitiveComponent>(GetRootComponent());
-        if (pc)
-            pc->AddForce(Direction);
+        //auto pc = Cast<UPrimitiveComponent>(GetRootComponent());
+        //if (pc)
+        //    pc->AddForce(Direction);
     }
     //if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent))
     {
@@ -213,12 +323,15 @@ void AP4Glider::Move(float AxisValue)
 
 void AP4Glider::Strafe(float AxisValue)
 {
-    AxisValue *= 100;
     if (Controller != NULL && AxisValue != 0.0f)
     {
-        const FRotator Rotation = Controller->GetControlRotation();
-        const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
-        AddMovementInput(Direction, AxisValue);
+        AxisValue *= 1000;
+        //const FRotator Rotation = Controller->GetControlRotation();
+        //const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
+        //AddMovementInput(Direction, AxisValue);
+
+        //AddMovementInput(GetActorRightVector() * AxisValue);
+        Mesh->AddForce(GetActorRightVector() * VisibleComponent->GetBodyInstance()->GetBodyMass() * AxisValue);
     }
     //if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent))
     {
@@ -228,6 +341,12 @@ void AP4Glider::Strafe(float AxisValue)
 
 void AP4Glider::Jump()
 {
+    if (JumpTimeout)
+    {
+        VisibleComponent->AddForce(GetActorUpVector() * VisibleComponent->GetMass() * 30, NAME_None, true);
+        JumpSound->Activate(true);
+        JumpSound->Play();
+    }
 }
 
 void AP4Glider::BoostOn()
@@ -296,4 +415,169 @@ void AP4Glider::FireHeavyOn()
 void AP4Glider::FireHeavyOff()
 {
     FireHeavy = false;
+}
+
+void AP4Glider::Hover()
+{
+    FHitResult TraceResults = HoverTrace(PowerUpProperties.HoverAltitude);
+
+    auto Mesh = VisibleComponent;
+
+    /* If the Trace Hit Something, then we need to start applying the hovering physics. Otherwise, we let the Physics Engine Handle Everything. */
+    if (TraceResults.bBlockingHit)
+    {
+        // Firstly, slow down the lateral movement so we don't go flying off into the wilderness.
+        Mesh->SetLinearDamping(1.0f);
+
+        /* Get the Compression Ratio of our invisible 'Spring'. This should always be between 1 and zero, and clamped to zero. */
+        float CompressionRatio;
+
+        /* Get Compression Ratio / Height Ratio */
+        float Altitude = FVector(GetActorLocation() - TraceResults.ImpactPoint).Size();
+        float RatioA = Altitude / (PowerUpProperties.HoverAltitude * -1.0f);
+
+        if (RatioA < -1.0f)
+        {
+            CompressionRatio = 0.0f;
+        }
+        else
+        {
+            CompressionRatio = FMath::GetMappedRangeValueClamped(FVector2D(0.0, -1.0), FVector2D(1.0f, 0.0f), RatioA);
+        }
+
+        /* Now add the spring force to the crate. */
+        FVector SpringForce = FVector(0.0f, 0.0f, (CompressionRatio * PowerUpProperties.LiftSpring) + (PowerUpProperties.LiftDamp * Mesh->GetPhysicsLinearVelocity().Z));
+        Mesh->AddForce(SpringForce);
+
+        /* Now we need to apply angular torque to the create to try and make it follow the normal of the terrain/object it's 'landed' on. */
+        /* First, get the Normal of the ground and Normalize it, with a slight bias in the upwards direction. */
+        FVector TraceNormal = FVector(TraceResults.ImpactNormal.X, TraceResults.ImpactNormal.Y, TraceResults.ImpactNormal.Z * 2.0f);
+        TraceNormal.Normalize();
+
+        /* Use our value to set the 'Damping' Force from our 'AlphaDamp' value. We also do this in 'Z' to prevent cone-spinning. */
+        FVector Alpha;
+        Alpha.X = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().X;
+        Alpha.Y = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().Y;
+        Alpha.Z = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().Z;
+
+        /* Scale the speed of the self-righting based on our current compression ratio (more torque at the top of the springs length). */
+        float ScaledTrack = PowerUpProperties.AlphaTrack * (CompressionRatio * -1.0f);
+
+        /* Set the new Alpha Values, attempt to align with the Forward and Right vectors, which should then straighten our Up vector. */
+        Alpha.X += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorForwardVector());
+        Alpha.Y += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorRightVector());
+
+        /* Apply the torque and scale it by the crate mass so our values stay slightly more sensible. (Torque is really weak by default). */
+        Mesh->AddTorque(Alpha * Mesh->GetMass());
+    }
+    else
+    {
+        // If we don't hit anything, let the crate fall with minimal resistance.
+        Mesh->SetLinearDamping(0.01f);
+    }
+}
+
+FHitResult AP4Glider::HoverTrace(float Altitude) const
+{
+    static const FName HoverTraceTag("HoverTrace");
+    //GetWorld()->DebugDrawTraceTag = HoverTraceTag;
+
+    FCollisionQueryParams TraceParams(HoverTraceTag, true, this);
+    TraceParams.bTraceAsyncScene = true;
+    //TraceParams.TraceTag = HoverTraceTag;
+
+    auto begin = GetActorLocation();
+    auto end = begin;
+    end.Z -= Altitude;
+    
+    FHitResult Hit(ForceInit);
+    if (GetWorld()->LineTraceSingleByChannel(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_Visibility,
+        TraceParams))
+    {
+        //UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByChannel succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByObjectType(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_Visibility, //
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByObjectType succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByChannel(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_PhysicsBody,
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByChannel ECC_PhysicsBody succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByObjectType(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_PhysicsBody, //
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByObjectType ECC_PhysicsBody succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByChannel(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_WorldStatic,
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByChannel ECC_WorldStatic succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByObjectType(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_WorldStatic, //
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByObjectType ECC_WorldStatic succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByChannel(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_WorldDynamic,
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByChannel ECC_WorldDynamic succeed"));
+        return Hit;
+    }
+
+    if (GetWorld()->LineTraceSingleByObjectType(
+        Hit,
+        begin,
+        end,
+        ECollisionChannel::ECC_WorldDynamic, //
+        TraceParams))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("LineTraceSingleByObjectType ECC_WorldDynamic succeed"));
+        return Hit;
+    }
+
+    return Hit;
 }

@@ -60,7 +60,7 @@ void AProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVec
 	{
         if (OtherComp->IsSimulatingPhysics())
 		    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());
-
-		Destroy();
-	}
+    }
+    if (OtherActor != this)
+        Destroy();
 }

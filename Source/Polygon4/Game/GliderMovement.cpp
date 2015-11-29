@@ -29,9 +29,10 @@ void UGliderMovement::TickComponent(float DeltaTime, enum ELevelTick TickType, F
         return;
     }
 
-    // Get (and then clear) the movement vector that we set in ACollidingPawn::Tick
-    FVector DesiredMovementThisFrame = ConsumeInputVector().GetClampedToMaxSize(1.0f) * DeltaTime * 150.0f;
-    if (!DesiredMovementThisFrame.IsNearlyZero())
+    float speed = 5000;
+
+    FVector DesiredMovementThisFrame = ConsumeInputVector().GetClampedToMaxSize(1.0f) * DeltaTime * speed;
+    /*if (!DesiredMovementThisFrame.IsNearlyZero())
     {
         FHitResult Hit;
         SafeMoveUpdatedComponent(DesiredMovementThisFrame, UpdatedComponent->GetComponentRotation(), true, Hit);
@@ -41,5 +42,5 @@ void UGliderMovement::TickComponent(float DeltaTime, enum ELevelTick TickType, F
         {
             SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);
         }
-    }
+    }*/
 };
