@@ -3,6 +3,8 @@
 *.sdf
 *.suo
 *.sln
+/*.db
+/*.opendb
 
 # dirs
 Binaries
@@ -17,7 +19,7 @@ Saved
 # ThirdParty
 ThirdParty
 
-# uproject
+# project
 *.uproject
 *.lnk
 *.bat

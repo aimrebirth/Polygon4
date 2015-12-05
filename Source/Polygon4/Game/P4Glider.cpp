@@ -17,16 +17,20 @@
  */
 
 #include "Polygon4.h"
-
 #include "P4Glider.h"
+
 #include "Projectile.h"
 
 #include "GliderMovement.h"
+#include "GliderHUD.h"
+
+const float k_mouse_x = 0.6;
+const float k_mouse_y = 0.6;
 
 FPowerUpProperties::FPowerUpProperties()
 {
     HoverInAir = true;
-    HoverAltitude = 250.0f;
+    HoverAltitude = 300.0f;
     GravityScale = 0.2f;
     LiftSpring = 350000.0f;
     LiftDamp = -128.0f;
@@ -49,11 +53,13 @@ AP4Glider::AP4Glider()
     //MovementComponent = CreateDefaultSubobject<UGliderMovement>(TEXT("CustomMovementComponent"));
     //MovementComponent->UpdatedComponent = RootComponent;
 
+    //CenterPoint = CreateDefaultSubobject<USceneComponent>(TEXT("CenterPoint"));
+
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     RootComponent = VisibleComponent;
     Mesh = VisibleComponent;
 
-    JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
+    JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
     //JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("SoundCue'/Game/Mods/Common/Sounds/Glider/jump_Cue.jump_Cue'"));
     //if (!JumpSound)
     //    JumpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("/Game/Mods/Common/Sounds/Glider/jump"));
@@ -62,6 +68,8 @@ AP4Glider::AP4Glider()
         JumpSound->AttachParent = RootComponent;
         JumpSound->bAutoActivate = false;
     }
+
+    JumpSound2 = CreateDefaultSubobject<USoundWave>(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
 
         
     //static ConstructorHelpers::FObjectFinder<UStaticMesh> GliderMesh(TEXT("/Game/Mods/Common/Gliders/Hawk/GLD_M1_BASE"));
@@ -75,15 +83,15 @@ AP4Glider::AP4Glider()
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
     //FirstPersonCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
     //FirstPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-    FirstPersonCameraComponent->bUsePawnControlRotation = true;
+    //FirstPersonCameraComponent->bUsePawnControlRotation = true;
     FirstPersonCameraComponent->AttachTo(VisibleComponent);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraSpringArm"));
     //SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
     //SpringArm->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
     SpringArm->bUsePawnControlRotation = false;
-    SpringArm->AttachTo(RootComponent);
-    SpringArm->RelativeRotation = FRotator(-10.f, 0.f, 0.f);
+    SpringArm->AttachTo(VisibleComponent);
+    SpringArm->RelativeRotation = FRotator(-20.f, 0.f, 0.f);
     SpringArm->TargetArmLength = 500.0f;
     SpringArm->bEnableCameraLag = true;
     SpringArm->CameraLagSpeed = 5.0f;
@@ -91,7 +99,7 @@ AP4Glider::AP4Glider()
     ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TPSCamera"));
     //ThirdPersonCameraComponent->SetRelativeLocation(FVector(-1000.0f, 0.0f, 250.0f));
     //ThirdPersonCameraComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
-    //ThirdPersonCameraComponent->bUsePawnControlRotation = false;
+    ThirdPersonCameraComponent->bUsePawnControlRotation = false;
     //ThirdPersonCameraComponent->AttachTo(RootComponent);
     ThirdPersonCameraComponent->AttachTo(SpringArm, USpringArmComponent::SocketName);
 
@@ -104,6 +112,7 @@ AP4Glider::AP4Glider()
     //bUseControllerRotationRoll = false;
 
     VisibleComponent->SetSimulatePhysics(true);
+    VisibleComponent->SetPhysicsMaxAngularVelocity(30);
 
     UpdateView();
 
@@ -115,11 +124,20 @@ AP4Glider::AP4Glider()
         b2 = heavy.Object;
 
     JumpTimeout = ArmedTimedValue(1.5);
+    SlopeAngle = FloatDampingValue(30);
 }
 
 void AP4Glider::BeginPlay()
 {
-	Super::BeginPlay();
+    JumpSound->Activate(true);
+
+    SpringArm->bInheritRoll = false;
+    SpringArm->bInheritPitch = true;
+    SpringArm->bInheritYaw = true;
+
+    Super::BeginPlay();
+
+    //JumpSound->Activate(true);
 }
 
 //UPawnMovementComponent* AP4Glider::GetMovementComponent() const
@@ -127,16 +145,102 @@ void AP4Glider::BeginPlay()
 //    return MovementComponent;
 //}
 
-void AP4Glider::Tick(float DeltaTime)
+void AP4Glider::Tick(float DeltaSeconds)
 {
     // parent
-    Super::Tick(DeltaTime);
+    Super::Tick(DeltaSeconds);
+
+    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+    // mouse pos
+    if (PlayerController)
+    {
+        auto Viewport = GetWorld()->GetGameViewport();
+        FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
+        FVector2D Position;
+        bool Focused1 = Viewport->IsFocused(Viewport->Viewport);
+        bool Focused2 = Viewport->Viewport->HasFocus();
+        if ((Focused1 || Focused2) && PlayerController->GetMousePosition(Position.X, Position.Y))
+        {
+            enum class MouseChange
+            {
+                None,
+                Start,
+                End,
+            };
+            auto NormPos = [](float &x, int len, float k)
+            {
+                int window = len * k;
+                int pos = round(x);
+                int start = (len - window) / 2.0f;
+                int end = start + window;
+                MouseChange changed = MouseChange::None;
+                if (pos > end)
+                {
+                    pos = end;
+                    changed = MouseChange::End;
+                }
+                else if (pos < start)
+                {
+                    pos = start;
+                    changed = MouseChange::Start;
+                }
+                x = pos;
+                return changed;
+            };
+
+            static auto oldpos2 = Position;
+            if (oldpos2.X != Position.X)
+            {
+                PlayerController->GetMousePosition(Position.X, Position.Y);
+            }
+            oldpos2 = Position;
+
+            //UE_LOG(LogTemp, Warning, TEXT("mouse before: x = %f, y = %f"), Position.X, Position.Y);
+
+            auto oldpos = Position;
+            auto changed_x = NormPos(Position.X, ViewSize.X, k_mouse_x);
+            auto changed_y = NormPos(Position.Y, ViewSize.Y, k_mouse_y);
+            bool changed = changed_x != MouseChange::None || changed_y != MouseChange::None;
+
+            if (changed)
+            {
+                //UE_LOG(LogTemp, Warning, TEXT("mouse before: x = %f, y = %f"), oldpos.X, oldpos.Y);
+                //UE_LOG(LogTemp, Warning, TEXT("mouse after : x = %f, y = %f"), Position.X, Position.Y);
+
+                //changed_x = NormPos(oldpos.X, ViewSize.X, k_mouse_x);
+                //changed_y = NormPos(oldpos.Y, ViewSize.Y, k_mouse_y);
+
+                if (changed_y == MouseChange::End)
+                    Position.X++;
+
+                //UE_LOG(LogTemp, Warning, TEXT("mouse after2: x = %f, y = %f"), oldpos.X, oldpos.Y);
+
+                Viewport->Viewport->SetMouse(Position.X, Position.Y);
+
+                //PlayerController->GetMousePosition(Position.X, Position.Y);
+
+                //UE_LOG(LogTemp, Warning, TEXT("mouse after3: x = %f, y = %f"), Position.X, Position.Y);
+                //UE_LOG(LogTemp, Warning, TEXT("-------------------------------------"));
+            }
+
+            auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD());
+            HUD->SetMousePosition(Position);
+
+            //
+            FIntPoint Center = ViewSize / 2;
+            auto kx = (Position.X - Center.X) / (float)Center.X;
+            auto ky = (Position.Y - Center.Y) / (float)Center.Y;
+            Position.X -= copysignf(3, kx);
+            Position.Y -= copysignf(2, ky);
+
+            //Viewport->Viewport->SetMouse(Position.X, Position.Y);
+            //UE_LOG(LogTemp, Warning, TEXT("mouse after3: x = %f, y = %f"), Position.X, Position.Y);
+        }
+    }
 
     // timers
-    JumpTimeout += DeltaTime;
-
-    // trace
-    ZTraceResults = HoverTrace(50000);
+    JumpTimeout += DeltaSeconds;
 
     //
 
@@ -149,14 +253,21 @@ void AP4Glider::Tick(float DeltaTime)
     const auto GunOffsetTop     = FVector(150.0f, 0.0f, 100.0f);
     
     FRotator SpawnRotation = GetActorRotation();
+    if (PlayerController)
+    {
+        FVector loc;
+        FVector rot;
+        PlayerController->DeprojectMousePositionToWorld(loc, rot);
+        SpawnRotation = rot.Rotation();
+    }
     SpawnRotation.Roll = 0;
 
     const FVector SpawnLocationLeft = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetLeft);
     const FVector SpawnLocationRight = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetRight);
     const FVector SpawnLocationTop = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetTop);
 
-    time1 -= DeltaTime;
-    time2 -= DeltaTime;
+    time1 -= DeltaSeconds;
+    time2 -= DeltaSeconds;
 
     if (FireLight)
     {
@@ -167,12 +278,12 @@ void AP4Glider::Tick(float DeltaTime)
                 if (LeftGun)
                 {
                     AProjectile *p = (AProjectile *)GetWorld()->SpawnActor(b1, &SpawnLocationLeft, &SpawnRotation);
-                    //p->SetOwner(VisibleComponent);
+                    p->SetOwner(VisibleComponent);
                 }
                 else
                 {
                     AProjectile *p = (AProjectile *)GetWorld()->SpawnActor(b1, &SpawnLocationRight, &SpawnRotation);
-                    //p->SetOwner(VisibleComponent->StaticMesh);
+                    p->SetOwner(VisibleComponent);
                 }
                 LeftGun = !LeftGun;
             }
@@ -188,27 +299,106 @@ void AP4Glider::Tick(float DeltaTime)
             time2 = rpm2;
         }
     }
+
+    // trace
+    ZTraceResults = HoverTrace(50000);
+    if (!ZTraceResults.bBlockingHit)
+    {
+        //UE_LOG(LogTemp, Error, TEXT("Tick Error: No forces will be applied. Line: %d"), __LINE__);
+        //UE_LOG(LogTemp, Error, TEXT("Actor: %d"), GetActorLabel().GetCharArray().GetData());
+        return;
+    }
+
+    auto CalcAngle = [](const FVector &Vector1, const FVector &Vector2 = FVector::UpVector)
+    {
+        float dp = FVector::DotProduct(Vector1, Vector2);
+        dp /= Vector1.Size() * Vector2.Size();
+        float acos_ = acosf(dp);
+        float grad = (acos_ * (180 / 3.1415926));
+        if (isnan(grad))
+            grad = 90.0;
+        return grad;
+    };
+
+    SlopeAngle += CalcAngle(ZTraceResults.ImpactNormal);
+
+    //if (PlayerController)
+    {
+        // recalc angle
+        //CurrentAngle = CalcAngle();
+    }
+
+    const float angle_max = 45.0f; // make angle - slow value (like average on last 5 values) - damping
+    bool on_slope = SlopeAngle > angle_max;
+    float f = SlopeAngle;
+    //if (PlayerController)
+    //    UE_LOG(LogTemp, Warning, TEXT("angle = %f"), f);
+    if (on_slope)
+    {
+        //if (PlayerController)
+        //    UE_LOG(LogTemp, Warning, TEXT("angle before = %f"), angle);
+        auto old = ZTraceResults.ImpactNormal;
+        ZTraceResults = HoverTrace(50000, ZTraceResults.ImpactNormal);
+        if (!ZTraceResults.bBlockingHit)
+        {
+            //UE_LOG(LogTemp, Error, TEXT("Tick Error: No forces will be applied. Line: %d"), __LINE__);
+            return;
+        }
+        //CurrentAngle = CalcAngle(ZTraceResults.ImpactNormal);
+        //if (PlayerController)
+        //    UE_LOG(LogTemp, Warning, TEXT("angle after = %f"), angle);
+    }
+
+
+    float Altitude = ZTraceResults.Distance;
+    float g = 980;
+    float force = g;
+    if (!on_slope)
+    {
+        if (Altitude > PowerUpProperties.HoverAltitude + 1000) // force down
+        {
+            force = -g;
+        }
+        else if (Altitude > PowerUpProperties.HoverAltitude + 50) // small down
+        {
+            force = (PowerUpProperties.HoverAltitude - Altitude) / 2;
+        }
+        else if (Altitude < PowerUpProperties.HoverAltitude) // force up
+        {
+            //force = g - (Altitude - PowerUpProperties.HoverAltitude) * 3;
+            force = g * (1 + 3 * (PowerUpProperties.HoverAltitude - Altitude) / PowerUpProperties.HoverAltitude);
+        }
+        VisibleComponent->SetLinearDamping(0.5f);
+        VisibleComponent->SetAngularDamping(0.75f);
+    }
+    else
+    {
+        float slope_altitude = PowerUpProperties.HoverAltitude;// / 2;
+        if (Altitude > slope_altitude) // small down
+        {
+            force = (slope_altitude - Altitude) / 2;
+        }
+        else if (Altitude < slope_altitude) // force up
+        {
+            force = g - (Altitude - slope_altitude) * 2;
+        }
+        VisibleComponent->SetLinearDamping(1.0f);
+        VisibleComponent->SetAngularDamping(1.0f);
+    }
     
 
-    float Altitude = FVector(GetActorLocation() - ZTraceResults.ImpactPoint).Size();
-    float g = 980;
-    if (Altitude > PowerUpProperties.HoverAltitude + 1000)
-    {
-        g = -g;
-    }
-    else if (Altitude > PowerUpProperties.HoverAltitude + 10)
-    {
-        g = (PowerUpProperties.HoverAltitude - Altitude) / 2;
-        //UE_LOG(LogTemp, Warning, TEXT("Altitude: %f"), Altitude);
-    }
-    else if (Altitude < PowerUpProperties.HoverAltitude)
-    {
-        g -= (Altitude - PowerUpProperties.HoverAltitude) * 2;
-    }
 
-    VisibleComponent->SetLinearDamping(1.0f);
-    VisibleComponent->SetAngularDamping(1.0f);
-    VisibleComponent->AddForce(FVector::UpVector * VisibleComponent->GetBodyInstance()->GetBodyMass() * g);
+    //if (!isnan(angle) && PlayerController)
+    {
+        //UE_LOG(LogTemp, Warning, TEXT("angle = %f"), angle);
+    }
+    // force can be applied
+    FVector ForceVector = FVector::UpVector;
+    if (on_slope)
+    {
+        ForceVector = ZTraceResults.ImpactNormal;
+    }
+    VisibleComponent->AddForce(ForceVector * VisibleComponent->GetBodyInstance()->GetBodyMass() * force);
 
 
 
@@ -230,36 +420,155 @@ void AP4Glider::Tick(float DeltaTime)
     FVector SpringForce = FVector(0.0f, 0.0f, (CompressionRatio * PowerUpProperties.LiftSpring) + (PowerUpProperties.LiftDamp * Mesh->GetPhysicsLinearVelocity().Z));
     Mesh->AddForce(SpringForce);
 
-    /* Now we need to apply angular torque to the create to try and make it follow the normal of the terrain/object it's 'landed' on. 
-    /* First, get the Normal of the ground and Normalize it, with a slight bias in the upwards direction. 
+    /* Now we need to apply angular torque to the create to try and make it follow the normal of the terrain/object it's 'landed' on.
+    /* First, get the Normal of the ground and Normalize it, with a slight bias in the upwards direction.
     FVector TraceNormal = FVector(ZTraceResults.ImpactNormal.X, ZTraceResults.ImpactNormal.Y, ZTraceResults.ImpactNormal.Z * 2.0f);
     TraceNormal.Normalize();
 
-    /* Use our value to set the 'Damping' Force from our 'AlphaDamp' value. We also do this in 'Z' to prevent cone-spinning. 
+    /* Use our value to set the 'Damping' Force from our 'AlphaDamp' value. We also do this in 'Z' to prevent cone-spinning.
     FVector Alpha;
     Alpha.X = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().X;
     Alpha.Y = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().Y;
     Alpha.Z = PowerUpProperties.AlphaDamp * Mesh->GetPhysicsAngularVelocity().Z;
 
-    /* Scale the speed of the self-righting based on our current compression ratio (more torque at the top of the springs length). 
+    /* Scale the speed of the self-righting based on our current compression ratio (more torque at the top of the springs length).
     float ScaledTrack = PowerUpProperties.AlphaTrack * (CompressionRatio * -1.0f);
 
-    /* Set the new Alpha Values, attempt to align with the Forward and Right vectors, which should then straighten our Up vector. 
+    /* Set the new Alpha Values, attempt to align with the Forward and Right vectors, which should then straighten our Up vector.
     //Alpha.X += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorForwardVector());
     //Alpha.Y += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorRightVector());
     Alpha.Z += ScaledTrack * FVector::DotProduct(TraceNormal, GetActorUpVector());
 
-    // Apply the torque and scale it by the crate mass so our values stay slightly more sensible. (Torque is really weak by default). 
+    // Apply the torque and scale it by the crate mass so our values stay slightly more sensible. (Torque is really weak by default).
     Mesh->AddTorque(Alpha * Mesh->GetMass());*/
 
 
 
+    // Torque
+    {
+        FVector Torque = ZTraceResults.ImpactNormal;
+        if (PlayerController)
+        {
+            if (GliderView != EGliderView::TPS)
+            {
+                FVector2D Position;
+                if (PlayerController->GetMousePosition(Position.X, Position.Y))
+                {
+                    auto Viewport = GetWorld()->GetGameViewport();
+                    FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
+                    FIntPoint Center = ViewSize / 2;
+                    Position.X = (Position.X - Center.X) / (float)Center.X;
+                    Position.Y = (Position.Y - Center.Y) / (float)Center.Y;
 
-    auto component_loc = VisibleComponent->GetComponentLocation();
-    auto ControlRotation = GetControlRotation();
-    ControlRotation.Roll = 0;
-    RootComponent->SetWorldRotation(ControlRotation);
-    //Mesh->AddTorque(  * Mesh->GetMass());
+                    // left/right
+                    Mesh->AddTorque(Position.X * GetActorUpVector() * 10000 * Mesh->GetMass());
+                    // top/bottom
+                    Mesh->AddTorque(Position.Y * GetActorRightVector() * 10000 * Mesh->GetMass());
+                    // do not roll
+                    float RollAngle = CalcAngle(ZTraceResults.ImpactNormal, GetActorRightVector());
+                    auto diff = RollAngle - 90.0f;
+                    int sign = 1;
+                    if (diff < 0)
+                        sign = -1;
+                    diff = fabs(diff);
+                    //UE_LOG(LogTemp, Warning, TEXT("RollAngle = %f"), RollAngle);
+                    if (diff > 20)
+                        Mesh->AddTorque(sign * GetActorForwardVector() * 50000 * Mesh->GetMass());
+                    else if (diff > 15)
+                        Mesh->AddTorque(sign * GetActorForwardVector() * 10000 * Mesh->GetMass());
+                    else if (diff > 10)
+                        Mesh->AddTorque(sign * GetActorForwardVector() * 7500 * Mesh->GetMass());
+                    else if (diff > 5)
+                        Mesh->AddTorque(sign * GetActorForwardVector() * 2500 * Mesh->GetMass());
+
+                    float CurrentAngle = CalcAngle(GetActorUpVector());
+
+                    //UE_LOG(LogTemp, Warning, TEXT("CurrentAngle = %f"), CurrentAngle);
+                    //if (CurrentAngle > 60)
+                    //    Mesh->AddTorque(ZTraceResults.ImpactNormal ^ -GetActorUpVector() * 100000 * Mesh->GetMass());
+
+                }
+            }
+            else
+            {
+                UCameraComponent *Camera = ThirdPersonCameraComponent;
+
+                FVector loc;
+                FVector r;
+                PlayerController->DeprojectMousePositionToWorld(loc, r);
+                FVector2D Position;
+                PlayerController->GetMousePosition(Position.X, Position.Y);
+
+                //UE_LOG(LogTemp, Warning, TEXT("loc: x = %f, y = %f, z = %f"), loc.X, loc.Y, loc.Z);
+
+                FVector Direction = loc - GetActorLocation();
+                //UE_LOG(LogTemp, Warning, TEXT("Direction: x = %f, y = %f, z = %f"), Direction.X, Direction.Y, Direction.Z);
+
+                //Torque = GetActorQuat().RotateVector(Direction);
+                //UE_LOG(LogTemp, Warning, TEXT("Torque: x = %f, y = %f, z = %f"), Torque.X, Torque.Y, Torque.Z);
+
+                //Torque.Normalize();
+                
+                auto arot = GetActorRotation();
+                auto rot = Direction.Rotation();
+
+                /*auto diff = rot - arot;
+                UE_LOG(LogTemp, Warning, TEXT("loc: %s"), loc.ToString().GetCharArray().GetData());
+                UE_LOG(LogTemp, Warning, TEXT("r: %s"), r.ToString().GetCharArray().GetData());
+                UE_LOG(LogTemp, Warning, TEXT("arot: %s"), arot.ToString().GetCharArray().GetData());
+                UE_LOG(LogTemp, Warning, TEXT("rot: %s"), rot.ToString().GetCharArray().GetData());
+                UE_LOG(LogTemp, Warning, TEXT("rot diff: %s"), diff.ToString().GetCharArray().GetData());*/
+
+
+                // left/right
+                //Mesh->AddTorque((diff.Pitch < 0 ? -1 : 1) * GetActorUpVector() * 30000 * Mesh->GetMass());
+
+                //Torque = Torque ^ -GetActorUpVector();
+                //Torque *= 20000;
+                //Mesh->AddTorque(Torque * Mesh->GetMass());
+
+                auto Viewport = GetWorld()->GetGameViewport();
+                FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
+                FIntPoint Center = ViewSize / 2;
+                Position.X = (Position.X - Center.X) / (float)Center.X;
+                Position.Y = (Position.Y - Center.Y) / (float)Center.Y;
+
+                // left/right
+                Mesh->AddTorque(Position.X * GetActorUpVector() * 10000 * Mesh->GetMass());
+                // top/bottom
+                Mesh->AddTorque(Position.Y * GetActorRightVector() * 10000 * Mesh->GetMass());
+                // do not roll
+                float RollAngle = CalcAngle(ZTraceResults.ImpactNormal, GetActorRightVector());
+                auto diff = RollAngle - 90.0f;
+                int sign = 1;
+                if (diff < 0)
+                    sign = -1;
+                diff = fabs(diff);
+                //UE_LOG(LogTemp, Warning, TEXT("RollAngle = %f"), RollAngle);
+                if (diff > 20)
+                    Mesh->AddTorque(sign * GetActorForwardVector() * 50000 * Mesh->GetMass());
+                else if (diff > 15)
+                    Mesh->AddTorque(sign * GetActorForwardVector() * 10000 * Mesh->GetMass());
+                else if (diff > 10)
+                    Mesh->AddTorque(sign * GetActorForwardVector() * 7500 * Mesh->GetMass());
+                else if (diff > 5)
+                    Mesh->AddTorque(sign * GetActorForwardVector() * 2500 * Mesh->GetMass());
+            }
+
+            //auto component_loc = VisibleComponent->GetComponentLocation();
+            //auto ControlRotation = GetControlRotation();
+            //ControlRotation.Roll = 0;
+            //RootComponent->SetWorldRotation(ControlRotation);
+        }
+        else
+        {
+            Torque = Torque ^ -GetActorUpVector();
+            Torque *= 10000;
+            Mesh->AddTorque(Torque * Mesh->GetMass());
+        }
+
+        VisibleComponent->SetAngularDamping(1.0f);
+    }
 
 
 
@@ -297,6 +606,8 @@ void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponen
     InInputComponent->BindAction("FireLight", IE_Released, this, &AP4Glider::FireLightOff);
     InInputComponent->BindAction("FireHeavy", IE_Pressed, this, &AP4Glider::FireHeavyOn);
     InInputComponent->BindAction("FireHeavy", IE_Released, this, &AP4Glider::FireHeavyOff);
+
+    InInputComponent->BindAction("HideUI", IE_Pressed, this, &AP4Glider::HideUI);
 }
 
 void AP4Glider::Move(float AxisValue)
@@ -343,9 +654,15 @@ void AP4Glider::Jump()
 {
     if (JumpTimeout)
     {
-        VisibleComponent->AddForce(GetActorUpVector() * VisibleComponent->GetMass() * 30, NAME_None, true);
-        JumpSound->Activate(true);
-        JumpSound->Play();
+        VisibleComponent->AddForce(GetActorUpVector() * VisibleComponent->GetMass() * 10, NAME_None, true);
+        //VisibleComponent->AddImpulse(GetActorUpVector() * 1);
+        //static bool b = false;
+        //if (b)
+        //    JumpSound->Play();
+        //else
+            //UGameplayStatics::PlaySound2D(GetWorld(), JumpSound2);
+        //JumpSound->Sound = JumpSound2;
+        //JumpSound->Play();
     }
 }
 
@@ -477,7 +794,7 @@ void AP4Glider::Hover()
     }
 }
 
-FHitResult AP4Glider::HoverTrace(float Altitude) const
+FHitResult AP4Glider::HoverTrace(float Altitude, FVector Vector) const
 {
     static const FName HoverTraceTag("HoverTrace");
     //GetWorld()->DebugDrawTraceTag = HoverTraceTag;
@@ -487,8 +804,8 @@ FHitResult AP4Glider::HoverTrace(float Altitude) const
     //TraceParams.TraceTag = HoverTraceTag;
 
     auto begin = GetActorLocation();
-    auto end = begin;
-    end.Z -= Altitude;
+    auto end = begin - Vector.Normalize() * Altitude;
+    //end.Z -= Altitude;
     
     FHitResult Hit(ForceInit);
     if (GetWorld()->LineTraceSingleByChannel(
@@ -580,4 +897,13 @@ FHitResult AP4Glider::HoverTrace(float Altitude) const
     }
 
     return Hit;
+}
+
+void AP4Glider::HideUI()
+{
+    UIHidden = !UIHidden;
+    
+    auto PlayerController = Cast<APlayerController>(GetController());
+    auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD());
+    HUD->SetVisible(!UIHidden);
 }

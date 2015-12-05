@@ -36,11 +36,26 @@ AP4Object::AP4Object()
 #endif
 }
 
-void AP4Object::setStaticMesh(UStaticMesh *mesh)
+void AP4Object::BeginPlay()
+{
+    if (MapObject->interactive)
+        VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Object::OnHit);
+
+    Super::BeginPlay();
+}
+
+void AP4Object::SetStaticMesh(UStaticMesh *mesh)
 {
     if (mesh)
     {
         VisibleComponent->SetStaticMesh(mesh);
+    }
+}
+
+void AP4Object::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+    if (OtherActor != this && OtherComp != NULL)
+    {
     }
 }
 
@@ -63,7 +78,8 @@ bool P4MapObject::spawn()
         if (o)
         {
             Object = World->SpawnActor<AP4Object>(AP4Object::StaticClass(), pos, rot);
-            Object->setStaticMesh(o);
+            Object->MapObject = this;
+            Object->SetStaticMesh(o);
             FVector scale(object->scale, object->scale, object->scale);
             Object->SetActorScale3D(scale);
 #if WITH_EDITOR

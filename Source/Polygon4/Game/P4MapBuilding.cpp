@@ -28,7 +28,7 @@ AP4Building::AP4Building()
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     VisibleComponent->AttachTo(RootComponent);
-    
+
 #if WITH_EDITOR
     RootComponent->SetMobility(EComponentMobility::Movable);
 #else
@@ -36,11 +36,26 @@ AP4Building::AP4Building()
 #endif
 }
 
-void AP4Building::setStaticMesh(UStaticMesh *mesh)
+void AP4Building::BeginPlay()
+{
+    if (MapBuilding->interactive)
+        VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Building::OnHit);
+
+    Super::BeginPlay();
+}
+
+void AP4Building::SetStaticMesh(UStaticMesh *mesh)
 {
     if (mesh)
     {
         VisibleComponent->SetStaticMesh(mesh);
+    }
+}
+
+void AP4Building::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+    if (OtherActor != this && OtherComp != NULL)
+    {
     }
 }
 
@@ -63,7 +78,8 @@ bool P4MapBuilding::spawn()
         if (o)
         {
             Building = World->SpawnActor<AP4Building>(AP4Building::StaticClass(), pos, rot);
-            Building->setStaticMesh(o);
+            Building->MapBuilding = this;
+            Building->SetStaticMesh(o);
             FVector scale(building->scale, building->scale, building->scale);
             Building->SetActorScale3D(scale);
 #if WITH_EDITOR

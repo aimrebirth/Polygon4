@@ -19,29 +19,113 @@
 #include "Polygon4.h"
 #include "GliderHUD.h"
 
+#include <UI/Game/SBar.h>
 
 AGliderHUD::AGliderHUD(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
 {
     static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("Texture2D'/Game/Mods/Common/HUD/crosshair.crosshair'"));
     CrosshairTex = CrosshairTexObj.Object;
+
+    EnergyShieldBar = SNew(SBar)
+        .Max(100)
+        .Current(10)
+        .Text(FText::FromString("Shield"))
+        .Color(FLinearColor::Blue * 0.65f)
+        ;
+    ArmorBar = SNew(SBar)
+        .Max(100)
+        .Current(50)
+        .Text(FText::FromString("Armor"))
+        .Color(FLinearColor::Green * 0.65f)
+        ;
+    EnergyBar = SNew(SBar)
+        .Max(100)
+        .Current(100)
+        .Text(FText::FromString("Energy"))
+        .Color(FLinearColor::Yellow * 0.65f)
+        ;
 }
 
 void AGliderHUD::DrawHUD()
 {
-	Super::DrawHUD();
+    Super::DrawHUD();
 
-	// find center of the Canvas
-	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
+    if (!Visible)
+    {
+        if (WidgetsDrawn)
+        {
+            WidgetsDrawn = false;
+
+            auto Viewport = GetWorld()->GetGameViewport();
+            auto PlayerController = GetWorld()->GetFirstPlayerController();
+
+            Viewport->RemoveViewportWidgetForPlayer(PlayerController->GetLocalPlayer(), BarsWidget.ToSharedRef());
+        }
+        return;
+    }
+    
+    decltype(MousePosition) Position(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
+    if (MousePosition.X != -1)
+        Position = MousePosition;
 
 	// offset by half the texture's dimensions so that the center of the texture aligns with the center of the Canvas
-	const FVector2D CrosshairDrawPosition( (Center.X - (CrosshairTex->GetSurfaceWidth() * 0.5)),
-										   (Center.Y - (CrosshairTex->GetSurfaceHeight() * 0.5f)) );
+	const FVector2D CrosshairDrawPosition( (Position.X - (CrosshairTex->GetSurfaceWidth() * 0.5)),
+										   (Position.Y - (CrosshairTex->GetSurfaceHeight() * 0.5f)) );
 
 	// draw the crosshair
 	FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
+
+    if (!WidgetsDrawn)
+    {
+        WidgetsDrawn = true;
+
+        auto Viewport = GetWorld()->GetGameViewport();
+        auto PlayerController = GetWorld()->GetFirstPlayerController();
+
+        Viewport->AddViewportWidgetForPlayer(PlayerController->GetLocalPlayer(),
+            SAssignNew(BarsWidget, SVerticalBox)
+            + SVerticalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Top)
+            .AutoHeight()
+            .Padding(30, 30, 10, 10)
+            [
+                SNew(SBox)
+                .WidthOverride(500)
+            .HeightOverride(40)
+            [
+                EnergyBar.ToSharedRef()
+            ]
+            ]
+        + SVerticalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Top)
+            .AutoHeight()
+            .Padding(30, 10, 10, 10)
+            [
+                SNew(SBox)
+                .WidthOverride(500)
+            .HeightOverride(40)
+            [
+                EnergyShieldBar.ToSharedRef()
+            ]
+            ]
+        + SVerticalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Top)
+            .AutoHeight()
+            .Padding(30, 10, 10, 10)
+            [
+                SNew(SBox)
+                .WidthOverride(500)
+            .HeightOverride(40)
+            [
+                ArmorBar.ToSharedRef()
+            ]
+            ], 0
+            );
+    }
 }
-
-

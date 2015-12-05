@@ -21,9 +21,8 @@
 #include "GameFramework/HUD.h"
 #include "GliderHUD.generated.h"
 
-/**
- * 
- */
+class SBar;
+
 UCLASS()
 class POLYGON4_API AGliderHUD : public AHUD
 {
@@ -31,9 +30,20 @@ class POLYGON4_API AGliderHUD : public AHUD
 	
 private:
     UTexture2D* CrosshairTex;
+    FVector2D MousePosition = {-1, -1};
+    bool Visible = true;
+
+    bool WidgetsDrawn = false;
+    TSharedPtr<SWidget> BarsWidget;
+    TSharedPtr<SBar> EnergyShieldBar;
+    TSharedPtr<SBar> ArmorBar;
+    TSharedPtr<SBar> EnergyBar;
 	
 public:
     AGliderHUD(const FObjectInitializer& ObjectInitializer);
 
 	virtual void DrawHUD() override;
+    void SetMousePosition(FVector2D Position) { MousePosition = Position; }
+
+    void SetVisible(bool Visible) { this->Visible = Visible; }
 };

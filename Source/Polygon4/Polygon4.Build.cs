@@ -39,7 +39,7 @@ public class Polygon4 : ModuleRules
 
 	public Polygon4(TargetInfo Target)
 	{
-		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape" });
+		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         LoadCoreModule(Target, "Engine");

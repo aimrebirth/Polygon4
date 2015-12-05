@@ -19,10 +19,12 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include <queue>
 #include <Polygon4/DataManager/Types.h>
 #include "P4Glider.generated.h"
 
 class UGliderMovement;
+class SBar;
 
 USTRUCT()
 struct FGliderData
@@ -34,15 +36,6 @@ struct FGliderData
 
     //UPROPERTY(EditAnywhere)
     //TArray<FString> Clan;
-};
-
-enum EGliderView
-{
-    FPS,
-    //FPSWeapons,
-    TPS,
-
-    Max
 };
 
 struct ArmedTimedValue
@@ -174,6 +167,55 @@ struct PreparedTimedValue
     }
 };
 
+template <typename T>
+class DampingValue
+{
+public:
+    DampingValue(size_t n = 5)
+        : n(n)
+    {
+    }
+
+    //DampingValue& operator=(T f)
+    //{
+    //    return plus(f);
+    //}
+
+    DampingValue& operator+(T f)
+    {
+        return plus(f);
+    }
+
+    DampingValue& operator+=(T f)
+    {
+        return plus(f);
+    }
+
+    DampingValue& plus(T f)
+    {
+        values.push_back(f);
+        if (values.size() > n)
+            values.pop_front();
+        return *this;
+    }
+
+    operator T() const
+    {
+        if (values.empty())
+            return T();
+        T sum = T();
+        for (auto &v : values)
+            sum = sum + v;
+        return sum / n;
+    }
+
+private:
+    std::deque<T> values;
+    size_t n;
+};
+
+using FloatDampingValue = DampingValue<float>;
+
 USTRUCT()
 struct FPowerUpProperties
 {
@@ -217,6 +259,15 @@ struct FPowerUpProperties
 UCLASS()
 class POLYGON4_API AP4Glider : public APawn
 {
+    enum EGliderView
+    {
+        FPS,
+        //FPSWeapons,
+        TPS,
+
+        Max
+    };
+
 	GENERATED_BODY()
         
 	/** First person camera */
@@ -234,6 +285,8 @@ class POLYGON4_API AP4Glider : public APawn
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
     UStaticMeshComponent* Mesh;
+
+    //USceneComponent* CenterPoint;
     
     //UPROPERTY()
     //UGliderMovement* MovementComponent;
@@ -299,15 +352,21 @@ private:
     void FireHeavyOn();
     void FireHeavyOff();
 
+    void HideUI();
+
 public:
 
 private:
     UAudioComponent *JumpSound;
+    USoundWave *JumpSound2;
 
 private:
     FPowerUpProperties PowerUpProperties;
     FHitResult ZTraceResults;
+    FloatDampingValue SlopeAngle;
+
+    bool UIHidden = false;
 
     void Hover();
-    FHitResult HoverTrace(float Altitude) const;
+    FHitResult HoverTrace(float Altitude, FVector Vector = FVector::UpVector) const;
 };

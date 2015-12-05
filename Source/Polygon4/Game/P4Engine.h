@@ -56,9 +56,13 @@ public:
     FVector GetWorldScale() const { return WorldScale; }
     void SetWorldScale(const FVector &Scale) { WorldScale = Scale; }
 
-    void OnLevelLoaded();
+    virtual void OnLevelLoaded() override;
 
 private:
+    //
+    // for some reasons ue4-side 32 bit code sees base class size = actual_size - sizeof(void*)
+    int __buffer[3]; // do not delete! this prevents 32-bit version from crash
+    //
     UP4GameInstance *P4GameInstance;
 
     EP4EngineState P4EngineState = EP4EngineState::None;

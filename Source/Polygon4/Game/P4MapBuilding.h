@@ -22,6 +22,8 @@
 #include <Polygon4/DataManager/Types.h>
 #include "P4MapBuilding.generated.h"
 
+class P4MapBuilding;
+
 UCLASS()
 class POLYGON4_API AP4Building : public AActor
 {
@@ -33,7 +35,15 @@ class POLYGON4_API AP4Building : public AActor
 public:
     AP4Building();
 
-    void setStaticMesh(UStaticMesh *mesh);
+    virtual void BeginPlay() override;
+
+    void SetStaticMesh(UStaticMesh *mesh);
+    void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+private:
+    P4MapBuilding *MapBuilding;
+
+    friend class P4MapBuilding;
 };
 
 class P4MapBuilding : public polygon4::detail::MapBuilding

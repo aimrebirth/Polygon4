@@ -25,6 +25,7 @@
 #include <P4GameInstance.h>
 
 #include <UI/Menu/MainMenu.h>
+#include <Game/GliderHUD.h>
 
 P4Engine *GP4Engine;
 
@@ -74,6 +75,10 @@ TSharedPtr<SMainMenu> P4Engine::GetMainMenu()
 
 void P4Engine::ShowMainMenu()
 {
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+        if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
+            HUD->SetVisible(false);
+
     auto mm = GetMainMenu();
     if (GEngine && GEngine->GameViewport)
     {
@@ -84,6 +89,10 @@ void P4Engine::ShowMainMenu()
 
 void P4Engine::HideMainMenu()
 {
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+        if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
+            HUD->SetVisible(true);
+
     auto mm = GetMainMenu();
     mm->SetVisibility(EVisibility::Hidden);
 }

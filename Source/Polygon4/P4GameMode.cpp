@@ -53,6 +53,11 @@ void AP4GameMode::BeginPlay()
 void AP4GameMode::ShowMenu()
 {
     paused = !paused;
+
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+        if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
+            HUD->SetVisible(!paused);
+
     GetWorld()->GetFirstPlayerController()->SetPause(paused);
     GetWorld()->GetFirstPlayerController()->bShowMouseCursor = paused;
     if (paused)
