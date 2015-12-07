@@ -39,15 +39,24 @@ void AP4GameMode::BeginPlay()
     Super::BeginPlay();
 
     FSlateApplication::Get().SetAllUserFocusToGameViewport();
-    
-    auto PlayerInputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
-    if (PlayerInputComponent)
+
+    auto PlayerController = GetWorld()->GetFirstPlayerController();
+    if (PlayerController)
     {
-        PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
-        PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
+        auto PlayerInputComponent = PlayerController->InputComponent;
+        if (PlayerInputComponent)
+        {
+            PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
+            PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
+        }
+
+        auto Viewport = GetWorld()->GetGameViewport();
+        FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
+        FIntPoint Center = ViewSize / 2;
+        Viewport->Viewport->SetMouse(Center.X, Center.Y);
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("AP4GameMode::BeginPlay()"));
+    //UE_LOG(LogTemp, Warning, TEXT("AP4GameMode::BeginPlay()"));
 }
 
 void AP4GameMode::ShowMenu()
@@ -85,11 +94,3 @@ void AP4GameMode::ShowMenu()
 
     UE_LOG(LogTemp, Warning, TEXT("AP4GameMode::ShowMenu()"));
 }
-
-/*void AP4GameMode::SpawnMechanoid(polygon4::Ptr<polygon4::detail::Mechanoid> mechanoid)
-{
-    FVector pos(mechanoid->x, mechanoid->y, mechanoid->z);
-    FRotator rot(mechanoid->pitch, mechanoid->yaw, mechanoid->roll);
-    GetWorld()->SpawnActor<AP4Glider>(pos, rot);
-}
-*/

@@ -47,8 +47,22 @@ bool P4Mechanoid::spawn(bool player)
 
     FVector loc{ x, y, z };
     FRotator rot{ pitch, yaw, roll };
-    auto g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
     FVector scale(configuration->glider->scale, configuration->glider->scale, configuration->glider->scale);
+    auto g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
+    if (!g)
+    {
+        // place is busy
+        auto z0 = loc.Z;
+        auto z1 = z0 + 10000;
+        while (!g && loc.Z < z1)
+        {
+            loc.Z += 250;
+            g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
+        }
+        if (!g)
+            return false;
+    }
+    g->SetMechanoid(this);
     g->SetActorScale3D(scale);
     g->Data.TextID = text_id.toFString();
 #if WITH_EDITOR
@@ -56,7 +70,6 @@ bool P4Mechanoid::spawn(bool player)
 #endif
     if (player)
         GWorld->GetFirstPlayerController()->Possess(g);
-
 
     return true;
 }

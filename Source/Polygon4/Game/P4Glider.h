@@ -18,13 +18,16 @@
 
 #pragma once
 
-#include "GameFramework/Pawn.h"
 #include <queue>
+
+#include "GameFramework/Pawn.h"
 #include <Polygon4/DataManager/Types.h>
 #include "P4Glider.generated.h"
 
 class UGliderMovement;
 class SBar;
+
+class P4Mechanoid;
 
 USTRUCT()
 struct FGliderData
@@ -168,6 +171,63 @@ struct PreparedTimedValue
 };
 
 template <typename T>
+struct FadedValue
+{
+    T time;
+    T fade_time;
+    bool started;
+
+    FadedValue(T s = 2)
+        : fade_time(s)
+    {
+        reset();
+    }
+
+    void reset()
+    {
+        time = T();
+        started = false;
+    }
+
+    void start()
+    {
+        reset();
+        started = true;
+    }
+
+    FadedValue& operator=(T f)
+    {
+        return plus(f);
+    }
+    FadedValue& operator+(T f)
+    {
+        return plus(f);
+    }
+    FadedValue& operator+=(T f)
+    {
+        return plus(f);
+    }
+
+    FadedValue& plus(T f)
+    {
+        time += f;
+        return *this;
+    }
+
+    operator bool()
+    {
+        if (started)
+        {
+            if (time <= fade_time)
+                return true;
+            else
+                reset();
+        }
+        return false;
+    }
+};
+
+template <typename T>
 class DampingValue
 {
 public:
@@ -175,17 +235,15 @@ public:
         : n(n)
     {
     }
-
-    //DampingValue& operator=(T f)
-    //{
-    //    return plus(f);
-    //}
-
+    
+    DampingValue& operator=(T f)
+    {
+        return plus(f);
+    }
     DampingValue& operator+(T f)
     {
         return plus(f);
     }
-
     DampingValue& operator+=(T f)
     {
         return plus(f);
@@ -215,6 +273,7 @@ private:
 };
 
 using FloatDampingValue = DampingValue<float>;
+using FloatFadedValue = FadedValue<float>;
 
 USTRUCT()
 struct FPowerUpProperties
@@ -284,26 +343,15 @@ class POLYGON4_API AP4Glider : public APawn
     
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
-    UStaticMeshComponent* Mesh;
 
-    //USceneComponent* CenterPoint;
-    
-    //UPROPERTY()
-    //UGliderMovement* MovementComponent;
+    UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+    UStaticMeshComponent* EnergyShield;
 
     int GliderView = EGliderView::FPS;
 
 public:
     UPROPERTY(EditAnywhere, Category = Mechanoid)
     FGliderData Data;
-
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseTurnRate;
-
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseLookUpRate;
 
 public:
 	// Sets default values for this pawn's properties
@@ -312,25 +360,26 @@ public:
 	virtual void BeginPlay() override;	
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
-    //virtual UPawnMovementComponent* GetMovementComponent() const override;
 
 private:
-    // data
-    float RunningTime;
-    float time1 = 0.0f;
-    float time2 = 0.0f;
+    ArmedTimedValue rpmLight;
+    ArmedTimedValue rpmHeavy;
     bool LeftGun = true;
+    UClass *projectileLight;
+    UClass *projectileHeavy;
+    FVector GunOffsetLeft;
+    FVector GunOffsetRight;
+    FVector GunOffsetTop;
 
-    ArmedTimedValue JumpTimeout;
+    UPrimitiveComponent* Body;
+    USoundWave* JumpSound = nullptr;
+    USoundWave* EngineSound = nullptr;
+    USoundWave* LightSound = nullptr;
+    USoundWave* HeavySound = nullptr;
+    UAudioComponent* EngineAudioComponent;
+    UAudioComponent* WeaponAudioComponent;
 
-    UClass *b1 = 0;
-    UClass *b2 = 0;
-
-    FVector CurrentVelocity;
-    bool boost = false;
-
-    bool FireLight = false;
-    bool FireHeavy = false;
+    FloatFadedValue EnergyShieldTimer;
 
     // functions
     void Move(float AxisValue);
@@ -341,32 +390,55 @@ private:
 
     void ChangeView();
     void UpdateView();
-
+    
+    ArmedTimedValue JumpTimeout;
     void Jump();
 
-    void BoostOn();
-    void BoostOff();
-
-    void FireLightOn();
-    void FireLightOff();
-    void FireHeavyOn();
-    void FireHeavyOff();
-
     void HideUI();
-
-public:
-
+    
 private:
-    UAudioComponent *JumpSound;
-    USoundWave *JumpSound2;
+    bool boost = false;
+    bool FireLight = false;
+    bool FireHeavy = false;
 
+    void BoostOn() { boost = true; }
+    void BoostOff() { boost = false; }
+    void FireLightOn() { FireLight = true; }
+    void FireLightOff() { FireLight = false; }
+    void FireHeavyOn() { FireHeavy = true; }
+    void FireHeavyOff() { FireHeavy = false; }
+    
 private:
     FPowerUpProperties PowerUpProperties;
     FHitResult ZTraceResults;
+
+    FVector2D MousePosition;
+    int MousePositionRepeats = 0;
+
     FloatDampingValue SlopeAngle;
 
     bool UIHidden = false;
 
-    void Hover();
-    FHitResult HoverTrace(float Altitude, FVector Vector = FVector::UpVector) const;
+    // Vertical
+    FHitResult HoverTrace(float Altitude = 50000.0f) const;
+    // To Point
+    FHitResult HoverTrace(FVector Vector, float Altitude = 50000.0f) const;
+
+private:
+    P4Mechanoid* Mechanoid = nullptr;
+    polygon4::detail::Configuration* Configuration;
+    polygon4::detail::Glider* Glider;
+
+public:
+    void SetMechanoid(P4Mechanoid* Mechanoid);
+
+public:
+    UFUNCTION()
+    void OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+    UFUNCTION()
+    void OnEnergyShieldBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+    UFUNCTION()
+    void OnEnergyShieldEndOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

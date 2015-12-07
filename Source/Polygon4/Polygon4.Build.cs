@@ -42,39 +42,55 @@ public class Polygon4 : ModuleRules
 		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
+        GenerateVersion();
         LoadCoreModule(Target, "Engine");
 	}
 
-    void MakeDir(string dst)
+    void GenerateVersion()
     {
-        try
-        {
-            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(dst));
-        }
-        catch (System.Exception)
-        {
-        }
-    }
+        bool has_git_dir = Directory.Exists(Path.Combine(ModulePath, "../../.git/"));
 
-    bool CopyLibrary(string src, string dst, bool overwrite)
-    {
-        bool copied = true;
-        string[] ext = { ".dll", ".pdb" };
-        MakeDir(dst);
-        foreach (var e in ext)
+        Process process = new Process();
+        process.StartInfo.FileName = "git";
+        process.StartInfo.Arguments = "--version";
+        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        process.StartInfo.WorkingDirectory = ModulePath;
+        process.Start();
+        process.WaitForExit();
+        bool has_git = process.ExitCode == 0;
+
+        var dir = Path.Combine(ModulePath, "Generated");
+        Directory.CreateDirectory(dir);
+
+        string version = "";
+        bool written = false;
+        if (has_git_dir && has_git)
         {
-            //System.Console.WriteLine("Copying " + (src + e));
-            try
-            {
-                File.Copy(src + e, dst + e, overwrite);
-            }
-            catch (System.Exception)
-            {
-                System.Console.WriteLine("Cannot copy " + (src + e));
-                copied = false;
-            }
+            string stdout = "";
+
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.StartInfo.Arguments = "rev-parse --short HEAD";
+            process.Start();
+            process.WaitForExit();
+            written |= process.ExitCode == 0;
+
+            stdout = process.StandardOutput.ReadToEnd();
+            stdout = stdout.Substring(0, stdout.Length - 1);
+            version += stdout;
+
+            process.StartInfo.Arguments = "rev-parse --abbrev-ref HEAD";
+            process.Start();
+            process.WaitForExit();
+            written |= process.ExitCode == 0;
+
+            stdout = process.StandardOutput.ReadToEnd();
+            stdout = stdout.Substring(0, stdout.Length - 1);
+            version += "+" + stdout;
         }
-        return copied;
+        version = "\"" + version + "\"";
+        File.WriteAllText(Path.Combine(ModulePath, "Generated/Version.h"), version);
     }
 
     bool RemoveLibrary(string dst)
@@ -168,34 +184,29 @@ public class Polygon4 : ModuleRules
         if (NumberOfCalls++ > 0)
             return;
         
-        bool copied = CopyLibrary(src, dst, true);
-
-        if (copied)
+        // try to remove previous dll, pdb
+        base_name_id = 1;
+        while (true)
         {
-            // try to remove previous dll, pdb
-            base_name_id = 1;
-            while (true)
-            {
-                dst = dst_base_name;
-                if (base_name_id > 0)
-                    dst = dst_base_name + "." + base_name_id.ToString();
-                if (!RemoveLibrary(dst))
-                    break;
-                if (base_name_id++ > 1000)
-                    break;
-            }
-            // try to remove previous logs
-            base_name_id = 0;
-            while (true)
-            {
-                dst = dst_base_name;
-                if (base_name_id > 0)
-                    dst = dst_base_name + "." + base_name_id.ToString();
-                if (!RemoveLogs(dst))
-                    break;
-                if (base_name_id++ > 1000)
-                    break;
-            }
+            dst = dst_base_name;
+            if (base_name_id > 0)
+                dst = dst_base_name + "." + base_name_id.ToString();
+            if (!RemoveLibrary(dst))
+                break;
+            if (base_name_id++ > 1000)
+                break;
+        }
+        // try to remove previous logs
+        base_name_id = 0;
+        while (true)
+        {
+            dst = dst_base_name;
+            if (base_name_id > 0)
+                dst = dst_base_name + "." + base_name_id.ToString();
+            if (!RemoveLogs(dst))
+                break;
+            if (base_name_id++ > 1000)
+                break;
         }
     }
 }

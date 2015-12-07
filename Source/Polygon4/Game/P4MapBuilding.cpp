@@ -70,7 +70,7 @@ bool P4MapBuilding::spawn()
     auto WorldScale = GP4Engine->GetWorldScale();
 
     FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
-    FRotator rot(pitch, yaw, roll);
+    FRotator rot(pitch + building->pitch, yaw + building->yaw, roll + building->roll);
 
     if (!building->resource.empty())
     {

@@ -25,6 +25,8 @@
 #include <Game/P4Engine.h>
 #include <Game/P4Modification.h>
 
+#include "Version.h"
+
 #define LOCTEXT_NAMESPACE "MainMenu"
 
 void SMainMenu::Construct(const FArguments& InArgs)
@@ -46,6 +48,10 @@ void SMainMenu::Construct(const FArguments& InArgs)
 
     // create Mods List View
     ModsListView = SNew(SModListView).PlayerController(PlayerController);
+
+    FString Ver = LOCTEXT("ReloadModsButtonLabel", "Version").ToString();
+    Ver += ": " + GetPolygon4Version();
+    FText Version = FText::FromString(Ver);
 
     // Create GUI
 	ChildSlot
@@ -141,6 +147,19 @@ void SMainMenu::Construct(const FArguments& InArgs)
                         MessageLine.ToSharedRef()
                     ]
                 ]
+            ]
+            // version
+            + SVerticalBox::Slot()
+            .VAlign(VAlign_Bottom)
+            .HAlign(HAlign_Right)
+            .AutoHeight()
+            [
+                SNew(STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::Green)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo("Verdana", 20))
+                .Text(Version)
             ]
 		];
 }

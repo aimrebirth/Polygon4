@@ -70,8 +70,8 @@ bool P4MapObject::spawn()
     auto WorldScale = GP4Engine->GetWorldScale();
 
     FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
-    FRotator rot(pitch, yaw, roll);
-
+    FRotator rot(pitch + object->pitch, yaw + object->yaw, roll + object->roll);
+    
     if (!object->resource.empty())
     {
         auto o = LoadObject<UStaticMesh>(0, object->resource);
