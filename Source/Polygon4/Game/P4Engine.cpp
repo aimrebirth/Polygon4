@@ -25,7 +25,31 @@
 #include <P4GameInstance.h>
 
 #include <UI/Menu/MainMenu.h>
+#include <UI/Menu/BuildingMenu.h>
+#include <UI/Menu/PauseMenu.h>
+
 #include <Game/GliderHUD.h>
+
+#define DEFINE_MENU(name) \
+TSharedPtr<S ## name ## Menu> P4Engine::Get ## name ## Menu() \
+{ \
+    return StaticCastSharedPtr<S ## name ## Menu>(GetMenu(MenuType:: ## name ## Menu)); \
+} \
+\
+void P4Engine::Show ## name ## Menu() \
+{ \
+    ShowMenu(MenuType:: ## name ## Menu); \
+} \
+\
+void P4Engine::Hide ## name ## Menu() \
+{ \
+    HideMenu(MenuType:: ## name ## Menu); \
+} \
+\
+void P4Engine::Set ## name ## MenuVisibility(bool Visibility) \
+{ \
+    SetMenuVisibility(MenuType:: ## name ## Menu, Visibility); \
+}
 
 P4Engine *GP4Engine;
 
@@ -33,6 +57,7 @@ P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4Gam
     : Base(modificationsDirectory.GetCharArray().GetData()), P4GameInstance(P4GameInstance)
 {
     GP4Engine = this;
+    Menus.AddDefaulted(static_cast<int>(MenuType::Max));
 }
 
 void P4Engine::initChildren()
@@ -63,39 +88,68 @@ TArray<TSharedPtr<struct ModificationDesc>> P4Engine::GetModificationDescriptors
     return mods;
 }
 
-TSharedPtr<SMainMenu> P4Engine::GetMainMenu()
+TSharedPtr<SMenu> P4Engine::GetMenu(MenuType Type)
 {
-    if (MainMenu.IsValid())
-        return MainMenu;
-    return MainMenu = SNew(SMainMenu)
-        .PlayerController(GetWorld()->GetFirstPlayerController())
-        .Engine(this)
-        ;
+    auto &Menu = Menus[static_cast<int>(Type)];
+    if (Menu.IsValid())
+        return Menu;
+    switch (Type)
+    {
+    case MenuType::MainMenu:
+        Menu = SNew(SMainMenu);
+        break;
+    case MenuType::BuildingMenu:
+        Menu = SNew(SBuildingMenu);
+        break;
+    case MenuType::PauseMenu:
+        Menu = SNew(SPauseMenu);
+        break;
+    }
+    return Menu;
 }
 
-void P4Engine::ShowMainMenu()
+void P4Engine::ShowMenu(MenuType Type)
 {
     if (auto PlayerController = GetWorld()->GetFirstPlayerController())
         if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
             HUD->SetVisible(false);
 
-    auto mm = GetMainMenu();
+    for (auto &m : Menus)
+    {
+        if (m.IsValid())
+            m->SetVisibility(EVisibility::Hidden);
+    }
+
+    auto m = GetMenu(Type);
     if (GEngine && GEngine->GameViewport)
     {
-        GEngine->GameViewport->AddViewportWidgetContent(mm.ToSharedRef());
+        GEngine->GameViewport->AddViewportWidgetContent(m.ToSharedRef());
     }
-    mm->SetVisibility(EVisibility::Visible);
+    m->SetVisibility(EVisibility::Visible);
 }
 
-void P4Engine::HideMainMenu()
+void P4Engine::HideMenu(MenuType Type)
 {
     if (auto PlayerController = GetWorld()->GetFirstPlayerController())
         if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
             HUD->SetVisible(true);
 
-    auto mm = GetMainMenu();
-    mm->SetVisibility(EVisibility::Hidden);
+    for (auto &m : Menus)
+    {
+        if (m.IsValid())
+            m->SetVisibility(EVisibility::Hidden);
+    }
 }
+
+void P4Engine::SetMenuVisibility(MenuType Type, bool Visibility)
+{
+    auto m = GetMenu(Type);
+    m->SetVisibility(Visibility ? EVisibility::Visible : EVisibility::Hidden);
+}
+
+DEFINE_MENU(Main)
+DEFINE_MENU(Building)
+DEFINE_MENU(Pause)
 
 void P4Engine::OnLevelLoaded()
 {

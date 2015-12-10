@@ -40,9 +40,6 @@ void FDBToolModule::StartupModule()
 {
     GDBToolModule = this;
 
-    // no need for explicit load
-    //Polygon4InitMm("Engine.x64.dll");
-
 	FDBToolStyle::Initialize();
 	FDBToolStyle::ReloadTextures();
 
@@ -116,15 +113,6 @@ void FDBToolModule::StartupModule()
 
 void FDBToolModule::ShutdownModule()
 {
-    // try to comment this as dll will autounloaded at the end
-    // no need to explicit unload
-    //TableView.Reset();
-    //TreeView.Reset();
-    //database.reset();
-    //storage.reset();
-    // no need to explicit unload
-    //Polygon4ResetMm("Engine.x64.dll");
-
 	FDBToolStyle::Shutdown();
 	FDBToolCommands::Unregister();
     FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(DBToolTabName);

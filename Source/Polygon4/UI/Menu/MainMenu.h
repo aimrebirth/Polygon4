@@ -18,22 +18,16 @@
 
 #pragma once
 
-#include "SlateBasics.h"
+#include "Menu.h"
 
-class P4Engine;
-
-class SMainMenu : public SCompoundWidget
+class SMainMenu : public SMenu
 {
 	SLATE_BEGIN_ARGS(SMainMenu){}
-        SLATE_ARGUMENT(APlayerController*, PlayerController)
-        SLATE_ARGUMENT(P4Engine*, Engine)
 	SLATE_END_ARGS()
 
     typedef TSharedPtr<class SModListView> SModsListView;
 
     SModsListView ModsListView;
-    APlayerController* PlayerController;
-    P4Engine* Engine;
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;
  

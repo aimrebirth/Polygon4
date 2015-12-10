@@ -34,6 +34,12 @@ bool P4Mechanoid::spawn(bool player)
     if (!enabled)
         return false;
 
+    if (player && building)
+    {
+        //GP4Engine->ShowBuildingMenu();
+        //return false;
+    }
+
     FString resource = configuration->glider->resource;
     auto c = StaticLoadClass(AP4Glider::StaticClass(), nullptr, resource.GetCharArray().GetData());
     if (!c)
@@ -69,7 +75,9 @@ bool P4Mechanoid::spawn(bool player)
     g->SetActorLabel(g->Data.TextID);
 #endif
     if (player)
+    {
         GWorld->GetFirstPlayerController()->Possess(g);
+    }
 
     return true;
 }

@@ -31,9 +31,7 @@
 
 void SMainMenu::Construct(const FArguments& InArgs)
 {
-    PlayerController = InArgs._PlayerController;
-    Engine = InArgs._Engine;
-
+    auto PlayerController = GWorld->GetFirstPlayerController();
     if (PlayerController)
     {
         PlayerController->bShowMouseCursor = true;
@@ -47,7 +45,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
         .Font(FSlateFontInfo("Verdana", 30));
 
     // create Mods List View
-    ModsListView = SNew(SModListView).PlayerController(PlayerController);
+    ModsListView = SNew(SModListView);
 
     FString Ver = LOCTEXT("ReloadModsButtonLabel", "Version").ToString();
     Ver += ": " + GetPolygon4Version();
@@ -211,7 +209,7 @@ FReply SMainMenu::OnReloadMods()
 
 FReply SMainMenu::OnExit()
 {
-    Engine->Exit();
+    GP4Engine->Exit();
     return FReply::Handled();
 }
 

@@ -25,6 +25,7 @@
 #include "GliderHUD.h"
 
 #include "P4Mechanoid.h"
+#include "P4MapBuilding.h"
 
 const float k_mouse_x = 0.6;
 const float k_mouse_y = 0.8;
@@ -80,8 +81,6 @@ AP4Glider::AP4Glider()
     if (HeavySoundAsset.Succeeded())
         HeavySound = HeavySoundAsset.Object;
 
-    
-
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
     FirstPersonCameraComponent->AttachTo(RootComponent);
 
@@ -118,6 +117,7 @@ AP4Glider::AP4Glider()
     Body->SetSimulatePhysics(true);
     Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     Body->OnComponentHit.AddDynamic(this, &AP4Glider::OnBodyHit);
+    Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnBodyBeginOverlap);
     //Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldBeginOverlap);
     //Body->OnComponentEndOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldEndOverlap);
         
@@ -692,6 +692,17 @@ void AP4Glider::OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FV
     }
 }
 
+void AP4Glider::OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor == nullptr)
+        return;
+    auto Building = Cast<AP4Building>(OtherActor);
+    if (Building)
+    {
+        Destroy();
+    }
+}
+
 void AP4Glider::OnEnergyShieldBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (OtherActor != this && OtherComp != NULL)
@@ -702,5 +713,4 @@ void AP4Glider::OnEnergyShieldBeginOverlap(AActor* OtherActor, UPrimitiveCompone
 
 void AP4Glider::OnEnergyShieldEndOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-
 }

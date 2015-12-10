@@ -30,8 +30,6 @@
 
 void SModListView::Construct(const FArguments& InArgs)
 {
-    PlayerController = InArgs._PlayerController;
-
     ReloadMods(false);
 
     auto ListViewColumn = [](FName Name, FText Text)

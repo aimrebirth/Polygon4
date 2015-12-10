@@ -36,5 +36,4 @@ public:
 	
 private:
     bool paused = false;
-    TSharedPtr<class SPauseMenu> PauseMenu;
 };

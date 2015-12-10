@@ -33,8 +33,6 @@ public:
     virtual void Shutdown() override;
     virtual void StartGameInstance() override;
 
-    //std::shared_ptr<P4Engine> GetEngine() const { return Engine; }
-
 private:
     std::shared_ptr<P4Engine> Engine;
 };

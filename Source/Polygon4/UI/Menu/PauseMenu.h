@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "SlateBasics.h"
+#include "Menu.h"
 
-class SPauseMenu : public SCompoundWidget
+class SPauseMenu : public SMenu
 {
 	SLATE_BEGIN_ARGS(SPauseMenu){}
         SLATE_ARGUMENT(APlayerController*, PlayerController)

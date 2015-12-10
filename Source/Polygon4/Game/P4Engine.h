@@ -22,8 +22,28 @@
 
 #include <Polygon4/Engine.h>
 
+#define DECLARE_MENU(name) \
+public: \
+    TSharedPtr<S ## name ## Menu> Get ## name ## Menu(); \
+    virtual void Show ## name ## Menu() override; \
+    virtual void Hide ## name ## Menu() override; \
+    virtual void Set ## name ## MenuVisibility(bool Visibility) override
+
 class UP4GameInstance;
+
+class SMenu;
 class SMainMenu;
+class SPauseMenu;
+class SBuildingMenu;
+
+enum class MenuType
+{
+    MainMenu,
+    PauseMenu,
+    BuildingMenu,
+
+    Max
+};
 
 enum class EP4EngineState
 {
@@ -49,10 +69,6 @@ public:
     UP4GameInstance* GetP4GameInstance() const { return P4GameInstance; }
     UWorld* GetWorld() const;
 
-    TSharedPtr<SMainMenu> GetMainMenu();
-    virtual void ShowMainMenu() override;
-    virtual void HideMainMenu() override;
-
     FVector GetWorldScale() const { return WorldScale; }
     void SetWorldScale(const FVector &Scale) { WorldScale = Scale; }
 
@@ -66,8 +82,21 @@ private:
     UP4GameInstance *P4GameInstance;
 
     EP4EngineState P4EngineState = EP4EngineState::None;
-    TSharedPtr<SMainMenu> MainMenu;
     FVector WorldScale;
+
+    // this should be at the end (after __buffer) because of __buffer var
+    DECLARE_MENU(Main);
+    DECLARE_MENU(Pause);
+    DECLARE_MENU(Building);
+
+public:
+    TSharedPtr<SMenu> GetMenu(MenuType Type);
+    void ShowMenu(MenuType Type);
+    void HideMenu(MenuType Type);
+    void SetMenuVisibility(MenuType Type, bool Visibility);
+
+private:
+    TArray<TSharedPtr<SMenu>> Menus;
 };
 
 extern P4Engine *GP4Engine;

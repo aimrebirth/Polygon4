@@ -44,9 +44,6 @@ static void HotpatchEngine()
 
 void UP4GameInstance::Init()
 {
-    // no need for explicit load
-    //Polygon4InitMm("Engine.x64.dll");
-
 #if !IS_MONOLITHIC
     HotpatchEngine();
 #endif
@@ -59,11 +56,6 @@ void UP4GameInstance::Init()
 void UP4GameInstance::Shutdown()
 {
     Super::Shutdown();
-
-    // try to comment this as dll will autounloaded at the end
-    // no need to explicit unload
-    //Engine.reset();
-    //Polygon4ResetMm("Engine.x64.dll");
 }
 
 void UP4GameInstance::StartGameInstance()

@@ -24,8 +24,6 @@
 #include "Game/P4Glider.h"
 #include "Game/GliderHUD.h"
 
-#include "UI/Menu/PauseMenu.h"
-
 AP4GameMode::AP4GameMode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -55,42 +53,13 @@ void AP4GameMode::BeginPlay()
         FIntPoint Center = ViewSize / 2;
         Viewport->Viewport->SetMouse(Center.X, Center.Y);
     }
-
-    //UE_LOG(LogTemp, Warning, TEXT("AP4GameMode::BeginPlay()"));
 }
 
 void AP4GameMode::ShowMenu()
 {
     paused = !paused;
-
-    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
-        if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
-            HUD->SetVisible(!paused);
-
+    
     GetWorld()->GetFirstPlayerController()->SetPause(paused);
+    GP4Engine->SetPauseMenuVisibility(paused);
     GetWorld()->GetFirstPlayerController()->bShowMouseCursor = paused;
-    if (paused)
-    {
-        if (!PauseMenu.Get())
-        {
-            PauseMenu = SNew(SPauseMenu)
-                .PlayerController(GetWorld()->GetFirstPlayerController())
-                .GameMode(this)
-                ;
-        }
-        if (GEngine->IsValidLowLevel())
-        {
-            GEngine->GameViewport->AddViewportWidgetContent(PauseMenu.ToSharedRef());
-        }
-        PauseMenu->SetVisibility(EVisibility::Visible);
-        //FSlateApplication::Get().SetKeyboardFocus(PauseMenu);
-        //FSlateApplication::Get().SetAllUserFocusToGameViewport();
-    }
-    else
-    {
-        PauseMenu->SetVisibility(EVisibility::Hidden);
-        //FSlateApplication::Get().SetAllUserFocusToGameViewport();
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("AP4GameMode::ShowMenu()"));
 }

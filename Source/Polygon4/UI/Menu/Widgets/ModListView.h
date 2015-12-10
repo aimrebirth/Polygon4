@@ -27,12 +27,10 @@ typedef TSharedPtr<ModificationDesc> ListItem;
 class SModListView : public SListView<ListItem>
 {
     SLATE_BEGIN_ARGS(SModListView) {}
-        SLATE_ARGUMENT(APlayerController*, PlayerController)
     SLATE_END_ARGS()
 
     typedef SListView<ListItem> ParentType;
 
-    APlayerController* PlayerController;
     TArray<ListItem> AvailableMods;
     int Padding = 20;
  
