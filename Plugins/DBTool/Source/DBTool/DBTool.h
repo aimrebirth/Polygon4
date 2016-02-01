@@ -25,9 +25,9 @@ class FDBToolModule : public IModuleInterface
 public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-	
+
 	void PluginButtonClicked();
-	
+
 	void AddToolbarExtension(FToolBarBuilder& Builder);
     void AddMenuExtension(FMenuBuilder& Builder);
 

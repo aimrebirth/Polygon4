@@ -34,32 +34,15 @@ AP4GameMode::AP4GameMode(const FObjectInitializer& ObjectInitializer)
 void AP4GameMode::BeginPlay()
 {
     GP4Engine->OnLevelLoaded();
-    Super::BeginPlay();
 
-    FSlateApplication::Get().SetAllUserFocusToGameViewport();
+    Super::BeginPlay();
 
     auto PlayerController = GetWorld()->GetFirstPlayerController();
     if (PlayerController)
     {
-        auto PlayerInputComponent = PlayerController->InputComponent;
-        if (PlayerInputComponent)
-        {
-            PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
-            PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
-        }
-
         auto Viewport = GetWorld()->GetGameViewport();
         FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
         FIntPoint Center = ViewSize / 2;
         Viewport->Viewport->SetMouse(Center.X, Center.Y);
     }
-}
-
-void AP4GameMode::ShowMenu()
-{
-    paused = !paused;
-    
-    GetWorld()->GetFirstPlayerController()->SetPause(paused);
-    GP4Engine->SetPauseMenuVisibility(paused);
-    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = paused;
 }

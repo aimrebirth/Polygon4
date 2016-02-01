@@ -30,9 +30,12 @@ class SMainMenu : public SMenu
     SModsListView ModsListView;
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;
- 
+
 public:
-	void Construct(const FArguments& InArgs);
+    void Construct(const FArguments& InArgs);
+
+    virtual void OnShow() override {}
+    virtual void OnHide() override {}
 
 private:
     template <typename F>

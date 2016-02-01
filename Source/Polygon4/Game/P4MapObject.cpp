@@ -71,7 +71,7 @@ bool P4MapObject::spawn()
 
     FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
     FRotator rot(pitch + object->pitch, yaw + object->yaw, roll + object->roll);
-    
+
     if (!object->resource.empty())
     {
         auto o = LoadObject<UStaticMesh>(0, object->resource);

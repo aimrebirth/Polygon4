@@ -47,10 +47,10 @@ FPowerUpProperties::FPowerUpProperties()
 AP4Glider::AP4Glider()
 {
 	PrimaryActorTick.bCanEverTick = true;
-    
+
     //AutoPossessPlayer = EAutoReceiveInput::Player0;
-    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-    
+    //AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     VisibleComponent->SnapTo(RootComponent);
     VisibleComponent->SetSimulatePhysics(false);
@@ -120,7 +120,7 @@ AP4Glider::AP4Glider()
     Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnBodyBeginOverlap);
     //Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldBeginOverlap);
     //Body->OnComponentEndOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldEndOverlap);
-        
+
     UpdateView();
 
     GunOffsetLeft = FVector(150.0f, -100.0f, 0.0f);
@@ -252,8 +252,8 @@ void AP4Glider::Tick(float DeltaSeconds)
 
             if (changed)
             {
-                if (changed_y == MouseChange::End)
-                    Position.X++;
+                //if (changed_y == MouseChange::End)
+                //    Position.X++;
                 Viewport->Viewport->SetMouse(Position.X, Position.Y);
             }
 
@@ -347,7 +347,7 @@ void AP4Glider::Tick(float DeltaSeconds)
     {
         return;
     }
-    
+
     auto CalcAngle = [](const FVector &Vector1, const FVector &Vector2 = FVector::UpVector)
     {
         float dp = FVector::DotProduct(Vector1, Vector2);
@@ -526,12 +526,12 @@ void AP4Glider::Tick(float DeltaSeconds)
 void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
 	Super::SetupPlayerInputComponent(InInputComponent);
-    
+
     InInputComponent->BindAction("View", IE_Pressed, this, &AP4Glider::ChangeView);
 
     InInputComponent->BindAxis("Move", this, &AP4Glider::Move);
     InInputComponent->BindAxis("Strafe", this, &AP4Glider::Strafe);
-    
+
     //InInputComponent->BindAxis("Turn", this, &AP4Glider::Turn);
 	//InInputComponent->BindAxis("LookUp", this, &AP4Glider::LookUp);
     InInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
@@ -539,10 +539,10 @@ void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponen
 
     InInputComponent->BindAction("Jump", IE_Pressed, this, &AP4Glider::Jump);
     //InInputComponent->BindAction("Jump", IE_Released, this, &AP4Glider::Jump);
-    
+
     InInputComponent->BindAction("Boost", IE_Pressed, this, &AP4Glider::BoostOn);
     InInputComponent->BindAction("Boost", IE_Released, this, &AP4Glider::BoostOff);
-    
+
     InInputComponent->BindAction("FireLight", IE_Pressed, this, &AP4Glider::FireLightOn);
     InInputComponent->BindAction("FireLight", IE_Released, this, &AP4Glider::FireLightOff);
     InInputComponent->BindAction("FireHeavy", IE_Pressed, this, &AP4Glider::FireHeavyOn);
@@ -657,27 +657,27 @@ FHitResult AP4Glider::HoverTrace(FVector Vector, float Altitude) const
 
     auto begin = GetActorLocation();
     auto end = (Vector - begin) * Altitude;
-    
+
     FHitResult Hit(ForceInit);
     GetWorld()->LineTraceSingleByChannel(
         Hit,
         begin,
         end,
         ECollisionChannel::ECC_Visibility,
-        TraceParams);    
+        TraceParams);
     return Hit;
 }
 
 void AP4Glider::HideUI()
 {
     UIHidden = !UIHidden;
-    
+
     auto PlayerController = Cast<APlayerController>(GetController());
     auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD());
     HUD->SetVisible(!UIHidden);
 }
 
-void AP4Glider::SetMechanoid(P4Mechanoid* Mechanoid)
+void AP4Glider::SetMechanoid(polygon4::detail::Mechanoid* Mechanoid)
 {
     this->Mechanoid = Mechanoid;
     Configuration = Mechanoid->configuration;

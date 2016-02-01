@@ -19,7 +19,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include <Polygon4/DataManager/Types.h>
+#include <Polygon4/MapBuilding.h>
 #include "P4MapBuilding.generated.h"
 
 class P4MapBuilding;
@@ -38,22 +38,31 @@ public:
     virtual void BeginPlay() override;
 
     void SetStaticMesh(UStaticMesh *mesh);
-    void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    void InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding *mmb);
+
+    UFUNCTION()
+    void OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    UFUNCTION()
+    void OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+    void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 
 private:
-    P4MapBuilding *MapBuilding;
+    P4MapBuilding *MapBuilding = nullptr;
 
     friend class P4MapBuilding;
 };
 
-class P4MapBuilding : public polygon4::detail::MapBuilding
+class P4MapBuilding : public polygon4::MapBuilding
 {
-    using Base = polygon4::detail::MapBuilding;
+    using Base = polygon4::MapBuilding;
 
 public:
     P4MapBuilding(const polygon4::detail::MapBuilding &rhs);
 
-    virtual bool spawn() override;
+    virtual bool spawn() override final;
+
+    virtual void initModificationMapBuilding() override final;
 
 private:
     AP4Building *Building;

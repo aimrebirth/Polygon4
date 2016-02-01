@@ -29,18 +29,36 @@ P4Mechanoid::P4Mechanoid(const polygon4::detail::Mechanoid &rhs)
 {
 }
 
-bool P4Mechanoid::spawn(bool player)
+bool P4Mechanoid::spawn()
 {
     if (!enabled)
         return false;
 
     if (player && building)
     {
-        //GP4Engine->ShowBuildingMenu();
-        //return false;
+        enterBuilding(building->building);
+        return false;
     }
 
-    FString resource = configuration->glider->resource;
+    auto g = ::spawn(this, GP4Engine->GetWorld());
+    if (!g)
+        return false;
+
+    if (player)
+    {
+        auto pc = GP4Engine->GetWorld()->GetFirstPlayerController();
+        if (pc)
+        {
+            pc->Possess(g);
+        }
+    }
+
+    return true;
+}
+
+AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
+{
+    FString resource = M->getConfiguration()->glider->resource;
     auto c = StaticLoadClass(AP4Glider::StaticClass(), nullptr, resource.GetCharArray().GetData());
     if (!c)
     {
@@ -49,12 +67,12 @@ bool P4Mechanoid::spawn(bool player)
         c = StaticLoadClass(AP4Glider::StaticClass(), nullptr, resource.GetCharArray().GetData());
     }
     if (!c)
-        return false;
+        return nullptr;
 
-    FVector loc{ x, y, z };
-    FRotator rot{ pitch, yaw, roll };
-    FVector scale(configuration->glider->scale, configuration->glider->scale, configuration->glider->scale);
-    auto g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
+    FVector loc{ M->x, M->y, M->z };
+    FRotator rot{ M->pitch, M->yaw, M->roll };
+    FVector scale(M->getConfiguration()->glider->scale, M->getConfiguration()->glider->scale, M->getConfiguration()->glider->scale);
+    auto g = W->SpawnActor<AP4Glider>(c, loc, rot);
     if (!g)
     {
         // place is busy
@@ -63,21 +81,16 @@ bool P4Mechanoid::spawn(bool player)
         while (!g && loc.Z < z1)
         {
             loc.Z += 250;
-            g = GWorld->SpawnActor<AP4Glider>(c, loc, rot);
+            g = W->SpawnActor<AP4Glider>(c, loc, rot);
         }
         if (!g)
-            return false;
+            return nullptr;
     }
-    g->SetMechanoid(this);
     g->SetActorScale3D(scale);
-    g->Data.TextID = text_id.toFString();
+    g->SetMechanoid(M);
+    g->Data.TextID = M->text_id.toFString();
 #if WITH_EDITOR
     g->SetActorLabel(g->Data.TextID);
 #endif
-    if (player)
-    {
-        GWorld->GetFirstPlayerController()->Possess(g);
-    }
-
-    return true;
+    return g;
 }

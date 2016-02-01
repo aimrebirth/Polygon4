@@ -58,13 +58,20 @@ P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4Gam
 {
     GP4Engine = this;
     Menus.AddDefaulted(static_cast<int>(MenuType::Max));
+    DummyObject = (UDummyObject*)calloc(1, sizeof(UDummyObject));
+}
+
+P4Engine::~P4Engine()
+{
+    free(DummyObject);
+    GP4Engine = nullptr;
 }
 
 void P4Engine::initChildren()
 {
     for (auto &modification : storage->modifications)
     {
-        auto m = modification.second.get();
+        auto m = modification.second;
         m->replace<P4Modification>(m);
     }
 }
@@ -82,7 +89,7 @@ TArray<TSharedPtr<struct ModificationDesc>> P4Engine::GetModificationDescriptors
         d->Version = m->version.toFString();
         d->DateCreated = m->date_created.toFString();
         d->DateModified = m->date_modified.toFString();
-        d->modification = m.get();
+        d->modification = m;
         mods.Add(d);
     }
     return mods;
@@ -111,13 +118,18 @@ TSharedPtr<SMenu> P4Engine::GetMenu(MenuType Type)
 void P4Engine::ShowMenu(MenuType Type)
 {
     if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+    {
         if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
             HUD->SetVisible(false);
+    }
 
     for (auto &m : Menus)
     {
         if (m.IsValid())
+        {
             m->SetVisibility(EVisibility::Hidden);
+            m->OnHide();
+        }
     }
 
     auto m = GetMenu(Type);
@@ -126,19 +138,29 @@ void P4Engine::ShowMenu(MenuType Type)
         GEngine->GameViewport->AddViewportWidgetContent(m.ToSharedRef());
     }
     m->SetVisibility(EVisibility::Visible);
+    m->OnShow();
+    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+    FSlateApplication::Get().ReleaseMouseCapture();
 }
 
 void P4Engine::HideMenu(MenuType Type)
 {
     if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+    {
         if (auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD()))
             HUD->SetVisible(true);
+    }
 
     for (auto &m : Menus)
     {
         if (m.IsValid())
+        {
             m->SetVisibility(EVisibility::Hidden);
+            m->OnHide();
+        }
     }
+    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+    FSlateApplication::Get().SetAllUserFocusToGameViewport();
 }
 
 void P4Engine::SetMenuVisibility(MenuType Type, bool Visibility)
@@ -155,6 +177,9 @@ void P4Engine::OnLevelLoaded()
 {
     if (!IsStarted())
         return;
+
+    SetPauseMenuBindings();
+
     TActorIterator<ALandscape> landscapeIterator(GetWorld());
     ALandscape* landscape = *landscapeIterator;
     SetWorldScale(landscape->GetActorScale() / 100.0f);
@@ -172,4 +197,73 @@ void P4Engine::Exit()
     auto c = world->GetFirstPlayerController();
     if (c)
         c->ConsoleCommand("quit");
+}
+
+void P4Engine::SetPauseMenuBindings()
+{
+    auto PlayerController = GetWorld()->GetFirstPlayerController();
+    if (PlayerController)
+    {
+        auto PlayerInputComponent = PlayerController->InputComponent;
+        if (PlayerInputComponent)
+        {
+            int n_binds = PlayerInputComponent->GetNumActionBindings();
+            bool exit = false, pause = false;
+            for (auto i = 0; i < n_binds; ++i)
+            {
+                auto &b = PlayerInputComponent->GetActionBinding(i);
+                if (b.ActionName == "Exit")
+                    exit = true;
+                else if (b.ActionName == "Pause")
+                    pause = true;
+            }
+            if (!exit)
+                PlayerInputComponent->BindAction("Exit", IE_Pressed, DummyObject, &UDummyObject::ShowPauseMenuFromBinding).bExecuteWhenPaused = true;
+            if (!pause)
+                PlayerInputComponent->BindAction("Pause", IE_Pressed, DummyObject, &UDummyObject::ShowPauseMenuFromBinding).bExecuteWhenPaused = true;
+        }
+    }
+}
+
+void P4Engine::UnsetPauseMenuBindings() const
+{
+    auto PlayerController = GetWorld()->GetFirstPlayerController();
+    if (PlayerController)
+    {
+        auto PlayerInputComponent = PlayerController->InputComponent;
+        if (PlayerInputComponent)
+        {
+            int n_binds = PlayerInputComponent->GetNumActionBindings();
+            for (auto i = n_binds - 1; i >= 0; --i)
+            {
+                auto &b = PlayerInputComponent->GetActionBinding(i);
+                if (b.ActionName == "Exit" || b.ActionName == "Pause")
+                {
+                    PlayerInputComponent->RemoveActionBinding(i);
+                }
+            }
+        }
+    }
+}
+
+void P4Engine::ShowPauseMenuFromBinding()
+{
+    DummyObject->ShowPauseMenuFromBinding();
+}
+
+void P4Engine::SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapBuilding *currentBuilding)
+{
+    GetBuildingMenu()->SetCurrentBuilding(currentBuilding);
+}
+
+void UDummyObject::ShowPauseMenuFromBinding()
+{
+    GP4Engine->paused = !GP4Engine->paused;
+
+    GP4Engine->GetWorld()->GetFirstPlayerController()->SetPause(GP4Engine->paused);
+
+    if (GP4Engine->paused)
+        GP4Engine->ShowPauseMenu();
+    else
+        GP4Engine->HidePauseMenu();
 }

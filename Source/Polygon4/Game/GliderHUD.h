@@ -27,7 +27,7 @@ UCLASS()
 class POLYGON4_API AGliderHUD : public AHUD
 {
 	GENERATED_BODY()
-	
+
 private:
     UTexture2D* CrosshairTex;
     FVector2D MousePosition = {-1, -1};
@@ -38,7 +38,7 @@ private:
     TSharedPtr<SBar> EnergyShieldBar;
     TSharedPtr<SBar> ArmorBar;
     TSharedPtr<SBar> EnergyBar;
-	
+
 public:
     AGliderHUD(const FObjectInitializer& ObjectInitializer);
 

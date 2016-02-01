@@ -44,7 +44,7 @@ void FDBToolModule::StartupModule()
 	FDBToolStyle::ReloadTextures();
 
     FDBToolCommands::Register();
-	
+
     PluginCommands = MakeShareable(new FUICommandList);
 
 	PluginCommands->MapAction(
@@ -62,19 +62,19 @@ void FDBToolModule::StartupModule()
         FCanExecuteAction());
 
     //
-	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");	
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 	{
 		TSharedPtr<FExtender> MenuExtender = MakeShareable(new FExtender());
 		MenuExtender->AddMenuExtension("WindowLayout", EExtensionHook::After, PluginCommands, FMenuExtensionDelegate::CreateRaw(this, &FDBToolModule::AddMenuExtension));
 
 		LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
-	}	
+	}
 	{
 		TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
 		ToolbarExtender->AddToolBarExtension("Settings", EExtensionHook::After, PluginCommands, FToolBarExtensionDelegate::CreateRaw(this, &FDBToolModule::AddToolbarExtension));
-		
+
 		LevelEditorModule.GetToolBarExtensibilityManager()->AddExtender(ToolbarExtender);
-	}	
+	}
 	auto &TabSpawner = FGlobalTabmanager::Get()->RegisterNomadTabSpawner(DBToolTabName, FOnSpawnTab::CreateRaw(this, &FDBToolModule::OnSpawnPluginTab))
 		.SetDisplayName(LOCTEXT("FDBToolTabTitle", "DB Tool"))
 		.SetMenuType(ETabSpawnerMenuType::Hidden);
@@ -361,7 +361,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
     TMap<FString, Mechanoid*> mechanoids;
     for (auto &m : storage->mechanoids)
     {
-        FString s = m->text_id;
+        FString s = m.second->text_id;
         if (mechanoids.Contains(s))
         {
             error_text(
@@ -369,7 +369,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
                 FText::Format(LOCTEXT("SaveMapMechanoidsDuplicateError", "There's duplicate text_id key '{0}'"), FText::FromString(s)));
             return;
         }
-        mechanoids.Add(s, m.second.get());
+        mechanoids.Add(s, m.second);
     }
 
     bool updated = false;
@@ -389,7 +389,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
             m->yaw = Rot.Yaw;
             m->roll = Rot.Roll;
             m->map = map;
-            
+
             auto full_name = Itr->GetClass()->GetFullName();
 
             Itr->Destroy();
@@ -479,13 +479,12 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
     for (auto &m : mechanoids)
     {
         if (m->map == map)
-            mapMechanoids.insert(m.second.get());
+            mapMechanoids.insert(m);
     }
 
     for (auto &m : mapMechanoids)
     {
-        auto p4m = m->replace<P4Mechanoid>(m);
-        p4m->spawn();
+        spawn(m, GWorld);
     }
 }
 
@@ -527,5 +526,5 @@ void FDBToolModule::SetDataCommitted()
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FDBToolModule, DBTool)

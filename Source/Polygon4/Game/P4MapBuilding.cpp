@@ -20,6 +20,7 @@
 #include "P4MapBuilding.h"
 
 #include "P4Engine.h"
+#include "P4Glider.h"
 
 AP4Building::AP4Building()
 {
@@ -38,9 +39,6 @@ AP4Building::AP4Building()
 
 void AP4Building::BeginPlay()
 {
-    if (MapBuilding->interactive)
-        VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Building::OnHit);
-
     Super::BeginPlay();
 }
 
@@ -52,11 +50,38 @@ void AP4Building::SetStaticMesh(UStaticMesh *mesh)
     }
 }
 
-void AP4Building::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AP4Building::InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding *mmb)
 {
-    if (OtherActor != this && OtherComp != NULL)
+    if (!mmb)
+        return;
+    if (mmb->interactive)
     {
+        VisibleComponent->SetCollisionProfileName("OverlapAllDynamic");
+        //VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Building::OnBodyHit);
+        VisibleComponent->OnComponentBeginOverlap.AddDynamic(this, &AP4Building::OnBodyBeginOverlap);
     }
+}
+
+void AP4Building::OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+    OnHit(OtherActor, OtherComp);
+}
+
+void AP4Building::OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    OnHit(OtherActor, OtherComp);
+}
+
+void AP4Building::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp)
+{
+    if (OtherActor == nullptr || OtherComp == nullptr || OtherActor == this)
+        return;
+    auto Glider = Cast<AP4Glider>(OtherActor);
+    if (!Glider)
+        return;
+    auto M = Glider->GetMechanoid();
+    Glider->Destroy();
+    M->enterBuilding(MapBuilding);
 }
 
 P4MapBuilding::P4MapBuilding(const polygon4::detail::MapBuilding &rhs)
@@ -95,4 +120,9 @@ bool P4MapBuilding::spawn()
     a->SetActorLabel(building->getName());
 #endif
     return false;
+}
+
+void P4MapBuilding::initModificationMapBuilding()
+{
+    Building->InitModificationMapBuilding(modificationMapBuilding);
 }

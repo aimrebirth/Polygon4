@@ -235,7 +235,7 @@ public:
         : n(n)
     {
     }
-    
+
     DampingValue& operator=(T f)
     {
         return plus(f);
@@ -328,7 +328,7 @@ class POLYGON4_API AP4Glider : public APawn
     };
 
 	GENERATED_BODY()
-        
+
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
@@ -340,7 +340,7 @@ class POLYGON4_API AP4Glider : public APawn
     /** Spring arm for TPCamera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* SpringArm;
-    
+
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
 
@@ -357,7 +357,7 @@ public:
 	// Sets default values for this pawn's properties
 	AP4Glider();
 
-	virtual void BeginPlay() override;	
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
@@ -390,12 +390,12 @@ private:
 
     void ChangeView();
     void UpdateView();
-    
+
     ArmedTimedValue JumpTimeout;
     void Jump();
 
     void HideUI();
-    
+
 private:
     bool boost = false;
     bool FireLight = false;
@@ -407,7 +407,7 @@ private:
     void FireLightOff() { FireLight = false; }
     void FireHeavyOn() { FireHeavy = true; }
     void FireHeavyOff() { FireHeavy = false; }
-    
+
 private:
     FPowerUpProperties PowerUpProperties;
     FHitResult ZTraceResults;
@@ -425,12 +425,13 @@ private:
     FHitResult HoverTrace(FVector Vector, float Altitude = 50000.0f) const;
 
 private:
-    P4Mechanoid* Mechanoid = nullptr;
+    polygon4::detail::Mechanoid* Mechanoid = nullptr;
     polygon4::detail::Configuration* Configuration;
     polygon4::detail::Glider* Glider;
 
 public:
-    void SetMechanoid(P4Mechanoid* Mechanoid);
+    void SetMechanoid(polygon4::detail::Mechanoid* Mechanoid);
+    polygon4::detail::Mechanoid* GetMechanoid() const { return Mechanoid; }
 
 public:
     UFUNCTION()

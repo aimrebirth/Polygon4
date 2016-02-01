@@ -25,7 +25,7 @@ UCLASS(Abstract, Blueprintable)
 class POLYGON4_API AProjectile : public AActor
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	class USphereComponent* CollisionComp;
 
@@ -38,14 +38,14 @@ class POLYGON4_API AProjectile : public AActor
 private:
     UObject *Owner = 0;
 
-public:	
+public:
     AProjectile(const FObjectInitializer& ObjectInitializer);
 
     void SetOwner(UObject *OtherOwner)
     {
         Owner = OtherOwner;
     }
-    
+
 	UFUNCTION()
 	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 

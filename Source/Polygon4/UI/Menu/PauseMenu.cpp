@@ -22,15 +22,14 @@
 #include "Widgets/MenuButton.h"
 
 #include <P4GameMode.h>
+#include <Game/P4Engine.h>
 #include <Game/P4Modification.h>
 
 #define LOCTEXT_NAMESPACE "PauseMenu"
 
 void SPauseMenu::Construct(const FArguments& InArgs)
 {
-    GameMode = InArgs._GameMode;
-    PlayerController = InArgs._PlayerController;
-    if (PlayerController)
+    if (auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController())
     {
         PlayerController->bShowMouseCursor = true;
     }
@@ -118,7 +117,7 @@ SVerticalBox::FSlot& SPauseMenu::PauseMenuButton(FText Text, F function) const
 
 FReply SPauseMenu::OnContinue()
 {
-    GameMode->ShowMenu();
+    GP4Engine->ShowPauseMenuFromBinding();
     return FReply::Handled();
 }
 
@@ -129,7 +128,7 @@ FReply SPauseMenu::OnLoadGame()
 
 FReply SPauseMenu::OnExit()
 {
-    if (PlayerController)
+    if (auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController())
         PlayerController->ConsoleCommand("quit");
     return FReply::Handled();
 }

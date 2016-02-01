@@ -20,12 +20,17 @@
 
 #include <Polygon4/Mechanoid.h>
 
-class POLYGON4_API P4Mechanoid : public polygon4::Mechanoid
+class AP4Glider;
+
+class P4Mechanoid : public polygon4::Mechanoid
 {
     using Base = polygon4::Mechanoid;
 
 public:
     P4Mechanoid(const polygon4::detail::Mechanoid &rhs);
 
-    virtual bool spawn(bool player = false) override;
+    virtual bool spawn() override;
 };
+
+POLYGON4_API
+AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W);

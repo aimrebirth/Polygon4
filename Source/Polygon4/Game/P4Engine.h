@@ -22,6 +22,8 @@
 
 #include <Polygon4/Engine.h>
 
+#include "P4Engine.generated.h"
+
 #define DECLARE_MENU(name) \
 public: \
     TSharedPtr<S ## name ## Menu> Get ## name ## Menu(); \
@@ -35,6 +37,8 @@ class SMenu;
 class SMainMenu;
 class SPauseMenu;
 class SBuildingMenu;
+
+class UDummyObject;
 
 enum class MenuType
 {
@@ -57,6 +61,7 @@ class P4Engine : public polygon4::Engine
 
 public:
     P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4GameInstance);
+    ~P4Engine();
 
     virtual void initChildren() override;
 
@@ -74,10 +79,17 @@ public:
 
     virtual void OnLevelLoaded() override;
 
+    void ShowPauseMenuFromBinding();
+    void SetPauseMenuBindings();
+    void UnsetPauseMenuBindings() const;
+
+    virtual void SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapBuilding *currentBuilding) override;
+
 private:
     //
     // for some reasons ue4-side 32 bit code sees base class size = actual_size - sizeof(void*)
     int __buffer[3]; // do not delete! this prevents 32-bit version from crash
+
     //
     UP4GameInstance *P4GameInstance;
 
@@ -97,6 +109,19 @@ public:
 
 private:
     TArray<TSharedPtr<SMenu>> Menus;
+    bool paused = false;
+    UDummyObject *DummyObject = nullptr;
+
+    friend class UDummyObject;
+};
+
+UCLASS()
+class UDummyObject : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    void ShowPauseMenuFromBinding();
 };
 
 extern P4Engine *GP4Engine;

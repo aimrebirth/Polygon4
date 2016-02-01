@@ -139,11 +139,11 @@ public class Polygon4 : ModuleRules
         }
         return removed;
     }
-    
+
     public void LoadCoreModule(TargetInfo Target, string Name)
     {
         //System.Console.WriteLine("Enter LoadCoreModule");
-        
+
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
@@ -168,7 +168,7 @@ public class Polygon4 : ModuleRules
 
         string base_name = Name + "." + PlatformString;
         int base_name_id = 0;
-        
+
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
         PublicDelayLoadDLLs.Add(base_name + ".dll");
 
@@ -180,10 +180,10 @@ public class Polygon4 : ModuleRules
 
         //if (Target.Type != TargetRules.TargetType.Editor)
         //    return;
-        
+
         if (NumberOfCalls++ > 0)
             return;
-        
+
         // try to remove previous dll, pdb
         base_name_id = 1;
         while (true)

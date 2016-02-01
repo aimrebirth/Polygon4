@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "Engine.h"
+#include <memory>
 
-#include <Polygon4/Common.h>
+#include "Engine.h"
 
 #define GET_MODS_DIR (FPaths::GameDir() + "Mods/").GetCharArray().GetData()
 

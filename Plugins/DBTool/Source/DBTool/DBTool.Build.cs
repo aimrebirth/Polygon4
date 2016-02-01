@@ -44,8 +44,8 @@ public class DBTool : ModuleRules
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
-			
-		
+
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -59,14 +59,15 @@ public class DBTool : ModuleRules
 				"SlateCore",
 				// ... add private dependencies that you statically link with here ...
                 "Landscape",
+                //
                 "Polygon4",
             }
 			);
-		
-		
+
+
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
-			{
+            {
 				// ... add any modules that your module loads dynamically here ...
             }
 			);

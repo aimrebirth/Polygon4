@@ -23,25 +23,18 @@
 class SPauseMenu : public SMenu
 {
 	SLATE_BEGIN_ARGS(SPauseMenu){}
-        SLATE_ARGUMENT(APlayerController*, PlayerController)
-        SLATE_ARGUMENT(class AP4GameMode*, GameMode)
 	SLATE_END_ARGS()
 
-    class AP4GameMode *GameMode;
-    APlayerController* PlayerController;
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;
- 
+
 public:
-	void Construct(const FArguments& InArgs);
+    void Construct(const FArguments& InArgs);
+
+    virtual void OnShow() override {}
+    virtual void OnHide() override {}
 
 private:
-    /*virtual bool SupportsKeyboardFocus() const override { return true; }
-    virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override
-	{
-		return FReply::Handled().SetUserFocus(SharedThis( this ), EFocusCause::SetDirectly, true);
-	}*/
-
     template <typename F>
     SVerticalBox::FSlot& PauseMenuButton(FText Text, F function) const;
 

@@ -20,15 +20,30 @@
 
 #include "Menu.h"
 
+namespace polygon4 {
+    namespace detail {
+        class ModificationMapBuilding;
+    }
+}
+
 class SBuildingMenu : public SMenu
 {
 	SLATE_BEGIN_ARGS(SBuildingMenu){}
 	SLATE_END_ARGS()
- 
-public:
-	void Construct(const FArguments& InArgs);
 
-    //virtual void SetVisibility(TAttribute<EVisibility> InVisibility) override;
+public:
+    void Construct(const FArguments& InArgs);
+
+    virtual void OnShow() override;
+    virtual void OnHide() override;
+
+    void SetCurrentBuilding(polygon4::detail::ModificationMapBuilding *B);
 
 private:
+    TSharedPtr<STextBlock> Name;
+    TSharedPtr<STextBlock> Text;
+
+    polygon4::detail::ModificationMapBuilding *CurrentBuilding = nullptr;
+
+    FReply OnExit();
 };

@@ -27,30 +27,137 @@
 
 void SBuildingMenu::Construct(const FArguments& InArgs)
 {
-    auto PlayerController = GWorld->GetFirstPlayerController();
+    auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController();
     if (PlayerController)
     {
         PlayerController->bShowMouseCursor = true;
     }
+
+    auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
+    FSlateBrush *BackgroundBrush;
+    if (BackgroundTexture)
+        BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
+    else
+        BackgroundBrush = new FSlateColorBrush(FColor::Black);
+
+    ChildSlot
+        .HAlign(HAlign_Fill)
+        .VAlign(VAlign_Fill)
+        [
+            SNew(SBorder)
+            .HAlign(HAlign_Fill)
+            .VAlign(VAlign_Fill)
+            .Padding(10)
+            .BorderImage(BackgroundBrush)
+            [
+                SNew(SHorizontalBox)
+                // left menu
+                + SHorizontalBox::Slot()
+                .FillWidth(0.25)
+                [
+                    SNew(SBorder)
+                    .Padding(10)
+                    [
+                        SNew(SVerticalBox)
+                        // exit button
+                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnExit)
+                        .VAlign(VAlign_Top)
+                        + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::OnExit)
+                        .VAlign(VAlign_Top)
+                        + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnExit)
+                        .VAlign(VAlign_Top)
+                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::OnExit)
+                        .VAlign(VAlign_Top)
+                        + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::OnExit)
+                        .VAlign(VAlign_Top)
+                        + VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit)
+                        .VAlign(VAlign_Bottom)
+                    ]
+                ]
+                // middle
+                + SHorizontalBox::Slot()
+                .FillWidth(0.5)
+                [
+                    SNew(SBorder)
+                    .Padding(10)
+                    [
+                        SNew(SVerticalBox)
+                        // caption
+                        + SVerticalBox::Slot()
+                        .VAlign(VAlign_Top)
+                        .HAlign(HAlign_Fill)
+                        .AutoHeight()
+                        [
+                            SNew(SBorder)
+                            .Padding(10)
+                            [
+                                SNew(SVerticalBox)
+                                + SVerticalBox::Slot()
+                                .HAlign(HAlign_Center)
+                                [
+                                    SAssignNew(Name, STextBlock)
+                                    .Font(FSlateFontInfo("Tahoma", 14))
+                                    .Text(FText::FromString(L"Building Name"))
+                                ]
+                            ]
+                        ]
+                        // text
+                        + SVerticalBox::Slot()
+                        .VAlign(VAlign_Fill)
+                        .HAlign(HAlign_Fill)
+                        [
+                            SNew(SBorder)
+                            .Padding(10)
+                            [
+                                SNew(SVerticalBox)
+                                + SVerticalBox::Slot()
+                                [
+                                    SAssignNew(Text, STextBlock)
+                                    .Font(FSlateFontInfo("Tahoma", 14))
+                                    .Text(FText::FromString(L"text"))
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+                // right menu
+                + SHorizontalBox::Slot()
+                .FillWidth(0.25)
+                [
+                    SNew(SBorder)
+                    .Padding(10)
+                ]
+            ]
+        ]
+    ;
 }
 
-/*void SBuildingMenu::SetVisibility(TAttribute<EVisibility> InVisibility) override
+void SBuildingMenu::OnShow()
 {
-    Super::SetVisibility(InVisibility);
-
-    if (InVisibility == EVisibility::Visible)
-    {
-        auto PlayerController = GetWorld()->GetFirstPlayerController();
-        if (PlayerController)
-        {
-            auto PlayerInputComponent = PlayerController->InputComponent;
-            if (PlayerInputComponent)
-            {
-                //PlayerInputComponent->
-                PlayerInputComponent->BindAction("Exit", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
-                PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AP4GameMode::ShowMenu).bExecuteWhenPaused = true;
-            }
-        }
-    }
+    GP4Engine->UnsetPauseMenuBindings();
 }
-*/
+
+void SBuildingMenu::OnHide()
+{
+    auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController();
+    if (PlayerController)
+    {
+        PlayerController->bShowMouseCursor = false;
+    }
+    GP4Engine->SetPauseMenuBindings();
+}
+
+FReply SBuildingMenu::OnExit()
+{
+    GP4Engine->HideBuildingMenu();
+    GP4Engine->spawnCurrentPlayer();
+    return FReply::Unhandled();
+}
+
+void SBuildingMenu::SetCurrentBuilding(polygon4::detail::ModificationMapBuilding *B)
+{
+    if (!B)
+        return;
+    CurrentBuilding = B;
+    Name->SetText(CurrentBuilding->getName().toFText());
+}

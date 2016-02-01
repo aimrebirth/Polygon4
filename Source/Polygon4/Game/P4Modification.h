@@ -29,7 +29,7 @@ struct ModificationDesc
     FString DateCreated;
     FString DateModified;
 
-    polygon4::IModification* modification;
+    polygon4::detail::Modification* modification;
 };
 
 class P4Modification : public polygon4::Modification

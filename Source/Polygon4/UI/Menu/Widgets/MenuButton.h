@@ -31,10 +31,26 @@ private:
         SLATE_ARGUMENT(FText, Text)
         SLATE_ARGUMENT(FParentArguments, ParentArguments)
 	SLATE_END_ARGS()
- 
+
 public:
 	void Construct(const FArguments& InArgs);
 
 private:
     FText Text;
 };
+
+template <typename C, typename F>
+SVerticalBox::FSlot& VerticalSlotMenuButton(FText Text, C *object, F function)
+{
+    return
+        SVerticalBox::Slot()
+        .VAlign(VAlign_Top)
+        .HAlign(HAlign_Center)
+        .Padding(20)
+        [
+            SNew(SMenuButton)
+            .Text(Text)
+            .ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))
+        ]
+    ;
+}

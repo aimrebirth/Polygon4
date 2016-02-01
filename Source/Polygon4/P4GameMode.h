@@ -25,15 +25,10 @@ UCLASS()
 class POLYGON4_API AP4GameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
 public:
     AP4GameMode(const FObjectInitializer& ObjectInitializer);
 
-    void ShowMenu();
-
 public:
     virtual void BeginPlay() override;
-	
-private:
-    bool paused = false;
 };

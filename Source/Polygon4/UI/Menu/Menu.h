@@ -24,4 +24,8 @@ class SMenu : public SCompoundWidget
 {
     SLATE_BEGIN_ARGS(SMenu) {}
     SLATE_END_ARGS()
+
+public:
+    virtual void OnShow() = 0;
+    virtual void OnHide() = 0;
 };
