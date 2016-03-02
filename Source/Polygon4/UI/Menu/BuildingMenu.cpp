@@ -17,7 +17,6 @@
  */
 
 #include "Polygon4.h"
-#include "EditorStyle.h"
 
 #include "BuildingMenu.h"
 
