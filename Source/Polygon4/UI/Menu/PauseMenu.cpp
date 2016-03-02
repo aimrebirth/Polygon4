@@ -29,7 +29,7 @@
 
 void SPauseMenu::Construct(const FArguments& InArgs)
 {
-    if (auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController())
+    if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
     {
         PlayerController->bShowMouseCursor = true;
     }
@@ -117,7 +117,7 @@ SVerticalBox::FSlot& SPauseMenu::PauseMenuButton(FText Text, F function) const
 
 FReply SPauseMenu::OnContinue()
 {
-    GP4Engine->ShowPauseMenuFromBinding();
+    GP4Engine()->ShowPauseMenuFromBinding();
     return FReply::Handled();
 }
 
@@ -128,7 +128,7 @@ FReply SPauseMenu::OnLoadGame()
 
 FReply SPauseMenu::OnExit()
 {
-    if (auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController())
+    if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
         PlayerController->ConsoleCommand("quit");
     return FReply::Handled();
 }

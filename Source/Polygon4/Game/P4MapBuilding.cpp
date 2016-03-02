@@ -91,8 +91,8 @@ P4MapBuilding::P4MapBuilding(const polygon4::detail::MapBuilding &rhs)
 
 bool P4MapBuilding::spawn()
 {
-    auto World = GP4Engine->GetWorld();
-    auto WorldScale = GP4Engine->GetWorldScale();
+    auto World = GP4Engine()->GetWorld();
+    auto WorldScale = GP4Engine()->GetWorldScale();
 
     FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
     FRotator rot(pitch + building->pitch, yaw + building->yaw, roll + building->roll);

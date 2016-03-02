@@ -40,13 +40,13 @@ bool P4Mechanoid::spawn()
         return false;
     }
 
-    auto g = ::spawn(this, GP4Engine->GetWorld());
+    auto g = ::spawn(this, GP4Engine()->GetWorld());
     if (!g)
         return false;
 
     if (player)
     {
-        auto pc = GP4Engine->GetWorld()->GetFirstPlayerController();
+        auto pc = GP4Engine()->GetWorld()->GetFirstPlayerController();
         if (pc)
         {
             pc->Possess(g);

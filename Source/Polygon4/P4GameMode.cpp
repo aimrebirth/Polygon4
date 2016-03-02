@@ -33,16 +33,6 @@ AP4GameMode::AP4GameMode(const FObjectInitializer& ObjectInitializer)
 
 void AP4GameMode::BeginPlay()
 {
-    GP4Engine->OnLevelLoaded();
-
+    GP4Engine()->OnLevelLoaded();
     Super::BeginPlay();
-
-    auto PlayerController = GetWorld()->GetFirstPlayerController();
-    if (PlayerController)
-    {
-        auto Viewport = GetWorld()->GetGameViewport();
-        FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
-        FIntPoint Center = ViewSize / 2;
-        Viewport->Viewport->SetMouse(Center.X, Center.Y);
-    }
 }

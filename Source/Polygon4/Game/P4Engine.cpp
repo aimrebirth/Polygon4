@@ -51,12 +51,21 @@ void P4Engine::Set ## name ## MenuVisibility(bool Visibility) \
     SetMenuVisibility(MenuType:: ## name ## Menu, Visibility); \
 }
 
-P4Engine *GP4Engine;
+P4Engine *GP4Engine(P4Engine *Engine)
+{
+    static P4Engine *P4Engine = nullptr;
+    if (Engine)
+        P4Engine = Engine;
+    return P4Engine;
+}
 
 P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4GameInstance)
     : Base(modificationsDirectory.GetCharArray().GetData()), P4GameInstance(P4GameInstance)
 {
-    GP4Engine = this;
+    // set engine pointers
+    polygon4::getEngine(this);
+    GP4Engine(this);
+
     Menus.AddDefaulted(static_cast<int>(MenuType::Max));
     DummyObject = (UDummyObject*)calloc(1, sizeof(UDummyObject));
 }
@@ -64,7 +73,7 @@ P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4Gam
 P4Engine::~P4Engine()
 {
     free(DummyObject);
-    GP4Engine = nullptr;
+    //GP4Engine = nullptr;
 }
 
 void P4Engine::initChildren()
@@ -256,14 +265,19 @@ void P4Engine::SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapB
     GetBuildingMenu()->SetCurrentBuilding(currentBuilding);
 }
 
+polygon4::BuildingMenu *P4Engine::getBuildingMenu()
+{
+    return GetBuildingMenu().Get();
+}
+
 void UDummyObject::ShowPauseMenuFromBinding()
 {
-    GP4Engine->paused = !GP4Engine->paused;
+    GP4Engine()->paused = !GP4Engine()->paused;
 
-    GP4Engine->GetWorld()->GetFirstPlayerController()->SetPause(GP4Engine->paused);
+    GP4Engine()->GetWorld()->GetFirstPlayerController()->SetPause(GP4Engine()->paused);
 
-    if (GP4Engine->paused)
-        GP4Engine->ShowPauseMenu();
+    if (GP4Engine()->paused)
+        GP4Engine()->ShowPauseMenu();
     else
-        GP4Engine->HidePauseMenu();
+        GP4Engine()->HidePauseMenu();
 }

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <Polygon4/BuildingMenu.h>
+
 #include "Menu.h"
 
 namespace polygon4 {
@@ -26,10 +28,12 @@ namespace polygon4 {
     }
 }
 
-class SBuildingMenu : public SMenu
+class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
 {
 	SLATE_BEGIN_ARGS(SBuildingMenu){}
-	SLATE_END_ARGS()
+    SLATE_END_ARGS()
+
+        using TextWidget = STextBlock;// SRichTextBlock;
 
 public:
     void Construct(const FArguments& InArgs);
@@ -39,9 +43,11 @@ public:
 
     void SetCurrentBuilding(polygon4::detail::ModificationMapBuilding *B);
 
+    FText getFText() const;
+
 private:
     TSharedPtr<STextBlock> Name;
-    TSharedPtr<STextBlock> Text;
+    TSharedPtr<TextWidget> Text;
 
     polygon4::detail::ModificationMapBuilding *CurrentBuilding = nullptr;
 

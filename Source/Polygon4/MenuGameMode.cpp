@@ -23,7 +23,7 @@
 
 void AMenuGameMode::BeginPlay()
 {
-    GP4Engine->StartEngine();
-    GP4Engine->ShowMainMenu();
+    GP4Engine()->StartEngine();
+    GP4Engine()->ShowMainMenu();
     Super::BeginPlay();
 }

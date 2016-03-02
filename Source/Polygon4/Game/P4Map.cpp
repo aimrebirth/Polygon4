@@ -41,7 +41,7 @@ void P4Map::initChildren()
 
 bool P4Map::loadLevel()
 {
-    auto world = GP4Engine->GetWorld();
+    auto world = GP4Engine()->GetWorld();
     world->ServerTravel(resource);
     return true;
 }

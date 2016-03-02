@@ -17,6 +17,8 @@
  */
 
 #include "Polygon4.h"
+#include "EditorStyle.h"
+
 #include "BuildingMenu.h"
 
 #include "Widgets/MenuButton.h"
@@ -27,7 +29,7 @@
 
 void SBuildingMenu::Construct(const FArguments& InArgs)
 {
-    auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController();
+    auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController();
     if (PlayerController)
     {
         PlayerController->bShowMouseCursor = true;
@@ -108,13 +110,20 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                         [
                             SNew(SBorder)
                             .Padding(10)
+                            //.BorderBackgroundColor(FColor::Black)
+                            //FColor(16, 23, 50, 128)
+                            //.ColorAndOpacity(FColor::Black)
+                            //.ForegroundColor(FColor::Black)
                             [
                                 SNew(SVerticalBox)
                                 + SVerticalBox::Slot()
                                 [
-                                    SAssignNew(Text, STextBlock)
+                                    SAssignNew(Text, TextWidget)
                                     .Font(FSlateFontInfo("Tahoma", 14))
-                                    .Text(FText::FromString(L"text"))
+                                    .Text(this, &SBuildingMenu::getFText)
+                                    //.TextStyle()
+                                    .AutoWrapText(true)
+                                    //.DecoratorStyleSet(&FEditorStyle::Get())
                                 ]
                             ]
                         ]
@@ -134,23 +143,23 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
 void SBuildingMenu::OnShow()
 {
-    GP4Engine->UnsetPauseMenuBindings();
+    GP4Engine()->UnsetPauseMenuBindings();
 }
 
 void SBuildingMenu::OnHide()
 {
-    auto PlayerController = GP4Engine->GetWorld()->GetFirstPlayerController();
+    auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController();
     if (PlayerController)
     {
         PlayerController->bShowMouseCursor = false;
     }
-    GP4Engine->SetPauseMenuBindings();
+    GP4Engine()->SetPauseMenuBindings();
 }
 
 FReply SBuildingMenu::OnExit()
 {
-    GP4Engine->HideBuildingMenu();
-    GP4Engine->spawnCurrentPlayer();
+    GP4Engine()->HideBuildingMenu();
+    GP4Engine()->spawnCurrentPlayer();
     return FReply::Unhandled();
 }
 
@@ -160,4 +169,9 @@ void SBuildingMenu::SetCurrentBuilding(polygon4::detail::ModificationMapBuilding
         return;
     CurrentBuilding = B;
     Name->SetText(CurrentBuilding->getName().toFText());
+}
+
+FText SBuildingMenu::getFText() const
+{
+    return getText().toFText();
 }

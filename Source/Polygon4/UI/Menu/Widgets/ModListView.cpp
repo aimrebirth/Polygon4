@@ -67,9 +67,9 @@ void SModListView::ReloadMods(bool reload)
 {
     bool Empty = AvailableMods.Num() == 0;
 
-    if (!reload || GP4Engine->reloadMods())
+    if (!reload || GP4Engine()->reloadMods())
     {
-        AvailableMods = GP4Engine->GetModificationDescriptors();
+        AvailableMods = GP4Engine()->GetModificationDescriptors();
     }
 
     if (!Empty)

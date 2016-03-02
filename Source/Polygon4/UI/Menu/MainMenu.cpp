@@ -209,7 +209,7 @@ FReply SMainMenu::OnReloadMods()
 
 FReply SMainMenu::OnExit()
 {
-    GP4Engine->Exit();
+    GP4Engine()->Exit();
     return FReply::Handled();
 }
 

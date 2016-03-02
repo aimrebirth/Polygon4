@@ -85,6 +85,8 @@ public:
 
     virtual void SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapBuilding *currentBuilding) override;
 
+    virtual polygon4::BuildingMenu *getBuildingMenu() override final;
+
 private:
     //
     // for some reasons ue4-side 32 bit code sees base class size = actual_size - sizeof(void*)
@@ -124,4 +126,6 @@ public:
     void ShowPauseMenuFromBinding();
 };
 
-extern P4Engine *GP4Engine;
+POLYGON4_API
+P4Engine *GP4Engine(P4Engine *Engine = nullptr);
+
