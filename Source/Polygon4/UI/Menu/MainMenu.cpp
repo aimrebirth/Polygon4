@@ -47,7 +47,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
     // create Mods List View
     ModsListView = SNew(SModListView);
 
-    FString Ver = LOCTEXT("ReloadModsButtonLabel", "Version").ToString();
+    FString Ver = LOCTEXT("VersionLabel", "Version").ToString();
     Ver += ": " + GetPolygon4Version();
     FText Version = FText::FromString(Ver);
 
