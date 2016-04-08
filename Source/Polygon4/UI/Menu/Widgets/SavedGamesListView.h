@@ -22,21 +22,26 @@
 
 #include <Game/P4Modification.h>
 
-class SModListView : public SListView<TSharedPtr<ModificationDesc>>
+struct SavedGameDesc
 {
-    using ListItem = TSharedPtr<ModificationDesc>;
+    FText Name;
+};
 
-    SLATE_BEGIN_ARGS(SModListView) {}
+class SSavedGamesListView : public SListView<TSharedPtr<SavedGameDesc>>
+{
+    using ListItem = TSharedPtr<SavedGameDesc>;
+
+    SLATE_BEGIN_ARGS(SSavedGamesListView) {}
     SLATE_END_ARGS()
 
     typedef SListView<ListItem> ParentType;
 
-    TArray<ListItem> AvailableMods;
+    TArray<ListItem> AvailableGames;
     int Padding = 20;
 
 public:
 	void Construct(const FArguments& InArgs);
-    void ReloadMods(bool reload = true);
+    void ReloadSaves(bool save = false);
 
     TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);
 };

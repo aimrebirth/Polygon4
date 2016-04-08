@@ -20,6 +20,7 @@
 
 #include "MainMenu.h"
 #include "Widgets/ModListView.h"
+#include "Widgets/SavedGamesListView.h"
 #include "Widgets/MenuButton.h"
 
 #include <Game/P4Engine.h>
@@ -44,8 +45,9 @@ void SMainMenu::Construct(const FArguments& InArgs)
         .ShadowOffset(FIntPoint(-1, 1))
         .Font(FSlateFontInfo("Verdana", 30));
 
-    // create Mods List View
+    // create List Views
     ModsListView = SNew(SModListView);
+    SavedGamesListView = SNew(SSavedGamesListView);
 
     FString Ver = LOCTEXT("VersionLabel", "Version").ToString();
     Ver += ": " + GetPolygon4Version();
@@ -82,57 +84,100 @@ void SMainMenu::Construct(const FArguments& InArgs)
 			    .HAlign(HAlign_Left)
                 .AutoWidth()
                 [
-			        SNew(SVerticalBox)
-                    + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
-                    + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
-                    + MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
-                    + MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
-                    + MainMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SMainMenu::OnExit)
+                    SNew(SVerticalBox)
+                    + SVerticalBox::Slot()
+                    [
+                        SAssignNew(MenuVB, SVerticalBox)
+                        + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
+                        + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
+                        + MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
+                        + MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
+                        + MainMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SMainMenu::OnExit)
+                    ]
+                    + SVerticalBox::Slot()
+                    [
+                        SAssignNew(LoadVB, SVerticalBox)
+                        .Visibility(EVisibility::Collapsed)
+                        + MainMenuButton(LOCTEXT("LoadButtonLabel", "Load"), &SMainMenu::OnLoadLoad)
+                        + MainMenuButton(LOCTEXT("BackButtonLabel", "Back"), &SMainMenu::OnLoadBack)
+                        + MainMenuButton(LOCTEXT("DeleteButtonLabel", "Delete"), &SMainMenu::OnLoadDelete)
+                    ]
                 ]
                 // right part of the screen
                 + SHorizontalBox::Slot()
 			    .VAlign(VAlign_Fill)
 			    .HAlign(HAlign_Fill)
                 [
-			        SNew(SVerticalBox)
-                    // label
+                    SNew(SVerticalBox)
                     + SVerticalBox::Slot()
-			        .VAlign(VAlign_Top)
-			        .HAlign(HAlign_Center)
-                    .Padding(Padding)
-                    .AutoHeight()
                     [
-				        SNew(STextBlock)
-				        .ShadowColorAndOpacity(FLinearColor::Black)
-				        .ColorAndOpacity(FLinearColor::White)
-				        .ShadowOffset(FIntPoint(-1, 1))
-				        .Font(FSlateFontInfo("Verdana", 30))
-				        .Text(LOCTEXT("ModsLabel", "Available Mods"))
-                    ]
-                    // List View
-                    + SVerticalBox::Slot()
-			        .VAlign(VAlign_Fill)
-			        .HAlign(HAlign_Fill)
-                    .Padding(Padding)
-                    [
-                        ModsListView.ToSharedRef()
-                    ]
-                    // Reload Button
-                    + SVerticalBox::Slot()
-			        .VAlign(VAlign_Bottom)
-			        .HAlign(HAlign_Center)
-                    .Padding(Padding)
-                    .AutoHeight()
-                    [
-                        SNew(SButton)
-                        .OnClicked(this, &SMainMenu::OnReloadMods)
+                        SAssignNew(ModsVB, SVerticalBox)
+                        // label
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Top)
+			            .HAlign(HAlign_Center)
+                        .Padding(Padding)
+                        .AutoHeight()
                         [
-                            SNew(STextBlock)
-                            .ShadowColorAndOpacity(FLinearColor::Black)
-                            .ColorAndOpacity(FLinearColor::White)
-                            .ShadowOffset(FIntPoint(-1, 1))
-                            .Font(FSlateFontInfo("Verdana", 40))
-                            .Text(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"))
+				            SNew(STextBlock)
+				            .ShadowColorAndOpacity(FLinearColor::Black)
+				            .ColorAndOpacity(FLinearColor::White)
+				            .ShadowOffset(FIntPoint(-1, 1))
+				            .Font(FSlateFontInfo("Verdana", 30))
+				            .Text(LOCTEXT("ModsLabel", "Available Mods"))
+                        ]
+                        // List View
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Fill)
+			            .HAlign(HAlign_Fill)
+                        .Padding(Padding)
+                        [
+                            ModsListView.ToSharedRef()
+                        ]
+                        // Reload Button
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Bottom)
+			            .HAlign(HAlign_Center)
+                        .Padding(Padding)
+                        .AutoHeight()
+                        [
+                            SNew(SButton)
+                            .OnClicked(this, &SMainMenu::OnReloadMods)
+                            [
+                                SNew(STextBlock)
+                                .ShadowColorAndOpacity(FLinearColor::Black)
+                                .ColorAndOpacity(FLinearColor::White)
+                                .ShadowOffset(FIntPoint(-1, 1))
+                                .Font(FSlateFontInfo("Verdana", 40))
+                                .Text(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"))
+                            ]
+                        ]
+                    ]
+                    + SVerticalBox::Slot()
+                    [
+                        SAssignNew(SavedGamesVB, SVerticalBox)
+                        .Visibility(EVisibility::Collapsed)
+                        // label
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Top)
+			            .HAlign(HAlign_Center)
+                        .Padding(Padding)
+                        .AutoHeight()
+                        [
+				            SNew(STextBlock)
+				            .ShadowColorAndOpacity(FLinearColor::Black)
+				            .ColorAndOpacity(FLinearColor::White)
+				            .ShadowOffset(FIntPoint(-1, 1))
+				            .Font(FSlateFontInfo("Verdana", 30))
+				            .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
+                        ]
+                        // List View
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Fill)
+			            .HAlign(HAlign_Fill)
+                        .Padding(Padding)
+                        [
+                            SavedGamesListView.ToSharedRef()
                         ]
                     ]
                     // Text line
@@ -191,12 +236,19 @@ FReply SMainMenu::OnNewGame()
 
 FReply SMainMenu::OnLoadGame()
 {
-    auto selected = ModsListView->GetSelectedItems();
+    SavedGamesListView->ReloadSaves();
+    MenuVB->SetVisibility(EVisibility::Collapsed);
+    ModsVB->SetVisibility(EVisibility::Collapsed);
+    LoadVB->SetVisibility(EVisibility::Visible);
+    SavedGamesVB->SetVisibility(EVisibility::Visible);
+
+    /*auto selected = ModsListView->GetSelectedItems();
     if (!selected.Num())
         return PrintError(LOCTEXT("ModNotSelected", "Please, select a modification from the list"));
     ClearError();
     if (!selected[0]->modification->loadGame(L"1"))
-        return PrintError(LOCTEXT("LoadGameFailed", "Cannot load game. See logs for more information"));
+        return PrintError(LOCTEXT("LoadGameFailed", "Cannot load game. See logs for more information"));*/
+
     return FReply::Handled();
 }
 
@@ -237,4 +289,23 @@ FReply SMainMenu::OnOptions()
 FReply SMainMenu::OnNotImplemented()
 {
     return PrintError(LOCTEXT("NotImplemented", "Not Implemented"));
+}
+
+FReply SMainMenu::OnLoadBack()
+{
+    LoadVB->SetVisibility(EVisibility::Collapsed);
+    SavedGamesVB->SetVisibility(EVisibility::Collapsed);
+    MenuVB->SetVisibility(EVisibility::Visible);
+    ModsVB->SetVisibility(EVisibility::Visible);
+    return FReply::Handled();
+}
+
+FReply SMainMenu::OnLoadDelete()
+{
+    return OnNotImplemented();
+}
+
+FReply SMainMenu::OnLoadLoad()
+{
+    return OnNotImplemented();
 }

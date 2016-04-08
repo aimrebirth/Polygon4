@@ -61,7 +61,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                     [
                         SNew(SVerticalBox)
                         // exit button
-                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::DoNothing)
+                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave)
                         .VAlign(VAlign_Top)
                         + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::DoNothing)
                         .VAlign(VAlign_Top)
@@ -155,11 +155,20 @@ void SBuildingMenu::OnHide()
     GP4Engine()->SetPauseMenuBindings();
 }
 
+FReply SBuildingMenu::OnSave()
+{
+    auto dir = FPaths::GameDir();
+    dir += "/saves/1.sqlite";
+    GP4Engine()->getStorage()->save(polygon4::String(dir).toString());
+
+    return FReply::Handled();
+}
+
 FReply SBuildingMenu::OnExit()
 {
     GP4Engine()->HideBuildingMenu();
     GP4Engine()->spawnCurrentPlayer();
-    return FReply::Unhandled();
+    return FReply::Handled();
 }
 
 void SBuildingMenu::SetCurrentBuilding(polygon4::detail::ModificationMapBuilding *B)

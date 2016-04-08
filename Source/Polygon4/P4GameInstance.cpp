@@ -48,7 +48,7 @@ void UP4GameInstance::Init()
     HotpatchEngine();
 #endif
 
-    Engine = P4Engine::create<P4Engine>(GET_MODS_DIR, this);
+    Engine = P4Engine::create<P4Engine>(FPaths::GameDir(), this);
 
     Super::Init();
 }

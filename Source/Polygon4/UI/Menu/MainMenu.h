@@ -22,14 +22,21 @@
 
 class SMainMenu : public SMenu
 {
+    using SModsListView = TSharedPtr<class SModListView>;
+    using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
+
 	SLATE_BEGIN_ARGS(SMainMenu){}
 	SLATE_END_ARGS()
-
-    typedef TSharedPtr<class SModListView> SModsListView;
 
     SModsListView ModsListView;
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;
+
+    SSGamesListView SavedGamesListView;
+    TSharedPtr<SVerticalBox> LoadVB;
+    TSharedPtr<SVerticalBox> MenuVB;
+    TSharedPtr<SVerticalBox> ModsVB;
+    TSharedPtr<SVerticalBox> SavedGamesVB;
 
 public:
     void Construct(const FArguments& InArgs);
@@ -47,6 +54,11 @@ private:
     FReply OnOptions();
     FReply OnAuthors();
     FReply OnExit();
+
+    FReply OnLoadBack();
+    FReply OnLoadDelete();
+    FReply OnLoadLoad();
+
     FReply OnNotImplemented();
 
     FReply PrintError(const FText& Text);

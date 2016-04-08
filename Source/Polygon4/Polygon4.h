@@ -22,8 +22,6 @@
 
 #include "Engine.h"
 
-#define GET_MODS_DIR (FPaths::GameDir() + "Mods/").GetCharArray().GetData()
-
 #define DUMMY_OBJECT TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'")
 #define DUMMY_BUILDING DUMMY_OBJECT
 

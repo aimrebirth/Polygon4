@@ -22,11 +22,18 @@
 
 class SPauseMenu : public SMenu
 {
+    using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
+
 	SLATE_BEGIN_ARGS(SPauseMenu){}
 	SLATE_END_ARGS()
 
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;
+
+    SSGamesListView SavedGamesListView;
+    TSharedPtr<SVerticalBox> LoadVB;
+    TSharedPtr<SVerticalBox> MenuVB;
+    TSharedPtr<SVerticalBox> SavedGamesVB;
 
 public:
     void Construct(const FArguments& InArgs);
@@ -39,10 +46,15 @@ private:
     SVerticalBox::FSlot& PauseMenuButton(FText Text, F function) const;
 
     FReply OnContinue();
+    FReply OnExitToMenu();
     FReply OnLoadGame();
     FReply OnOptions();
     FReply OnExit();
     FReply OnNotImplemented();
+
+    FReply OnLoadBack();
+    FReply OnLoadDelete();
+    FReply OnLoadLoad();
 
     FReply PrintError(const FText& Text);
     void ClearError();

@@ -51,6 +51,7 @@ private:
 
     polygon4::detail::ModificationMapBuilding *CurrentBuilding = nullptr;
 
+    FReply OnSave();
     FReply OnExit();
     FReply DoNothing() const { return FReply::Handled(); }
 };

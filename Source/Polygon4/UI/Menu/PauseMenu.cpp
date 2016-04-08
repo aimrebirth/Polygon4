@@ -20,6 +20,7 @@
 
 #include "PauseMenu.h"
 #include "Widgets/MenuButton.h"
+#include "Widgets/SavedGamesListView.h"
 
 #include <P4GameMode.h>
 #include <Game/P4Engine.h>
@@ -40,6 +41,8 @@ void SPauseMenu::Construct(const FArguments& InArgs)
         .ColorAndOpacity(FLinearColor::Red)
         .ShadowOffset(FIntPoint(-1, 1))
         .Font(FSlateFontInfo("Verdana", 30));
+
+    SavedGamesListView = SNew(SSavedGamesListView);
 
     // Create GUI
 	ChildSlot
@@ -72,19 +75,62 @@ void SPauseMenu::Construct(const FArguments& InArgs)
 			    .HAlign(HAlign_Left)
                 .AutoWidth()
                 [
-			        SNew(SVerticalBox)
-                    + PauseMenuButton(LOCTEXT("ContinueGameButtonLabel" , "Continue Game" ), &SPauseMenu::OnContinue)
-                    + PauseMenuButton(LOCTEXT("SaveGameButtonLabel" , "Save Game" ), &SPauseMenu::OnNotImplemented)
-                    + PauseMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SPauseMenu::OnNotImplemented)
-                    + PauseMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SPauseMenu::OnNotImplemented)
-                    + PauseMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SPauseMenu::OnExit)
+                    SNew(SVerticalBox)
+                    + SVerticalBox::Slot()
+                    [
+                        SAssignNew(MenuVB, SVerticalBox)
+                        + PauseMenuButton(LOCTEXT("ContinueGameButtonLabel" , "Continue Game"), &SPauseMenu::OnContinue)
+                        + PauseMenuButton(LOCTEXT("SaveGameButtonLabel" , "Save Game"), &SPauseMenu::OnNotImplemented)
+                        + PauseMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SPauseMenu::OnLoadGame)
+                        + PauseMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SPauseMenu::OnNotImplemented)
+                        + PauseMenuButton(LOCTEXT("MainMenuButtonLabel" , "Exit to Main Menu"), &SPauseMenu::OnExitToMenu)
+                        + PauseMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SPauseMenu::OnExit)
+                    ]
+                    + SVerticalBox::Slot()
+                    [
+                        SAssignNew(LoadVB, SVerticalBox)
+                        .Visibility(EVisibility::Collapsed)
+                        + PauseMenuButton(NSLOCTEXT("MainMenu", "LoadButtonLabel", "Load"), &SPauseMenu::OnLoadLoad)
+                        + PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack)
+                        + PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnLoadDelete)
+                    ]
                 ]
                 // right part of the screen
                 + SHorizontalBox::Slot()
 			    .VAlign(VAlign_Fill)
 			    .HAlign(HAlign_Fill)
                 [
-			        SNew(SVerticalBox)
+                    SNew(SVerticalBox)
+                    + SVerticalBox::Slot()
+                    .VAlign(VAlign_Fill)
+                    .HAlign(HAlign_Fill)
+                    [
+                        SAssignNew(SavedGamesVB, SVerticalBox)
+                        .Visibility(EVisibility::Collapsed)
+                        // label
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Top)
+			            .HAlign(HAlign_Center)
+                        .Padding(Padding)
+                        .AutoHeight()
+                        [
+				            SNew(STextBlock)
+				            .ShadowColorAndOpacity(FLinearColor::Black)
+				            .ColorAndOpacity(FLinearColor::White)
+				            .ShadowOffset(FIntPoint(-1, 1))
+				            .Font(FSlateFontInfo("Verdana", 30))
+				            .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
+                        ]
+                        // List View
+                        + SVerticalBox::Slot()
+			            .VAlign(VAlign_Fill)
+			            .HAlign(HAlign_Fill)
+                        .Padding(Padding)
+                        [
+                            SavedGamesListView.ToSharedRef()
+                        ]
+                        // save name edit
+                    ]
                     // Text line
                     + SVerticalBox::Slot()
 			        .VAlign(VAlign_Bottom)
@@ -121,8 +167,20 @@ FReply SPauseMenu::OnContinue()
     return FReply::Handled();
 }
 
+FReply SPauseMenu::OnExitToMenu()
+{
+    auto world = GP4Engine()->GetWorld();
+    world->ServerTravel("/Game/Mods/Common/Maps/start");
+    return FReply::Handled();
+}
+
 FReply SPauseMenu::OnLoadGame()
 {
+    SavedGamesListView->ReloadSaves();
+    MenuVB->SetVisibility(EVisibility::Collapsed);
+    LoadVB->SetVisibility(EVisibility::Visible);
+    SavedGamesVB->SetVisibility(EVisibility::Visible);
+
     return FReply::Handled();
 }
 
@@ -152,4 +210,22 @@ FReply SPauseMenu::OnOptions()
 FReply SPauseMenu::OnNotImplemented()
 {
     return PrintError(LOCTEXT("NotImplemented", "Not Implemented"));
+}
+
+FReply SPauseMenu::OnLoadBack()
+{
+    LoadVB->SetVisibility(EVisibility::Collapsed);
+    SavedGamesVB->SetVisibility(EVisibility::Collapsed);
+    MenuVB->SetVisibility(EVisibility::Visible);
+    return FReply::Handled();
+}
+
+FReply SPauseMenu::OnLoadDelete()
+{
+    return OnNotImplemented();
+}
+
+FReply SPauseMenu::OnLoadLoad()
+{
+    return OnNotImplemented();
 }
