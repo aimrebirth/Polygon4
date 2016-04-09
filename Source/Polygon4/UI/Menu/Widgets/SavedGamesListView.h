@@ -29,12 +29,17 @@ struct SavedGameDesc
 
 class SSavedGamesListView : public SListView<TSharedPtr<SavedGameDesc>>
 {
+public:
     using ListItem = TSharedPtr<SavedGameDesc>;
+    using Base = SListView<ListItem>;
+    using FOnSelectionChanged = Base::FOnSelectionChanged;
 
-    SLATE_BEGIN_ARGS(SSavedGamesListView) {}
+public:
+    SLATE_BEGIN_ARGS(SSavedGamesListView)
+        : _OnSelectionChanged()
+    {}
+    SLATE_EVENT(FOnSelectionChanged, OnSelectionChanged)
     SLATE_END_ARGS()
-
-    typedef SListView<ListItem> ParentType;
 
     TArray<ListItem> AvailableGames;
     int Padding = 20;

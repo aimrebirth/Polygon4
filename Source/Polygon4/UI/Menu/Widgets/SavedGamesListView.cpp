@@ -37,19 +37,22 @@ void SSavedGamesListView::Construct(const FArguments& InArgs)
             .HAlignCell(EHorizontalAlignment::HAlign_Center);
     };
 
-    ParentType::FArguments args;
+    this->OnSelectionChanged = InArgs._OnSelectionChanged;
+
+    Base::FArguments args;
     args
         .SelectionMode(ESelectionMode::Single)
         .AllowOverscroll(EAllowOverscroll::No)
         .ItemHeight(40)
         .ListItemsSource( &AvailableGames )
+        .OnSelectionChanged(OnSelectionChanged)
         .OnGenerateRow(this, &SSavedGamesListView::OnGenerateWidgetForList)
         .HeaderRow(
             SNew(SHeaderRow)
             + ListViewColumn("Name", LOCTEXT("ModsNameLabel", "Name"))
             )
         ;
-    ParentType::Construct(args);
+    Base::Construct(args);
 
     ReloadSaves();
 }
@@ -105,7 +108,6 @@ TSharedRef<ITableRow> SSavedGamesListView::OnGenerateWidgetForList( ListItem InI
                 .ShadowOffset(FIntPoint(-1, 1))
                 .Font(FSlateFontInfo("Verdana", 24))
                 .Text(ItemText)
-                .ColorAndOpacity(FSlateColor(FLinearColor(FColor(0, 0, 0, 255))))
                 ;
         }
     };

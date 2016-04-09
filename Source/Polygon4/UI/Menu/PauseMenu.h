@@ -32,8 +32,11 @@ class SPauseMenu : public SMenu
 
     SSGamesListView SavedGamesListView;
     TSharedPtr<SVerticalBox> LoadVB;
+    TSharedPtr<SVerticalBox> SaveVB;
     TSharedPtr<SVerticalBox> MenuVB;
     TSharedPtr<SVerticalBox> SavedGamesVB;
+    TSharedPtr<SHorizontalBox> SaveGameNameHB;
+    TSharedPtr<SEditableTextBox> SaveNameTB;
 
 public:
     void Construct(const FArguments& InArgs);
@@ -48,6 +51,7 @@ private:
     FReply OnContinue();
     FReply OnExitToMenu();
     FReply OnLoadGame();
+    FReply OnSaveGame();
     FReply OnOptions();
     FReply OnExit();
     FReply OnNotImplemented();
@@ -55,6 +59,8 @@ private:
     FReply OnLoadBack();
     FReply OnLoadDelete();
     FReply OnLoadLoad();
+    FReply OnSaveSave();
+    FReply OnSaveDelete();
 
     FReply PrintError(const FText& Text);
     void ClearError();

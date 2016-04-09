@@ -22,12 +22,14 @@
 
 class SMainMenu : public SMenu
 {
+public:
     using SModsListView = TSharedPtr<class SModListView>;
     using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
 
 	SLATE_BEGIN_ARGS(SMainMenu){}
 	SLATE_END_ARGS()
 
+private:
     SModsListView ModsListView;
     TSharedPtr<STextBlock> MessageLine;
     int Padding = 20;
@@ -43,6 +45,8 @@ public:
 
     virtual void OnShow() override {}
     virtual void OnHide() override {}
+
+    void ReloadMods();
 
 private:
     template <typename F>

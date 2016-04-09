@@ -19,7 +19,9 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+
 #include <Polygon4/MapBuilding.h>
+
 #include "P4MapBuilding.generated.h"
 
 class P4MapBuilding;

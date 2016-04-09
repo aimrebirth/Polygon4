@@ -127,7 +127,7 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
             {
                 ItemText = "Unknown field!";
             }
-            return 
+            return
                 SNew(STextBlock)
                 .ShadowColorAndOpacity(FLinearColor::Black)
                 .ColorAndOpacity(FLinearColor::White)

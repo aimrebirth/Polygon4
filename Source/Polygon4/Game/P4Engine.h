@@ -109,9 +109,12 @@ public:
     void HideMenu(MenuType Type);
     void SetMenuVisibility(MenuType Type, bool Visibility);
 
+    void ReturnToMainMenu();
+
 private:
     TArray<TSharedPtr<SMenu>> Menus;
     bool paused = false;
+    // this will keep some key bindings (pause etc.)
     UDummyObject *DummyObject = nullptr;
 
     friend class UDummyObject;

@@ -80,6 +80,8 @@ void AP4Building::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp)
     if (!Glider)
         return;
     auto M = Glider->GetMechanoid();
+    if (!M || !Glider->CanEnterBuilding())
+        return;
     Glider->Destroy();
     M->enterBuilding(MapBuilding);
 }

@@ -33,6 +33,8 @@ TSharedPtr<TreeItem> TreeItem::AddChild(const SPtrP4TreeItem &P4Item)
 
 void TreeItem::Build(P4TreeItem *Root)
 {
+    if (!Root)
+        return;
     if (Root->children.empty())
         return;
     for (auto &c : Root->children)

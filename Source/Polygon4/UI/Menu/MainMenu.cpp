@@ -45,10 +45,6 @@ void SMainMenu::Construct(const FArguments& InArgs)
         .ShadowOffset(FIntPoint(-1, 1))
         .Font(FSlateFontInfo("Verdana", 30));
 
-    // create List Views
-    ModsListView = SNew(SModListView);
-    SavedGamesListView = SNew(SSavedGamesListView);
-
     FString Ver = LOCTEXT("VersionLabel", "Version").ToString();
     Ver += ": " + GetPolygon4Version();
     FText Version = FText::FromString(Ver);
@@ -90,8 +86,8 @@ void SMainMenu::Construct(const FArguments& InArgs)
                         SAssignNew(MenuVB, SVerticalBox)
                         + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
                         + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
-                        + MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
-                        + MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
+                        //+ MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
+                        //+ MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
                         + MainMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SMainMenu::OnExit)
                     ]
                     + SVerticalBox::Slot()
@@ -132,7 +128,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 			            .HAlign(HAlign_Fill)
                         .Padding(Padding)
                         [
-                            ModsListView.ToSharedRef()
+                            SAssignNew(ModsListView, SModListView)
                         ]
                         // Reload Button
                         + SVerticalBox::Slot()
@@ -177,7 +173,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 			            .HAlign(HAlign_Fill)
                         .Padding(Padding)
                         [
-                            SavedGamesListView.ToSharedRef()
+                            SAssignNew(SavedGamesListView, SSavedGamesListView)
                         ]
                     ]
                     // Text line
@@ -223,6 +219,12 @@ SVerticalBox::FSlot& SMainMenu::MainMenuButton(FText Text, F function) const
         ;
 }
 
+void SMainMenu::ReloadMods()
+{
+    if (ModsListView.IsValid())
+        ModsListView->ReloadMods();
+}
+
 FReply SMainMenu::OnNewGame()
 {
     auto selected = ModsListView->GetSelectedItems();
@@ -241,14 +243,6 @@ FReply SMainMenu::OnLoadGame()
     ModsVB->SetVisibility(EVisibility::Collapsed);
     LoadVB->SetVisibility(EVisibility::Visible);
     SavedGamesVB->SetVisibility(EVisibility::Visible);
-
-    /*auto selected = ModsListView->GetSelectedItems();
-    if (!selected.Num())
-        return PrintError(LOCTEXT("ModNotSelected", "Please, select a modification from the list"));
-    ClearError();
-    if (!selected[0]->modification->loadGame(L"1"))
-        return PrintError(LOCTEXT("LoadGameFailed", "Cannot load game. See logs for more information"));*/
-
     return FReply::Handled();
 }
 
@@ -302,10 +296,29 @@ FReply SMainMenu::OnLoadBack()
 
 FReply SMainMenu::OnLoadDelete()
 {
-    return OnNotImplemented();
+    ClearError();
+    auto selected = SavedGamesListView->GetSelectedItems();
+    if (!selected.Num())
+        return PrintError(LOCTEXT("ModNotSelected", "Please, select a saved game from the list"));
+    auto n = selected[0]->Name.ToString();
+    if (n.IsEmpty())
+        return FReply::Unhandled();
+    GP4Engine()->deleteSaveGame(n);
+    SavedGamesListView->ReloadSaves();
+    return FReply::Handled();
 }
 
 FReply SMainMenu::OnLoadLoad()
 {
-    return OnNotImplemented();
+    ClearError();
+    auto selected = SavedGamesListView->GetSelectedItems();
+    if (!selected.Num())
+        return PrintError(LOCTEXT("ModNotSelected", "Please, select a saved game from the list"));
+    auto n = selected[0]->Name.ToString();
+    if (n.IsEmpty())
+        return FReply::Unhandled();
+    if (!GP4Engine()->load(n))
+        return PrintError(LOCTEXT("LoadFailed", "Load Game failed. See logs for more information"));
+    OnLoadBack();
+    return FReply::Handled();
 }

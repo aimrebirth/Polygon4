@@ -33,7 +33,7 @@ class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
 	SLATE_BEGIN_ARGS(SBuildingMenu){}
     SLATE_END_ARGS()
 
-        using TextWidget = STextBlock;// SRichTextBlock;
+    using TextWidget = STextBlock;// SRichTextBlock;
 
 public:
     void Construct(const FArguments& InArgs);

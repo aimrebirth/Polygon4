@@ -163,10 +163,22 @@ void AP4Glider::Tick(float DeltaSeconds)
     if (!Mechanoid)
         return;
 
+    Lifetime += DeltaSeconds;
+
     // vars
     APlayerController* PlayerController = Cast<APlayerController>(GetController());
     static const int mouse_gap = 30;
     static const int mouse_pos_gap = 30;
+
+    const auto loc = GetActorLocation();
+    const auto rot = GetActorRotation();
+
+    Mechanoid->x = loc.X;
+    Mechanoid->y = loc.Y;
+    Mechanoid->z = loc.Z;
+    Mechanoid->pitch = rot.Pitch;
+    Mechanoid->yaw = rot.Yaw;
+    Mechanoid->roll = rot.Roll;
 
     // conditions
     //if (!PlayerController)
@@ -303,7 +315,7 @@ void AP4Glider::Tick(float DeltaSeconds)
         float rpm1 = 60.f / 400.0f;
         float rpm2 = 60.f / 60.0f;
 
-        FRotator SpawnRotation = GetActorRotation();
+        FRotator SpawnRotation = rot;
         if (PlayerController)
         {
             FVector loc;
@@ -313,10 +325,9 @@ void AP4Glider::Tick(float DeltaSeconds)
         }
         SpawnRotation.Roll = 0;
 
-        auto loc = GetActorLocation();
-        const FVector SpawnLocationLeft = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetLeft);
-        const FVector SpawnLocationRight = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetRight);
-        const FVector SpawnLocationTop = GetActorLocation() + SpawnRotation.RotateVector(GunOffsetTop);
+        const FVector SpawnLocationLeft = loc +SpawnRotation.RotateVector(GunOffsetLeft);
+        const FVector SpawnLocationRight = loc + SpawnRotation.RotateVector(GunOffsetRight);
+        const FVector SpawnLocationTop = loc + SpawnRotation.RotateVector(GunOffsetTop);
 
         AProjectile *p = nullptr;
         if (FireLight && projectileLight && rpmLight)
@@ -697,7 +708,7 @@ void AP4Glider::OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* Othe
     if (OtherActor == nullptr)
         return;
     auto Building = Cast<AP4Building>(OtherActor);
-    if (Building)
+    if (Building && CanEnterBuilding())
     {
         Destroy();
     }

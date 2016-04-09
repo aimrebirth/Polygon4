@@ -78,6 +78,8 @@ P4Engine::~P4Engine()
 
 void P4Engine::initChildren()
 {
+    if (!storage)
+        return;
     for (auto &modification : storage->modifications)
     {
         auto m = modification.second;
@@ -88,6 +90,8 @@ void P4Engine::initChildren()
 TArray<TSharedPtr<struct ModificationDesc>> P4Engine::GetModificationDescriptors() const
 {
     TArray<TSharedPtr<struct ModificationDesc>> mods;
+    if (!storage)
+        return mods;
     for (auto &modification : storage->modifications)
     {
         auto &m = modification.second;
@@ -263,6 +267,14 @@ void P4Engine::ShowPauseMenuFromBinding()
 void P4Engine::SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapBuilding *currentBuilding)
 {
     GetBuildingMenu()->SetCurrentBuilding(currentBuilding);
+}
+
+void P4Engine::ReturnToMainMenu()
+{
+    auto world = GetWorld();
+    world->ServerTravel("/Game/Mods/Common/Maps/start");
+    reloadMods();
+    GetMainMenu()->ReloadMods();
 }
 
 polygon4::BuildingMenu *P4Engine::getBuildingMenu()

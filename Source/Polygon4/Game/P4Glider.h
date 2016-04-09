@@ -408,6 +408,8 @@ private:
     void FireHeavyOn() { FireHeavy = true; }
     void FireHeavyOff() { FireHeavy = false; }
 
+    float Lifetime = 0.0f;
+
 private:
     FPowerUpProperties PowerUpProperties;
     FHitResult ZTraceResults;
@@ -432,6 +434,9 @@ private:
 public:
     void SetMechanoid(polygon4::detail::Mechanoid* Mechanoid);
     polygon4::detail::Mechanoid* GetMechanoid() const { return Mechanoid; }
+
+    float GetLifetime() const { return Lifetime; }
+    bool CanEnterBuilding() const { return GetLifetime() > 3.0f; }
 
 public:
     UFUNCTION()
