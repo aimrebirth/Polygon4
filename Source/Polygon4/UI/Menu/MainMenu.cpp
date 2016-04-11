@@ -97,6 +97,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
                         + MainMenuButton(LOCTEXT("LoadButtonLabel", "Load"), &SMainMenu::OnLoadLoad)
                         + MainMenuButton(LOCTEXT("BackButtonLabel", "Back"), &SMainMenu::OnLoadBack)
                         + MainMenuButton(LOCTEXT("DeleteButtonLabel", "Delete"), &SMainMenu::OnLoadDelete)
+                        .Padding(Padding, 200, Padding, Padding)
                     ]
                 ]
                 // right part of the screen

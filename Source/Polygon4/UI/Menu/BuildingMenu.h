@@ -30,10 +30,11 @@ namespace polygon4 {
 
 class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
 {
+    using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
+    using TextWidget = STextBlock;// SRichTextBlock;
+
 	SLATE_BEGIN_ARGS(SBuildingMenu){}
     SLATE_END_ARGS()
-
-    using TextWidget = STextBlock;// SRichTextBlock;
 
 public:
     void Construct(const FArguments& InArgs);
@@ -41,17 +42,29 @@ public:
     virtual void OnShow() override;
     virtual void OnHide() override;
 
-    void SetCurrentBuilding(polygon4::detail::ModificationMapBuilding *B);
-
     FText getFText() const;
+
+    virtual void refresh() override final;
 
 private:
     TSharedPtr<STextBlock> Name;
     TSharedPtr<TextWidget> Text;
 
-    polygon4::detail::ModificationMapBuilding *CurrentBuilding = nullptr;
+    SSGamesListView SavedGamesListView;
+    TSharedPtr<SVerticalBox> SaveVB;
+    TSharedPtr<SVerticalBox> BuildingMenuVB;
+    TSharedPtr<SEditableTextBox> SaveNameTB;
+    TSharedPtr<STextBlock> MoneyTB;
+    TSharedPtr<STextBlock> RatingTB;
+    TSharedPtr<STextBlock> MassTB;
 
     FReply OnSave();
     FReply OnExit();
     FReply DoNothing() const { return FReply::Handled(); }
+
+    FReply OnSaveSave();
+    FReply OnSaveBack();
+    FReply OnSaveDelete();
+
+    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
 };

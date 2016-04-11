@@ -83,8 +83,6 @@ public:
     void SetPauseMenuBindings();
     void UnsetPauseMenuBindings() const;
 
-    virtual void SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapBuilding *currentBuilding) override;
-
     virtual polygon4::BuildingMenu *getBuildingMenu() override final;
 
 private:

@@ -264,11 +264,6 @@ void P4Engine::ShowPauseMenuFromBinding()
     DummyObject->ShowPauseMenuFromBinding();
 }
 
-void P4Engine::SetBuildingMenuCurrentBuilding(polygon4::detail::ModificationMapBuilding *currentBuilding)
-{
-    GetBuildingMenu()->SetCurrentBuilding(currentBuilding);
-}
-
 void P4Engine::ReturnToMainMenu()
 {
     auto world = GetWorld();

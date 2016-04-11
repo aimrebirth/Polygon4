@@ -91,6 +91,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
                         + PauseMenuButton(NSLOCTEXT("MainMenu", "LoadButtonLabel", "Load"), &SPauseMenu::OnLoadLoad)
                         + PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack)
                         + PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnLoadDelete)
+                        .Padding(Padding, 200, Padding, Padding)
                     ]
                     + SVerticalBox::Slot()
                     [
@@ -99,6 +100,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
                         + PauseMenuButton(NSLOCTEXT("MainMenu", "SaveButtonLabel", "Save"), &SPauseMenu::OnSaveSave)
                         + PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack)
                         + PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnSaveDelete)
+                        .Padding(Padding, 200, Padding, Padding)
                     ]
                 ]
                 // right part of the screen
