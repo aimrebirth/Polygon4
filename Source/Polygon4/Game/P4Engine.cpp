@@ -24,9 +24,16 @@
 #include "P4Modification.h"
 #include <P4GameInstance.h>
 
+#include "P4Map.h"
+#include "P4Mechanoid.h"
+#include "P4MapObject.h"
+#include "P4MapBuilding.h"
+
 #include <UI/Menu/MainMenu.h>
 #include <UI/Menu/BuildingMenu.h>
 #include <UI/Menu/PauseMenu.h>
+
+#include <Polygon4/Glider.h>
 
 #include <Game/GliderHUD.h>
 
@@ -73,18 +80,22 @@ P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4Gam
 P4Engine::~P4Engine()
 {
     free(DummyObject);
-    //GP4Engine = nullptr;
 }
 
 void P4Engine::initChildren()
 {
     if (!storage)
         return;
-    for (auto &modification : storage->modifications)
-    {
-        auto m = modification.second;
-        m->replace<P4Modification>(m);
-    }
+#define REPLACE(a, t) \
+    for (auto &v : storage->a) \
+        v.second->replace<t>(v.second)
+
+    REPLACE(modifications, P4Modification);
+    REPLACE(maps, P4Map);
+    REPLACE(mechanoids, P4Mechanoid);
+    REPLACE(mapObjects, P4MapObject);
+    REPLACE(mapBuildings, P4MapBuilding);
+    REPLACE(gliders, polygon4::Glider);
 }
 
 TArray<TSharedPtr<struct ModificationDesc>> P4Engine::GetModificationDescriptors() const

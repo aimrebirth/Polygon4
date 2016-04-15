@@ -30,10 +30,3 @@ P4Modification::P4Modification(const polygon4::detail::Modification &rhs)
     : Base(rhs)
 {
 }
-
-void P4Modification::initChildren()
-{
-    for (auto &m : maps)
-        m->map->replace<P4Map>(m->map.get());
-    initMechanoids<P4Mechanoid>();
-}

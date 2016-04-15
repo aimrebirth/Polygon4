@@ -27,8 +27,6 @@ class P4Map : public polygon4::Map
 public:
     P4Map(const polygon4::detail::Map &rhs);
 
-    virtual void initChildren() override;
-
 protected:
     virtual bool loadLevel() override final;
     virtual bool spawnMechanoid(polygon4::detail::Mechanoid *) override final;

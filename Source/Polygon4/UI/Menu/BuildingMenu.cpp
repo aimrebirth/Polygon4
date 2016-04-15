@@ -17,11 +17,13 @@
  */
 
 #include "Polygon4.h"
-
 #include "BuildingMenu.h"
+
+#include <Polygon4/Mechanoid.h>
 
 #include "Widgets/MenuButton.h"
 #include "Widgets/SavedGamesListView.h"
+#include "Widgets/InfoTreeView.h"
 
 #include <Game/P4Engine.h>
 
@@ -57,6 +59,25 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                 + SVerticalBox::Slot()
                 [
                     SAssignNew(BuildingMenuVB, SVerticalBox)
+                    // caption
+                    + SVerticalBox::Slot()
+                    .VAlign(VAlign_Top)
+                    .HAlign(HAlign_Fill)
+                    .AutoHeight()
+                    [
+                        SNew(SBorder)
+                        .Padding(10)
+                        [
+                            SNew(SVerticalBox)
+                            + SVerticalBox::Slot()
+                            .HAlign(HAlign_Center)
+                            [
+                                SAssignNew(Name, STextBlock)
+                                .Font(FSlateFontInfo("Tahoma", 14))
+                                .Text(FText::FromString(L"Building Name"))
+                            ]
+                        ]
+                    ]
                     // top layout
                     + SVerticalBox::Slot()
                     .HAlign(HAlign_Fill)
@@ -94,25 +115,6 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                             .Padding(10)
                             [
                                 SNew(SVerticalBox)
-                                // caption
-                                + SVerticalBox::Slot()
-                                .VAlign(VAlign_Top)
-                                .HAlign(HAlign_Fill)
-                                .AutoHeight()
-                                [
-                                    SNew(SBorder)
-                                    .Padding(10)
-                                    [
-                                        SNew(SVerticalBox)
-                                        + SVerticalBox::Slot()
-                                        .HAlign(HAlign_Center)
-                                        [
-                                            SAssignNew(Name, STextBlock)
-                                            .Font(FSlateFontInfo("Tahoma", 14))
-                                            .Text(FText::FromString(L"Building Name"))
-                                        ]
-                                    ]
-                                ]
                                 // text
                                 + SVerticalBox::Slot()
                                 .VAlign(VAlign_Fill)
@@ -145,6 +147,37 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                         [
                             SNew(SBorder)
                             .Padding(10)
+                            [
+                                SNew(SVerticalBox)
+                                // themes
+                                + SVerticalBox::Slot()
+                                .HAlign(HAlign_Fill)
+                                .VAlign(VAlign_Fill)
+                                [
+                                    SAssignNew(ThemesVB, SVerticalBox)
+                                    + SVerticalBox::Slot()
+                                    [
+                                        SAssignNew(ThemesTV, InfoTreeView)
+                                        .RootItem(&themes)
+                                    ]
+                                ]
+                                // journal
+                                + SVerticalBox::Slot()
+                                .HAlign(HAlign_Fill)
+                                .VAlign(VAlign_Fill)
+                                [
+                                    SAssignNew(JournalVB, SVerticalBox)
+                                    .Visibility(EVisibility::Collapsed)
+                                    + SVerticalBox::Slot()
+                                    [
+                                        SAssignNew(JournalTV, InfoTreeView)
+                                        .RootItem(&journal)
+                                    ]
+                                ]
+                                // goods
+                                // glider
+                                // clans
+                            ]
                         ]
                     ]
                     // bottom layout (money, rating etc.)
@@ -301,17 +334,31 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock
 
 void SBuildingMenu::refresh()
 {
-    if (currentBuilding)
+    if (building)
     {
-        Name->SetText(currentBuilding->getName().toFText());
+        Name->SetText(building->getName().toFText());
     }
     if (mechanoid)
     {
-        MoneyTB->SetText(FString(std::to_string(mechanoid->money).c_str()));
-        RatingTB->SetText(FString(std::to_string(mechanoid->rating).c_str()));
-        //MassTB->SetText(FString(std::to_string(mechanoid->money).c_str()));
-        MassTB->SetText(FString("0"));
+        MoneyTB->SetText(FString(std::to_string((int)mechanoid->money).c_str()));
+
+        auto rat = std::to_string((int)mechanoid->rating);
+        int level = mechanoid->getRatingLevel();
+        auto cap = polygon4::getRatingLevelCap(level);
+        auto caps = std::to_string((int)cap);
+        rat = rat + "/" + caps + " (Level: " + std::to_string(level) + ")";
+        RatingTB->SetText(FString(rat.c_str()));
+
+        auto conf = mechanoid->configuration;
+        auto m = std::to_string((int)conf->getMass());
+        auto c = std::to_string((int)conf->getCapacity());
+        m = m + "/" + c;
+        MassTB->SetText(FString(m.c_str()));
     }
+    ThemesTV->Reset(&themes);
+
+    updateJournal();
+    JournalTV->Reset(&journal);
 }
 
 void SBuildingMenu::OnShow()

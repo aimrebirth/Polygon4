@@ -28,6 +28,8 @@ namespace polygon4 {
     }
 }
 
+class InfoTreeView;
+
 class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
 {
     using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
@@ -57,6 +59,12 @@ private:
     TSharedPtr<STextBlock> MoneyTB;
     TSharedPtr<STextBlock> RatingTB;
     TSharedPtr<STextBlock> MassTB;
+
+    TSharedPtr<SVerticalBox> ThemesVB;
+    TSharedPtr<SVerticalBox> JournalVB;
+
+    TSharedPtr<InfoTreeView> ThemesTV;
+    TSharedPtr<InfoTreeView> JournalTV;
 
     FReply OnSave();
     FReply OnExit();

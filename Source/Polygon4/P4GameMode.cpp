@@ -24,15 +24,24 @@
 #include "Game/P4Glider.h"
 #include "Game/GliderHUD.h"
 
+#include <Polygon4/Settings.h>
+
 AP4GameMode::AP4GameMode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
     DefaultPawnClass = AP4Glider::StaticClass();
     HUDClass = AGliderHUD::StaticClass();
+
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 void AP4GameMode::BeginPlay()
 {
     GP4Engine()->OnLevelLoaded();
     Super::BeginPlay();
+}
+
+void AP4GameMode::Tick(float DeltaSeconds)
+{
+    polygon4::getSettings().playtime += DeltaSeconds;
 }

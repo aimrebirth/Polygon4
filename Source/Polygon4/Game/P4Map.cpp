@@ -32,13 +32,6 @@ P4Map::P4Map(const polygon4::detail::Map &rhs)
 {
 }
 
-void P4Map::initChildren()
-{
-    initObjects<P4MapObject>();
-    initBuildings<P4MapBuilding>();
-    //initGoods<>();
-}
-
 bool P4Map::loadLevel()
 {
     auto world = GP4Engine()->GetWorld();
