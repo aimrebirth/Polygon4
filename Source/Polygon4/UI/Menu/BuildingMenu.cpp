@@ -88,23 +88,60 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                         + SHorizontalBox::Slot()
                         .FillWidth(0.25)
                         [
-                            SNew(SBorder)
-                            .Padding(10)
+                            SNew(SVerticalBox)
+                            // part w/out back button
+                            + SVerticalBox::Slot()
+                            .HAlign(HAlign_Fill)
+                            .VAlign(VAlign_Fill)
                             [
-                                SNew(SVerticalBox)
-                                // exit button
-                                + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave)
-                                .VAlign(VAlign_Top)
-                                + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::DoNothing)
-                                .VAlign(VAlign_Top)
-                                + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::DoNothing)
-                                .VAlign(VAlign_Top)
-                                + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::DoNothing)
-                                .VAlign(VAlign_Top)
-                                + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing)
-                                .VAlign(VAlign_Top)
-                                + VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit)
-                                .VAlign(VAlign_Bottom)
+                                SNew(SBorder)
+                                .Padding(10)
+                                [
+                                    SNew(SVerticalBox)
+                                    // buttons
+                                    + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
+                                    [
+                                        SAssignNew(ButtonsVB, SVerticalBox)
+                                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave)
+                                        .VAlign(VAlign_Top)
+                                        + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::OnJournal)
+                                        .VAlign(VAlign_Top)
+                                        + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnGlider)
+                                        .VAlign(VAlign_Top)
+                                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::DoNothing)
+                                        .VAlign(VAlign_Top)
+                                        + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing)
+                                        .VAlign(VAlign_Top)
+                                        + VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit)
+                                        .VAlign(VAlign_Bottom)
+                                    ]
+                                    + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
+                                    [
+                                        SAssignNew(GliderVB, SVerticalBox)
+                                        .Visibility(EVisibility::Collapsed)
+                                        + SVerticalBox::Slot()
+                                        .HAlign(HAlign_Fill)
+                                        .VAlign(VAlign_Fill)
+                                        [
+                                            SAssignNew(GliderTV, InfoTreeView)
+                                            .RootItem(&glider)
+                                        ]
+                                    ]
+                                ]
+                            ]
+                            // back button
+                            + SVerticalBox::Slot()
+                            .HAlign(HAlign_Center)
+                            .VAlign(VAlign_Bottom)
+                            .AutoHeight()
+                            [
+                                SAssignNew(BackLeftVB, SVerticalBox)
+                                .Visibility(EVisibility::Collapsed)
+                                + VerticalSlotMenuButton(LOCTEXT("BackButton", "Back"), this, &SBuildingMenu::OnBack)
                             ]
                         ]
                         // middle
@@ -122,10 +159,6 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                 [
                                     SNew(SBorder)
                                     .Padding(10)
-                                    //.BorderBackgroundColor(FColor::Black)
-                                    //FColor(16, 23, 50, 128)
-                                    //.ColorAndOpacity(FColor::Black)
-                                    //.ForegroundColor(FColor::Black)
                                     [
                                         SNew(SVerticalBox)
                                         + SVerticalBox::Slot()
@@ -133,9 +166,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                             SAssignNew(Text, TextWidget)
                                             .Font(FSlateFontInfo("Tahoma", 14))
                                             .Text(this, &SBuildingMenu::getFText)
-                                            //.TextStyle()
                                             .AutoWrapText(true)
-                                            //.DecoratorStyleSet(&FEditorStyle::Get())
                                         ]
                                     ]
                                 ]
@@ -145,38 +176,66 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                         + SHorizontalBox::Slot()
                         .FillWidth(0.25)
                         [
-                            SNew(SBorder)
-                            .Padding(10)
+                            SNew(SVerticalBox)
+                            + SVerticalBox::Slot()
+                            .HAlign(HAlign_Fill)
+                            .VAlign(VAlign_Fill)
                             [
-                                SNew(SVerticalBox)
-                                // themes
-                                + SVerticalBox::Slot()
-                                .HAlign(HAlign_Fill)
-                                .VAlign(VAlign_Fill)
+                                SNew(SBorder)
+                                .Padding(10)
                                 [
-                                    SAssignNew(ThemesVB, SVerticalBox)
+                                    SNew(SVerticalBox)
+                                    // themes
                                     + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
                                     [
-                                        SAssignNew(ThemesTV, InfoTreeView)
-                                        .RootItem(&themes)
+                                        SAssignNew(ThemesVB, SVerticalBox)
+                                        + SVerticalBox::Slot()
+                                        [
+                                            SAssignNew(ThemesTV, InfoTreeView)
+                                            .RootItem(&themes)
+                                        ]
                                     ]
-                                ]
-                                // journal
-                                + SVerticalBox::Slot()
-                                .HAlign(HAlign_Fill)
-                                .VAlign(VAlign_Fill)
-                                [
-                                    SAssignNew(JournalVB, SVerticalBox)
-                                    .Visibility(EVisibility::Collapsed)
+                                    // journal
                                     + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
                                     [
-                                        SAssignNew(JournalTV, InfoTreeView)
-                                        .RootItem(&journal)
+                                        SAssignNew(JournalVB, SVerticalBox)
+                                        .Visibility(EVisibility::Collapsed)
+                                        + SVerticalBox::Slot()
+                                        [
+                                            SAssignNew(JournalTV, InfoTreeView)
+                                            .RootItem(&journal)
+                                        ]
                                     ]
+                                    // glider
+                                    + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
+                                    [
+                                        SAssignNew(GliderStoreVB, SVerticalBox)
+                                        .Visibility(EVisibility::Collapsed)
+                                        + SVerticalBox::Slot()
+                                        [
+                                            SAssignNew(GliderStoreTV, InfoTreeView)
+                                            .RootItem(&glider_store)
+                                        ]
+                                    ]
+                                    // goods
+                                    // clans
                                 ]
-                                // goods
-                                // glider
-                                // clans
+                            ]
+                            // back button
+                            + SVerticalBox::Slot()
+                            .HAlign(HAlign_Center)
+                            .VAlign(VAlign_Bottom)
+                            .AutoHeight()
+                            [
+                                SAssignNew(BackRightVB, SVerticalBox)
+                                .Visibility(EVisibility::Collapsed)
+                                + VerticalSlotMenuButton(LOCTEXT("BackButton", "Back"), this, &SBuildingMenu::OnBack)
                             ]
                         ]
                     ]
@@ -357,8 +416,11 @@ void SBuildingMenu::refresh()
     }
     ThemesTV->Reset(&themes);
 
-    updateJournal();
+    update();
+
     JournalTV->Reset(&journal);
+    GliderTV->Reset(&glider);
+    GliderStoreTV->Reset(&glider_store);
 }
 
 void SBuildingMenu::OnShow()
@@ -423,5 +485,37 @@ FReply SBuildingMenu::OnSaveDelete()
         return FReply::Unhandled();
     GP4Engine()->deleteSaveGame(n);
     SavedGamesListView->ReloadSaves(true);
+    return FReply::Handled();
+}
+
+FReply SBuildingMenu::OnJournal()
+{
+    BackRightVB->SetVisibility(EVisibility::Visible);
+    JournalVB->SetVisibility(EVisibility::Visible);
+    ThemesVB->SetVisibility(EVisibility::Collapsed);
+    return FReply::Handled();
+}
+
+FReply SBuildingMenu::OnGlider()
+{
+    BackLeftVB->SetVisibility(EVisibility::Visible);
+    JournalVB->SetVisibility(EVisibility::Collapsed);
+    GliderVB->SetVisibility(EVisibility::Visible);
+    GliderStoreVB->SetVisibility(EVisibility::Visible);
+    BackRightVB->SetVisibility(EVisibility::Collapsed);
+    ButtonsVB->SetVisibility(EVisibility::Collapsed);
+    ThemesVB->SetVisibility(EVisibility::Collapsed);
+    return FReply::Handled();
+}
+
+FReply SBuildingMenu::OnBack()
+{
+    BackLeftVB->SetVisibility(EVisibility::Collapsed);
+    BackRightVB->SetVisibility(EVisibility::Collapsed);
+    JournalVB->SetVisibility(EVisibility::Collapsed);
+    GliderVB->SetVisibility(EVisibility::Collapsed);
+    GliderStoreVB->SetVisibility(EVisibility::Collapsed);
+    ButtonsVB->SetVisibility(EVisibility::Visible);
+    ThemesVB->SetVisibility(EVisibility::Visible);
     return FReply::Handled();
 }

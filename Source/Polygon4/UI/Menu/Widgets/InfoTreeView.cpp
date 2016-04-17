@@ -19,6 +19,10 @@
 #include "Polygon4.h"
 #include "InfoTreeView.h"
 
+#include "Game/P4Engine.h"
+
+#define LOCTEXT_NAMESPACE "InfoTreeView"
+
 TSharedPtr<InfoTreeItem> InfoTreeItem::AddChild(P4InfoTreeItem *P4Item)
 {
     TSharedPtr<InfoTreeItem> Item = MakeShareable(new InfoTreeItem());
@@ -86,10 +90,35 @@ void InfoTreeView::SetExpandedItems(const TArray<TSharedPtr<InfoTreeItem>> &Item
 
 TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable)
 {
+    using namespace polygon4;
+    using namespace polygon4::detail;
+
+    FText T = InItem->P4Item->text.toFText();
+    auto o = InItem->P4Item->object;
+    if (o)
+    {
+        switch (o->getType())
+        {
+        case EObjectType::JournalRecord:
+        {
+            JournalRecord *r = (JournalRecord *)o;
+            if (r->message)
+            {
+                polygon4::String s = r->message->title->string;
+                T = s.toFText();
+            }
+        }
+        break;
+        }
+    }
+
+    if (T.IsEmpty())
+        T = LOCTEXT("EmptyString", "Empty");
+
     return SNew(STableRow<ListItem>, OwnerTable)
         [
             SAssignNew(InItem->Widget, STextBlock)
-            .Text(InItem->P4Item->text.toFText())
+            .Text(T)
             .Font(FSlateFontInfo("Tahoma", 16))
         ];
 }
@@ -101,6 +130,24 @@ void InfoTreeView::OnGetChildren(ListItem Item, TArray<ListItem>& OutChildren)
 
 void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInfo)
 {
-    if (!Item.IsValid())
+    if (GetVisibility() != EVisibility::Visible)
         return;
+    if (!Item.IsValid() || !Item->P4Item)
+        return;
+    auto bm = GP4Engine()->getBuildingMenu();
+    auto p = Item->P4Item;
+    if (!p->object)
+    {
+        bm->getText() = p->text;
+        return;
+    }
+    switch (p->object->getType())
+    {
+    case polygon4::detail::EObjectType::Message:
+        bm->showMessage((polygon4::detail::Message*)p->object);
+        break;
+    case polygon4::detail::EObjectType::JournalRecord:
+        bm->showMessage(((polygon4::detail::JournalRecord*)p->object)->message);
+        break;
+    }
 }

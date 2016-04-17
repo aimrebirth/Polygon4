@@ -60,13 +60,25 @@ private:
     TSharedPtr<STextBlock> RatingTB;
     TSharedPtr<STextBlock> MassTB;
 
+    TSharedPtr<SVerticalBox> ButtonsVB;
+
     TSharedPtr<SVerticalBox> ThemesVB;
     TSharedPtr<SVerticalBox> JournalVB;
+    TSharedPtr<SVerticalBox> GliderVB;
+    TSharedPtr<SVerticalBox> GliderStoreVB;
+
+    TSharedPtr<SVerticalBox> BackLeftVB;
+    TSharedPtr<SVerticalBox> BackRightVB;
 
     TSharedPtr<InfoTreeView> ThemesTV;
     TSharedPtr<InfoTreeView> JournalTV;
+    TSharedPtr<InfoTreeView> GliderTV;
+    TSharedPtr<InfoTreeView> GliderStoreTV;
 
     FReply OnSave();
+    FReply OnJournal();
+    FReply OnGlider();
+    FReply OnBack();
     FReply OnExit();
     FReply DoNothing() const { return FReply::Handled(); }
 
