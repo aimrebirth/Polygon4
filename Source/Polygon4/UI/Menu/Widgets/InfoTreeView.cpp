@@ -149,5 +149,41 @@ void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInf
     case polygon4::detail::EObjectType::JournalRecord:
         bm->showMessage(((polygon4::detail::JournalRecord*)p->object)->message);
         break;
+
+#define PRINT_DESCRIPTION(t) \
+    case polygon4::detail::EObjectType::t: \
+        if (((polygon4::detail::t*)p->object)->description) \
+            bm->showText(p->object->getName(), ((polygon4::detail::t*)p->object)->description->string); \
+        else \
+            bm->showText(p->object->getName()); \
+        break
+
+        PRINT_DESCRIPTION(Glider);
+        PRINT_DESCRIPTION(Good);
+        PRINT_DESCRIPTION(Equipment);
+        PRINT_DESCRIPTION(Weapon);
+        PRINT_DESCRIPTION(Projectile);
+        PRINT_DESCRIPTION(Modificator);
+
+#define PRINT_DESCRIPTION_VAR(t, v) \
+    case polygon4::detail::EObjectType::t: \
+        if (((polygon4::detail::t*)p->object)->v->description) \
+            bm->showText(p->object->getName(), ((polygon4::detail::t*)p->object)->v->description->string); \
+        else \
+            bm->showText(p->object->getName()); \
+        break
+
+        PRINT_DESCRIPTION_VAR(ConfigurationEquipment, equipment);
+        PRINT_DESCRIPTION_VAR(ConfigurationGood, good);
+        PRINT_DESCRIPTION_VAR(ConfigurationProjectile, projectile);
+        PRINT_DESCRIPTION_VAR(ConfigurationWeapon, weapon);
+        PRINT_DESCRIPTION_VAR(ConfigurationModificator, modificator);
+
+        PRINT_DESCRIPTION_VAR(MapBuildingGlider, glider);
+        PRINT_DESCRIPTION_VAR(MapBuildingEquipment, equipment);
+        PRINT_DESCRIPTION_VAR(MapBuildingGood, good);
+        PRINT_DESCRIPTION_VAR(MapBuildingProjectile, projectile);
+        PRINT_DESCRIPTION_VAR(MapBuildingWeapon, weapon);
+        PRINT_DESCRIPTION_VAR(MapBuildingModificator, modificator);
     }
 }

@@ -44,6 +44,8 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     else
         BackgroundBrush = new FSlateColorBrush(FColor::Black);
 
+    LeftMenuButtons.resize(polygon4::bbMax);
+
     ChildSlot
         .HAlign(HAlign_Fill)
         .VAlign(VAlign_Fill)
@@ -104,17 +106,19 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                     .VAlign(VAlign_Fill)
                                     [
                                         SAssignNew(ButtonsVB, SVerticalBox)
-                                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave)
+                                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave, &LeftMenuButtons[polygon4::bbSave])
                                         .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::OnJournal)
+                                        + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::OnJournal, &LeftMenuButtons[polygon4::bbJournal])
                                         .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnGlider)
+                                        + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnGlider, &LeftMenuButtons[polygon4::bbGlider])
                                         .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::DoNothing)
+                                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbTrade])
                                         .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing)
+                                        + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbClans])
                                         .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit)
+                                        + VerticalSlotMenuButton(LOCTEXT("TunnelButton", "Tunnel"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbTunnel])
+                                        .VAlign(VAlign_Top)
+                                        + VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit, &LeftMenuButtons[polygon4::bbExit])
                                         .VAlign(VAlign_Bottom)
                                     ]
                                     + SVerticalBox::Slot()
@@ -137,7 +141,6 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                             + SVerticalBox::Slot()
                             .HAlign(HAlign_Center)
                             .VAlign(VAlign_Bottom)
-                            .AutoHeight()
                             [
                                 SAssignNew(BackLeftVB, SVerticalBox)
                                 .Visibility(EVisibility::Collapsed)
@@ -396,6 +399,10 @@ void SBuildingMenu::refresh()
     if (building)
     {
         Name->SetText(building->getName().toFText());
+
+        polygon4::BuildingButtonsBitset bbb((uint32_t)building->buttons);
+        for (int i = 0; i < polygon4::bbMax; i++)
+            LeftMenuButtons[i]->SetVisibility(bbb[i] ? EVisibility::Visible : EVisibility::Hidden);
     }
     if (mechanoid)
     {

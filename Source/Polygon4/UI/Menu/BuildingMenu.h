@@ -75,6 +75,8 @@ private:
     TSharedPtr<InfoTreeView> GliderTV;
     TSharedPtr<InfoTreeView> GliderStoreTV;
 
+    std::vector<TSharedPtr<class SMenuButton>> LeftMenuButtons;
+
     FReply OnSave();
     FReply OnJournal();
     FReply OnGlider();

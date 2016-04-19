@@ -31,6 +31,8 @@ POLYGON4_UNREAL_MEMORY_STUB
 #include <Polygon4/Game/P4Glider.h>
 #include <Polygon4/Game/P4Mechanoid.h>
 
+#include <Polygon4/Mechanoid.h>
+
 static const FName DBToolTabName("DBTool");
 FDBToolModule *GDBToolModule;
 
@@ -252,6 +254,15 @@ bool FDBToolModule::LoadDB()
     {
         storage = polygon4::initStorage(database);
         storage->load();
+
+        storage->getSettings().flags.set(polygon4::gfDbTool);
+
+#define REPLACE(a, t) \
+    for (auto &v : storage->a) \
+        v.second->replace<t>(v.second)
+
+        REPLACE(mechanoids, polygon4::Mechanoid);
+
         SetDataCommitted();
     }
     catch (std::exception &e)

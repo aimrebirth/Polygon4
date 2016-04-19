@@ -691,7 +691,7 @@ void AP4Glider::HideUI()
 void AP4Glider::SetMechanoid(polygon4::detail::Mechanoid* Mechanoid)
 {
     this->Mechanoid = Mechanoid;
-    Configuration = Mechanoid->configuration;
+    Configuration = Mechanoid->getConfiguration();
     Glider = Configuration->glider;
 }
 

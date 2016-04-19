@@ -40,17 +40,32 @@ private:
 };
 
 template <typename C, typename F>
-SVerticalBox::FSlot& VerticalSlotMenuButton(FText Text, C *object, F function)
+SVerticalBox::FSlot& VerticalSlotMenuButton(FText Text, C *object, F function, TSharedPtr<SMenuButton> *Button = nullptr)
 {
-    return
-        SVerticalBox::Slot()
-        .VAlign(VAlign_Top)
-        .HAlign(HAlign_Center)
-        .Padding(20)
-        [
-            SNew(SMenuButton)
-            .Text(Text)
-            .ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))
-        ]
+    if (Button)
+        return
+            SVerticalBox::Slot()
+            .VAlign(VAlign_Top)
+            .HAlign(HAlign_Center)
+            //.AutoHeight()
+            .Padding(20)
+            [
+                SAssignNew(*Button, SMenuButton)
+                .Text(Text)
+                .ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))
+            ]
     ;
+    else
+        return
+            SVerticalBox::Slot()
+            .VAlign(VAlign_Top)
+            .HAlign(HAlign_Center)
+            //.AutoHeight()
+            .Padding(20)
+            [
+                SNew(SMenuButton)
+                .Text(Text)
+                .ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))
+            ]
+        ;
 }

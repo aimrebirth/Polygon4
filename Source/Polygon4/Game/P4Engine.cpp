@@ -86,6 +86,7 @@ void P4Engine::initChildren()
 {
     if (!storage)
         return;
+
 #define REPLACE(a, t) \
     for (auto &v : storage->a) \
         v.second->replace<t>(v.second)
