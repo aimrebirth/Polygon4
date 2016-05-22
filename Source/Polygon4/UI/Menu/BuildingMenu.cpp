@@ -416,7 +416,7 @@ void SBuildingMenu::refresh()
         rat = rat + "/" + caps + " (Level: " + std::to_string(level) + ")";
         RatingTB->SetText(FString(rat.c_str()));
 
-        auto conf = mechanoid->configuration;
+        auto conf = mechanoid->getConfiguration();
         auto m = std::to_string((int)conf->getMass());
         auto c = std::to_string((int)conf->getCapacity());
         m = m + "/" + c;
