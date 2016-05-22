@@ -43,7 +43,7 @@ private:
 public:
     void Construct(const FArguments& InArgs);
 
-    virtual void OnShow() override {}
+    virtual void OnShow() override;
     virtual void OnHide() override {}
 
     void ReloadMods();

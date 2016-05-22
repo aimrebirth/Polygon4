@@ -59,11 +59,11 @@ AP4Glider::AP4Glider()
 
     EngineAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudioComponent"));
     EngineAudioComponent->AttachTo(RootComponent);
-    EngineAudioComponent->bOverrideAttenuation = true;
+    //EngineAudioComponent->bOverrideAttenuation = true;
 
     WeaponAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudioComponent"));
     WeaponAudioComponent->AttachTo(RootComponent);
-    WeaponAudioComponent->bOverrideAttenuation = true;
+    //WeaponAudioComponent->bOverrideAttenuation = true;
 
     static ConstructorHelpers::FObjectFinder<USoundWave> JumpSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
     if (JumpSoundAsset.Succeeded())
@@ -570,8 +570,11 @@ void AP4Glider::Move(float AxisValue)
         if (boost)
             AxisValue *= 2;
         Body->AddForce(GetActorForwardVector() * Body->GetMass() * AxisValue);
+
         if (!EngineAudioComponent->IsPlaying())
             EngineAudioComponent->Play();
+
+        //UGameplayStatics::PlaySoundAtLocation(this, EngineSound, GetActorLocation());
     }
 }
 
@@ -581,8 +584,11 @@ void AP4Glider::Strafe(float AxisValue)
     {
         AxisValue *= 600;
         Body->AddForce(GetActorRightVector() * Body->GetMass() * AxisValue);
+
         if (!EngineAudioComponent->IsPlaying())
             EngineAudioComponent->Play();
+
+        //UGameplayStatics::PlaySoundAtLocation(this, EngineSound, GetActorLocation());
     }
 }
 

@@ -220,6 +220,11 @@ SVerticalBox::FSlot& SMainMenu::MainMenuButton(FText Text, F function) const
         ;
 }
 
+void SMainMenu::OnShow()
+{
+    ReloadMods();
+}
+
 void SMainMenu::ReloadMods()
 {
     if (ModsListView.IsValid())

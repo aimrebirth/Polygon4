@@ -140,6 +140,12 @@ TSharedPtr<SMenu> P4Engine::GetMenu(MenuType Type)
     return Menu;
 }
 
+void P4Engine::DestroyMenu(MenuType Type)
+{
+    auto &Menu = Menus[static_cast<int>(Type)];
+    Menu.Reset();
+}
+
 void P4Engine::ShowMenu(MenuType Type)
 {
     if (auto PlayerController = GetWorld()->GetFirstPlayerController())
@@ -287,6 +293,11 @@ void P4Engine::ReturnToMainMenu()
 polygon4::BuildingMenu *P4Engine::getBuildingMenu()
 {
     return GetBuildingMenu().Get();
+}
+
+void P4Engine::DestroyBuildingMenu()
+{
+    DestroyMenu(MenuType::BuildingMenu);
 }
 
 void UDummyObject::ShowPauseMenuFromBinding()

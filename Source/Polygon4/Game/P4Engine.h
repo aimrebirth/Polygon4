@@ -55,7 +55,7 @@ enum class EP4EngineState
     Started,
 };
 
-class P4Engine : public polygon4::Engine
+class P4Engine final : public polygon4::Engine
 {
     using Base = polygon4::Engine;
 
@@ -83,7 +83,8 @@ public:
     void SetPauseMenuBindings();
     void UnsetPauseMenuBindings() const;
 
-    virtual polygon4::BuildingMenu *getBuildingMenu() override final;
+    virtual polygon4::BuildingMenu *getBuildingMenu() override;
+    virtual void DestroyBuildingMenu() override;
 
 private:
     //
@@ -105,6 +106,7 @@ public:
     TSharedPtr<SMenu> GetMenu(MenuType Type);
     void ShowMenu(MenuType Type);
     void HideMenu(MenuType Type);
+    void DestroyMenu(MenuType Type);
     void SetMenuVisibility(MenuType Type, bool Visibility);
 
     void ReturnToMainMenu();
