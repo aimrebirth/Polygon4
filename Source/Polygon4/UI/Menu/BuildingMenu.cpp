@@ -141,6 +141,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                             + SVerticalBox::Slot()
                             .HAlign(HAlign_Center)
                             .VAlign(VAlign_Bottom)
+                            .AutoHeight()
                             [
                                 SAssignNew(BackLeftVB, SVerticalBox)
                                 .Visibility(EVisibility::Collapsed)
