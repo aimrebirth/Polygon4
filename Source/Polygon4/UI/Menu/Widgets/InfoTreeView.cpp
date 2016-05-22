@@ -93,7 +93,7 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
     using namespace polygon4;
     using namespace polygon4::detail;
 
-    FText T = InItem->P4Item->text.toFText();
+    auto T = InItem->P4Item->text;
     auto o = InItem->P4Item->object;
     if (o)
     {
@@ -107,18 +107,27 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
                 polygon4::String s = r->message->title->string;
                 T = s.toFText();
             }
+            break;
         }
-        break;
+        case EObjectType::ConfigurationProjectile:
+        {
+            ConfigurationProjectile *p = (ConfigurationProjectile *)o;
+            T += L" (" + std::to_wstring(p->quantity) + L")";
+            break;
+        }
+        default:
+            break;
         }
     }
 
-    if (T.IsEmpty())
-        T = LOCTEXT("EmptyString", "Empty");
+    auto FT = T.toFText();
+    if (FT.IsEmpty())
+        FT = LOCTEXT("EmptyString", "Empty");
 
     return SNew(STableRow<ListItem>, OwnerTable)
         [
             SAssignNew(InItem->Widget, STextBlock)
-            .Text(T)
+            .Text(FT)
             .Font(FSlateFontInfo("Tahoma", 16))
         ];
 }
@@ -167,11 +176,14 @@ void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInf
 
 #define PRINT_DESCRIPTION_VAR(t, v) \
     case polygon4::detail::EObjectType::t: \
-        if (((polygon4::detail::t*)p->object)->v->description) \
-            bm->showText(p->object->getName(), ((polygon4::detail::t*)p->object)->v->description->string); \
+    do { \
+        auto o = (polygon4::detail::t*)p->object; \
+        if (o->v->description) \
+            bm->showText(o->getName(), o->v->description->string); \
         else \
-            bm->showText(p->object->getName()); \
-        break
+            bm->showText(o->getName()); \
+        break; \
+    } while (0)
 
         PRINT_DESCRIPTION_VAR(ConfigurationEquipment, equipment);
         PRINT_DESCRIPTION_VAR(ConfigurationGood, good);
