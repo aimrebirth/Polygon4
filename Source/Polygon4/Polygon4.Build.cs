@@ -24,15 +24,9 @@ using UnrealBuildTool;
 
 public class Polygon4 : ModuleRules
 {
-    private string ModulePath
-    {
-        get { return Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name)); }
-        //get { return Path.GetDirectoryName(RulesCompiler.GetFileNameFromType(this.GetType())); }
-    }
-
     private string ThirdPartyPath
     {
-        get { return Path.GetFullPath(Path.Combine(ModulePath, "../../ThirdParty/")); }
+        get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../ThirdParty/")); }
     }
 
     private static int NumberOfCalls = 0;
@@ -48,18 +42,18 @@ public class Polygon4 : ModuleRules
 
     void GenerateVersion()
     {
-        bool has_git_dir = Directory.Exists(Path.Combine(ModulePath, "../../.git/"));
+        bool has_git_dir = Directory.Exists(Path.Combine(ModuleDirectory, "../../.git/"));
 
         Process process = new Process();
         process.StartInfo.FileName = "git";
         process.StartInfo.Arguments = "--version";
         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        process.StartInfo.WorkingDirectory = ModulePath;
+        process.StartInfo.WorkingDirectory = ModuleDirectory;
         process.Start();
         process.WaitForExit();
         bool has_git = process.ExitCode == 0;
 
-        var dir = Path.Combine(ModulePath, "Generated");
+        var dir = Path.Combine(ModuleDirectory, "Generated");
         Directory.CreateDirectory(dir);
 
         string version = "";
@@ -90,7 +84,7 @@ public class Polygon4 : ModuleRules
             version += "+" + stdout;
         }
         version = "\"" + version + "\"";
-        File.WriteAllText(Path.Combine(ModulePath, "Generated/Version.h"), version);
+        File.WriteAllText(Path.Combine(ModuleDirectory, "Generated/Version.h"), version);
     }
 
     bool RemoveLibrary(string dst)
@@ -172,7 +166,7 @@ public class Polygon4 : ModuleRules
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
         PublicDelayLoadDLLs.Add(base_name + ".dll");
 
-        string dst_base_name = Path.Combine(ModulePath, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
+        string dst_base_name = Path.Combine(ModuleDirectory, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
         dst_base_name = Path.GetFullPath(dst_base_name);
 
         string src = Path.Combine(BaseDir, base_name);

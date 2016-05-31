@@ -24,15 +24,9 @@ using UnrealBuildTool;
 
 public class DBTool : ModuleRules
 {
-    private string ModulePath
-    {
-        get { return Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name)); }
-        //get { return Path.GetDirectoryName(RulesCompiler.GetFileNameFromType(this.GetType())); }
-    }
-
     private string ThirdPartyPath
     {
-        get { return Path.GetFullPath(Path.Combine(ModulePath, "../../../../ThirdParty/")); }
+        get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../ThirdParty/")); }
     }
 
     public DBTool(TargetInfo Target)
