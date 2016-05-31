@@ -455,6 +455,7 @@ FReply SBuildingMenu::OnSave()
 
 FReply SBuildingMenu::OnExit()
 {
+    OnBack();
     GP4Engine()->HideBuildingMenu();
     GP4Engine()->spawnCurrentPlayer();
     return FReply::Handled();
