@@ -52,17 +52,17 @@ AP4Glider::AP4Glider()
     //AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
-    VisibleComponent->SnapTo(RootComponent);
+    VisibleComponent->SetupAttachment(RootComponent);
     VisibleComponent->SetSimulatePhysics(false);
     RootComponent = VisibleComponent;
     Body = VisibleComponent;
 
     EngineAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudioComponent"));
-    EngineAudioComponent->AttachTo(RootComponent);
+    EngineAudioComponent->SetupAttachment(RootComponent);
     //EngineAudioComponent->bOverrideAttenuation = true;
 
     WeaponAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudioComponent"));
-    WeaponAudioComponent->AttachTo(RootComponent);
+    WeaponAudioComponent->SetupAttachment(RootComponent);
     //WeaponAudioComponent->bOverrideAttenuation = true;
 
     static ConstructorHelpers::FObjectFinder<USoundWave> JumpSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
@@ -82,11 +82,11 @@ AP4Glider::AP4Glider()
         HeavySound = HeavySoundAsset.Object;
 
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
-    FirstPersonCameraComponent->AttachTo(RootComponent);
+    FirstPersonCameraComponent->SetupAttachment(RootComponent);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraSpringArm"));
     SpringArm->bUsePawnControlRotation = false;
-    SpringArm->AttachTo(RootComponent);
+    SpringArm->SetupAttachment(RootComponent);
     SpringArm->RelativeRotation = FRotator(-15.f, 0.f, 0.f);
     SpringArm->TargetArmLength = 500.0f;
     SpringArm->bEnableCameraLag = true;
@@ -94,7 +94,7 @@ AP4Glider::AP4Glider()
 
     ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TPSCamera"));
     ThirdPersonCameraComponent->bUsePawnControlRotation = false;
-    ThirdPersonCameraComponent->AttachTo(SpringArm, USpringArmComponent::SocketName);
+    ThirdPersonCameraComponent->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> EnergyShieldAsset(TEXT("/Engine/BasicShapes/Sphere"));
     if (EnergyShieldAsset.Succeeded())
@@ -102,7 +102,7 @@ AP4Glider::AP4Glider()
         EnergyShield = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EnergyShield"));
         EnergyShield->SetStaticMesh(EnergyShieldAsset.Object);
         EnergyShield->SetWorldScale3D({ 6.2,6.2,6.2 });
-        EnergyShield->AttachTo(RootComponent);
+        EnergyShield->SetupAttachment(RootComponent);
         EnergyShield->SetSimulatePhysics(false);
         EnergyShield->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         EnergyShield->SetOwnerNoSee(true);
@@ -348,7 +348,7 @@ void AP4Glider::Tick(float DeltaSeconds)
         }
         if (p)
         {
-            p->SetOwner(Body);
+            p->SetOwner(this);
         }
     }
 
@@ -701,7 +701,7 @@ void AP4Glider::SetMechanoid(polygon4::detail::Mechanoid* Mechanoid)
     Glider = Configuration->glider;
 }
 
-void AP4Glider::OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AP4Glider::OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
     if (OtherActor != this && OtherComp != NULL)
     {
@@ -709,7 +709,7 @@ void AP4Glider::OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FV
     }
 }
 
-void AP4Glider::OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP4Glider::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (OtherActor == nullptr)
         return;
@@ -720,7 +720,7 @@ void AP4Glider::OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* Othe
     }
 }
 
-void AP4Glider::OnEnergyShieldBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP4Glider::OnEnergyShieldBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (OtherActor != this && OtherComp != NULL)
     {
@@ -728,6 +728,6 @@ void AP4Glider::OnEnergyShieldBeginOverlap(AActor* OtherActor, UPrimitiveCompone
     }
 }
 
-void AP4Glider::OnEnergyShieldEndOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AP4Glider::OnEnergyShieldEndOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 }

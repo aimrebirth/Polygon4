@@ -50,13 +50,12 @@ AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)
     bCanBeDamaged = false;
 }
 
-void AProjectile::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    if ((OtherActor != this &&
-        (OtherComp != NULL) &&
-        (OtherActor != Owner) &&
-        (OtherComp != Owner) &&
-        (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry())))
+    if (OtherActor != this &&
+        OtherComp != nullptr &&
+        OtherActor != Owner &&
+        (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry()))
 	{
         if (OtherComp->IsSimulatingPhysics())
 		    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());

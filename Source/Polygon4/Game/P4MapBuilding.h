@@ -43,9 +43,9 @@ public:
     void InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding *mmb);
 
     UFUNCTION()
-    void OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    void OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
     UFUNCTION()
-    void OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    void OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
     void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 

@@ -36,18 +36,18 @@ class POLYGON4_API AProjectile : public AActor
 	float Impulse = 100.0f;
 
 private:
-    UObject *Owner = 0;
+    AActor *Owner = 0;
 
 public:
     AProjectile(const FObjectInitializer& ObjectInitializer);
 
-    void SetOwner(UObject *OtherOwner)
+    virtual void SetOwner(AActor *OtherOwner)
     {
         Owner = OtherOwner;
     }
 
 	UFUNCTION()
-	void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }

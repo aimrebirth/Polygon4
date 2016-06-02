@@ -27,7 +27,7 @@ AP4Object::AP4Object()
 
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
-    VisibleComponent->AttachTo(RootComponent);
+    VisibleComponent->SetupAttachment(RootComponent);
 
 #if WITH_EDITOR
     RootComponent->SetMobility(EComponentMobility::Movable);
@@ -52,7 +52,7 @@ void AP4Object::SetStaticMesh(UStaticMesh *mesh)
     }
 }
 
-void AP4Object::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AP4Object::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
     if (OtherActor != this && OtherComp != NULL)
     {

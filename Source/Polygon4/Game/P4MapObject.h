@@ -38,7 +38,7 @@ public:
     virtual void BeginPlay() override;
 
     void SetStaticMesh(UStaticMesh *mesh);
-    void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
     P4MapObject *MapObject;

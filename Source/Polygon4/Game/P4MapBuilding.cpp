@@ -28,7 +28,7 @@ AP4Building::AP4Building()
 
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
-    VisibleComponent->AttachTo(RootComponent);
+    VisibleComponent->SetupAttachment(RootComponent);
 
 #if WITH_EDITOR
     RootComponent->SetMobility(EComponentMobility::Movable);
@@ -62,12 +62,12 @@ void AP4Building::InitModificationMapBuilding(polygon4::detail::ModificationMapB
     }
 }
 
-void AP4Building::OnBodyHit(AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AP4Building::OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
     OnHit(OtherActor, OtherComp);
 }
 
-void AP4Building::OnBodyBeginOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP4Building::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     OnHit(OtherActor, OtherComp);
 }
