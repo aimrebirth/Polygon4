@@ -16,19 +16,10 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Polygon4.h"
-#include "Version.h"
+#pragma once
 
-const FString GitVersion =
-#include "Generated/Version.h"
-;
-
-FString GetPolygon4Version()
-{
-    FString Version = "0.1.2";
-    if (!GitVersion.IsEmpty())
-    {
-        Version += "+" + GitVersion;
-    }
-    return Version;
-}
+#define P4_CREATE_COLOR(c) FColor::FromHex(c)
+#define P4_COLOR_RED P4_CREATE_COLOR("C4635A")
+#define P4_COLOR_YELLOW P4_CREATE_COLOR("D1D153")
+#define P4_COLOR_GREEN P4_CREATE_COLOR("4AC64A")
+#define P4_COLOR_BLUE P4_CREATE_COLOR("A099EA")

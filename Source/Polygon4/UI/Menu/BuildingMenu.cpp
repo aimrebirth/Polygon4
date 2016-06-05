@@ -26,8 +26,110 @@
 #include "Widgets/InfoTreeView.h"
 
 #include <Game/P4Engine.h>
+#include <UI/Colors.h>
 
 #define LOCTEXT_NAMESPACE "BuildingMenu"
+
+TextDecorator::TextDecorator(const FTextBlockStyle &DefaultStyle)
+    : DefaultStyle(DefaultStyle)
+{
+}
+
+bool TextDecorator::Supports(const FTextRunParseResults& RunInfo, const FString& Text) const
+{
+    return
+        RunInfo.Name == TEXT("span") ||
+        RunInfo.Name == TEXT("ref") ||
+        0;
+}
+
+TSharedRef<ISlateRun> TextDecorator::Create(const TSharedRef<FTextLayout>& TextLayout, const FTextRunParseResults& RunParseResult, const FString& OriginalText, const TSharedRef<FString>& InOutModelText, const ISlateStyle* Style)
+{
+    FRunInfo RunInfo(RunParseResult.Name);
+    for (const TPair<FString, FTextRange>& Pair : RunParseResult.MetaData)
+    {
+        RunInfo.MetaData.Add(Pair.Key, OriginalText.Mid(Pair.Value.BeginIndex, Pair.Value.EndIndex - Pair.Value.BeginIndex));
+    }
+
+    FTextRange ModelRange;
+    ModelRange.BeginIndex = InOutModelText->Len();
+    *InOutModelText += OriginalText.Mid(RunParseResult.ContentRange.BeginIndex, RunParseResult.ContentRange.EndIndex - RunParseResult.ContentRange.BeginIndex);
+    ModelRange.EndIndex = InOutModelText->Len();
+
+    return CreateRun(TextLayout, RunInfo, InOutModelText, CreateTextBlockStyle(RunInfo), ModelRange);
+}
+
+TSharedRef<ISlateRun> TextDecorator::CreateRun(const TSharedRef<FTextLayout>& TextLayout, const FRunInfo& InRunInfo, const TSharedRef< const FString >& InText, const FTextBlockStyle& Style, const FTextRange& InRange)
+{
+    return FSlateTextRun::Create(InRunInfo, InText, Style, InRange);
+}
+
+FTextBlockStyle TextDecorator::CreateTextBlockStyle(const FRunInfo& InRunInfo) const
+{
+    FSlateFontInfo Font;
+    FLinearColor FontColor;
+    ExplodeRunInfo(InRunInfo, Font, FontColor);
+
+    FTextBlockStyle TextBlockStyle;
+    TextBlockStyle.SetFont(Font);
+    TextBlockStyle.SetColorAndOpacity(FontColor);
+
+    return TextBlockStyle;
+}
+
+void TextDecorator::ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& OutFont, FLinearColor& OutFontColor) const
+{
+    OutFont = DefaultStyle.Font;
+
+    const FString* const FontFamilyString = InRunInfo.MetaData.Find(TEXT("font"));
+    const FString* const FontSizeString = InRunInfo.MetaData.Find(TEXT("size"));
+    const FString* const FontStyleString = InRunInfo.MetaData.Find(TEXT("style"));
+    const FString* const FontColorString = InRunInfo.MetaData.Find(TEXT("color"));
+    const FString* const ObjString = InRunInfo.MetaData.Find(TEXT("object"));
+    const FString* const BldString = InRunInfo.MetaData.Find(TEXT("building"));
+
+    if (FontFamilyString)
+    {
+        FStringAssetReference Font(**FontFamilyString);
+        if (UObject* FontAsset = Font.TryLoad())
+        {
+            OutFont.FontObject = FontAsset;
+        }
+    }
+
+    if (FontSizeString)
+    {
+        OutFont.Size = static_cast<uint8>(FPlatformString::Atoi(**FontSizeString));
+    }
+
+    if (FontStyleString)
+    {
+        OutFont.TypefaceFontName = FName(**FontStyleString);
+    }
+
+    OutFontColor = DefaultStyle.ColorAndOpacity.GetSpecifiedColor();
+    if (FontColorString)
+    {
+        auto FontColorStringRef = FontColorString->ToLower();
+
+        // Is Hex color?
+        if (!FontColorStringRef.IsEmpty() && FontColorStringRef[0] == TCHAR('#'))
+        {
+            OutFontColor = FLinearColor(FColor::FromHex(FontColorStringRef));
+        }
+#define CHANGE_COLOR(c, cc) else if (FontColorStringRef == L ## #c) { OutFontColor = cc; }
+        CHANGE_COLOR(green, P4_COLOR_GREEN)
+        CHANGE_COLOR(blue, P4_COLOR_BLUE)
+        CHANGE_COLOR(red, P4_COLOR_RED)
+        CHANGE_COLOR(yellow, P4_COLOR_YELLOW)
+        // add more text colors here
+    }
+    else
+    {
+        if (ObjString || BldString)
+            OutFontColor = P4_COLOR_BLUE;
+    }
+}
 
 void SBuildingMenu::Construct(const FArguments& InArgs)
 {
@@ -39,12 +141,19 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
     auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
     FSlateBrush *BackgroundBrush;
-    if (BackgroundTexture)
+    /*if (BackgroundTexture)
         BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
-    else
+    else*/
         BackgroundBrush = new FSlateColorBrush(FColor::Black);
 
     LeftMenuButtons.resize(polygon4::bbMax);
+
+    FTextBlockStyle FontStyle;
+    FontStyle.SetFont(FSlateFontInfo("Tahoma", 14));
+    FontStyle.SetColorAndOpacity(FLinearColor::White);
+
+    TArray< TSharedRef< class ITextDecorator > > TextDecorators;
+    TextDecorators.Add(MakeShareable(new TextDecorator(FontStyle)));
 
     ChildSlot
         .HAlign(HAlign_Fill)
@@ -167,10 +276,13 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                         SNew(SVerticalBox)
                                         + SVerticalBox::Slot()
                                         [
+                                            // for rich text: default text style, decorators
                                             SAssignNew(Text, TextWidget)
-                                            .Font(FSlateFontInfo("Tahoma", 14))
+                                            .TextStyle(&FontStyle)
+                                            .Decorators(TextDecorators)
                                             .Text(this, &SBuildingMenu::getFText)
                                             .AutoWrapText(true)
+                                            //+ TextDecorator::Create(MakeShareable(new FTextLayout), )
                                         ]
                                     ]
                                 ]

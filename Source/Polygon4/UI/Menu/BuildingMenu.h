@@ -30,10 +30,28 @@ namespace polygon4 {
 
 class InfoTreeView;
 
+class TextDecorator : public ITextDecorator
+{
+public:
+    TextDecorator(const FTextBlockStyle &DefaultStyle);
+    virtual ~TextDecorator() {}
+
+    virtual bool Supports(const FTextRunParseResults& RunInfo, const FString& Text) const override;
+    virtual TSharedRef<ISlateRun> Create(const TSharedRef<FTextLayout>& TextLayout, const FTextRunParseResults& RunParseResult, const FString& OriginalText, const TSharedRef<FString>& InOutModelText, const ISlateStyle* Style) override;
+
+protected:
+    virtual TSharedRef<ISlateRun> CreateRun(const TSharedRef<FTextLayout>& TextLayout, const FRunInfo& InRunInfo, const TSharedRef< const FString >& InText, const FTextBlockStyle& Style, const FTextRange& InRange);
+    FTextBlockStyle CreateTextBlockStyle(const FRunInfo& InRunInfo) const;
+    void ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& OutFont, FLinearColor& OutFontColor) const;
+
+private:
+    FTextBlockStyle DefaultStyle;
+};
+
 class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
 {
     using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
-    using TextWidget = STextBlock;// SRichTextBlock;
+    using TextWidget = SRichTextBlock;
 
 	SLATE_BEGIN_ARGS(SBuildingMenu){}
     SLATE_END_ARGS()

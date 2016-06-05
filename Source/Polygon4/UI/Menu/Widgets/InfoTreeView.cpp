@@ -20,6 +20,7 @@
 #include "InfoTreeView.h"
 
 #include "Game/P4Engine.h"
+#include "UI/Colors.h"
 
 #define LOCTEXT_NAMESPACE "InfoTreeView"
 
@@ -93,6 +94,10 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
     using namespace polygon4;
     using namespace polygon4::detail;
 
+    FSlateColor Color = FLinearColor::White;
+    if (InItem->P4Item->highlight)
+        Color = FSlateColor(P4_COLOR_YELLOW);
+
     auto T = InItem->P4Item->text;
     auto o = InItem->P4Item->object;
     if (o)
@@ -129,6 +134,7 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
             SAssignNew(InItem->Widget, STextBlock)
             .Text(FT)
             .Font(FSlateFontInfo("Tahoma", 16))
+            .ColorAndOpacity(Color)
         ];
 }
 
