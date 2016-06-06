@@ -39,7 +39,7 @@ bool TextDecorator::Supports(const FTextRunParseResults& RunInfo, const FString&
 {
     return
         RunInfo.Name == TEXT("span") ||
-        RunInfo.Name == TEXT("ref") ||
+        //RunInfo.Name == TEXT("ref") ||
         0;
 }
 
@@ -131,6 +131,26 @@ void TextDecorator::ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& Ou
     }
 }
 
+void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
+{
+    const FString* const IdString = Map.Find(TEXT("id"));
+    const FString* const NameString = Map.Find(TEXT("name"));
+
+    if (!IdString || !NameString)
+        return;
+    if (*IdString == TEXT("building"))
+    {
+        addThemeBuilding(*NameString);
+    }
+    else if (*IdString == TEXT("object"))
+    {
+        addThemeObject(*NameString);
+    }
+
+    // refresh themes tree view
+    ThemesTV->Reset(&themes);
+}
+
 void SBuildingMenu::Construct(const FArguments& InArgs)
 {
     auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController();
@@ -150,10 +170,27 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
     FTextBlockStyle FontStyle;
     FontStyle.SetFont(FSlateFontInfo("Tahoma", 14));
-    FontStyle.SetColorAndOpacity(FLinearColor::White);
+    FontStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_WHITE));
 
+    FTextBlockStyle HyperlinkStyle = FontStyle;
+    HyperlinkStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_BLUE));
+    //HyperlinkStyle.SetHighlightColor(FLinearColor::White);
+
+    // set default hyperlink style
+    // hack: modify const object
+    // TODO: find another way to change it
+    const FHyperlinkStyle &style = FCoreStyle::Get().GetWidgetStyle<FHyperlinkStyle>(L"Hyperlink");
+    auto style_ptr = (FHyperlinkStyle*)&style;
+    style_ptr->SetTextStyle(HyperlinkStyle);
+    //style_ptr->UnderlineStyle.Normal = style_ptr->UnderlineStyle.Disabled;
+    //style_ptr->UnderlineStyle.Hovered = style_ptr->UnderlineStyle.Disabled;
+
+    // set decorators
     TArray< TSharedRef< class ITextDecorator > > TextDecorators;
     TextDecorators.Add(MakeShareable(new TextDecorator(FontStyle)));
+
+    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("building", this, &SBuildingMenu::OnHyperlinkClick));
+    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("object", this, &SBuildingMenu::OnHyperlinkClick));
 
     ChildSlot
         .HAlign(HAlign_Fill)
@@ -221,7 +258,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                         .VAlign(VAlign_Top)
                                         + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnGlider, &LeftMenuButtons[polygon4::bbGlider])
                                         .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbTrade])
+                                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::OnTrade, &LeftMenuButtons[polygon4::bbTrade])
                                         .VAlign(VAlign_Top)
                                         + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbClans])
                                         .VAlign(VAlign_Top)
@@ -242,6 +279,20 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                         [
                                             SAssignNew(GliderTV, InfoTreeView)
                                             .RootItem(&glider)
+                                        ]
+                                    ]
+                                    + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
+                                    [
+                                        SAssignNew(HoldStoreVB, SVerticalBox)
+                                        .Visibility(EVisibility::Collapsed)
+                                        + SVerticalBox::Slot()
+                                        .HAlign(HAlign_Fill)
+                                        .VAlign(VAlign_Fill)
+                                        [
+                                            SAssignNew(HoldStoreTV, InfoTreeView)
+                                            .RootItem(&hold_store)
                                         ]
                                     ]
                                 ]
@@ -340,6 +391,18 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                         ]
                                     ]
                                     // goods
+                                    + SVerticalBox::Slot()
+                                    .HAlign(HAlign_Fill)
+                                    .VAlign(VAlign_Fill)
+                                    [
+                                        SAssignNew(GoodsStoreVB, SVerticalBox)
+                                        .Visibility(EVisibility::Collapsed)
+                                        + SVerticalBox::Slot()
+                                        [
+                                            SAssignNew(GoodsStoreTV, InfoTreeView)
+                                            .RootItem(&goods_store)
+                                        ]
+                                    ]
                                     // clans
                                 ]
                             ]
@@ -534,13 +597,15 @@ void SBuildingMenu::refresh()
         m = m + "/" + c;
         MassTB->SetText(FString(m.c_str()));
     }
-    ThemesTV->Reset(&themes);
 
     update();
 
+    ThemesTV->Reset(&themes);
     JournalTV->Reset(&journal);
     GliderTV->Reset(&glider);
     GliderStoreTV->Reset(&glider_store);
+    HoldStoreTV->Reset(&hold_store);
+    GoodsStoreTV->Reset(&goods_store);
 }
 
 void SBuildingMenu::OnShow()
@@ -636,7 +701,21 @@ FReply SBuildingMenu::OnBack()
     JournalVB->SetVisibility(EVisibility::Collapsed);
     GliderVB->SetVisibility(EVisibility::Collapsed);
     GliderStoreVB->SetVisibility(EVisibility::Collapsed);
+    HoldStoreVB->SetVisibility(EVisibility::Collapsed);
+    GoodsStoreVB->SetVisibility(EVisibility::Collapsed);
     ButtonsVB->SetVisibility(EVisibility::Visible);
     ThemesVB->SetVisibility(EVisibility::Visible);
+    return FReply::Handled();
+}
+
+FReply SBuildingMenu::OnTrade()
+{
+    BackLeftVB->SetVisibility(EVisibility::Visible);
+    JournalVB->SetVisibility(EVisibility::Collapsed);
+    HoldStoreVB->SetVisibility(EVisibility::Visible);
+    GoodsStoreVB->SetVisibility(EVisibility::Visible);
+    BackRightVB->SetVisibility(EVisibility::Collapsed);
+    ButtonsVB->SetVisibility(EVisibility::Collapsed);
+    ThemesVB->SetVisibility(EVisibility::Collapsed);
     return FReply::Handled();
 }

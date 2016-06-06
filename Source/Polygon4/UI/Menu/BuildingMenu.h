@@ -80,24 +80,29 @@ private:
 
     TSharedPtr<SVerticalBox> ButtonsVB;
 
+    TSharedPtr<SVerticalBox> BackLeftVB;
+    TSharedPtr<SVerticalBox> BackRightVB;
+
     TSharedPtr<SVerticalBox> ThemesVB;
     TSharedPtr<SVerticalBox> JournalVB;
     TSharedPtr<SVerticalBox> GliderVB;
     TSharedPtr<SVerticalBox> GliderStoreVB;
-
-    TSharedPtr<SVerticalBox> BackLeftVB;
-    TSharedPtr<SVerticalBox> BackRightVB;
+    TSharedPtr<SVerticalBox> HoldStoreVB;
+    TSharedPtr<SVerticalBox> GoodsStoreVB;
 
     TSharedPtr<InfoTreeView> ThemesTV;
     TSharedPtr<InfoTreeView> JournalTV;
     TSharedPtr<InfoTreeView> GliderTV;
     TSharedPtr<InfoTreeView> GliderStoreTV;
+    TSharedPtr<InfoTreeView> HoldStoreTV;
+    TSharedPtr<InfoTreeView> GoodsStoreTV;
 
     std::vector<TSharedPtr<class SMenuButton>> LeftMenuButtons;
 
     FReply OnSave();
     FReply OnJournal();
     FReply OnGlider();
+    FReply OnTrade();
     FReply OnBack();
     FReply OnExit();
     FReply DoNothing() const { return FReply::Handled(); }
@@ -107,4 +112,6 @@ private:
     FReply OnSaveDelete();
 
     SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
+
+    void OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &map);
 };

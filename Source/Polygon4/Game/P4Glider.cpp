@@ -269,7 +269,8 @@ void AP4Glider::Tick(float DeltaSeconds)
                 Viewport->Viewport->SetMouse(Position.X, Position.Y);
             }
 
-            if (MousePositionRepeats > 50)
+            // slightly move mouse to center
+            if (MousePositionRepeats > 100)
             {
                 auto kx = (Position.X - Center.X) / (float)Center.X;
                 auto ky = (Position.Y - Center.Y) / (float)Center.Y;

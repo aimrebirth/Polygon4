@@ -116,8 +116,15 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
         }
         case EObjectType::ConfigurationProjectile:
         {
-            ConfigurationProjectile *p = (ConfigurationProjectile *)o;
+            auto p = (ConfigurationProjectile *)o;
             T += L" (" + std::to_wstring(p->quantity) + L")";
+            break;
+        }
+        case EObjectType::MapBuildingGood:
+        {
+            auto p = (MapBuildingGood *)o;
+            if (p->quantity != -1)
+                T += L" (" + std::to_wstring(p->quantity) + L")";
             break;
         }
         default:
@@ -172,6 +179,8 @@ void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInf
         else \
             bm->showText(p->object->getName()); \
         break
+
+        PRINT_DESCRIPTION(Building);
 
         PRINT_DESCRIPTION(Glider);
         PRINT_DESCRIPTION(Good);
