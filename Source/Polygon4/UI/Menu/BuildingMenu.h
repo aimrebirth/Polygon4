@@ -114,4 +114,5 @@ private:
     SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
 
     void OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &map);
+    FSlateWidgetRun::FWidgetRunInfo WidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const;
 };

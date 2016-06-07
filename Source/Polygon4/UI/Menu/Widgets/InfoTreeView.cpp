@@ -106,12 +106,15 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
         {
         case EObjectType::JournalRecord:
         {
-            JournalRecord *r = (JournalRecord *)o;
+            auto r = (JournalRecord *)o;
             if (r->message)
             {
                 polygon4::String s = r->message->title->string;
                 T = s.toFText();
             }
+            Color = FSlateColor(P4_COLOR_YELLOW);
+            if (r->type == JournalRecordType::Completed)
+                Color = FSlateColor(P4_COLOR_GRAY);
             break;
         }
         case EObjectType::ConfigurationProjectile:
@@ -213,4 +216,45 @@ void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInf
         PRINT_DESCRIPTION_VAR(MapBuildingWeapon, weapon);
         PRINT_DESCRIPTION_VAR(MapBuildingModificator, modificator);
     }
+}
+
+static InfoTreeView::ListItem FindFirstParent(const InfoTreeView::ListItem &Root)
+{
+    if (Root->P4Item && Root->P4Item->highlight)
+        return Root;
+    for (auto &c : Root->Children)
+    {
+        auto p = FindFirstParent(c);
+        if (p.IsValid())
+            return p;
+    }
+    return nullptr;
+}
+
+static InfoTreeView::ListItem FindFirstNotParent(const InfoTreeView::ListItem &Root)
+{
+    if (Root->P4Item && !Root->P4Item->highlight)
+        return Root;
+    for (auto &c : Root->Children)
+    {
+        auto p = FindFirstNotParent(c);
+        if (p.IsValid())
+            return p;
+    }
+    return nullptr;
+}
+
+bool InfoTreeView::SelectFirstNotParent()
+{
+    auto f = [this](auto &&f)
+    {
+        auto i = f(RootItem);
+        if (i.IsValid())
+        {
+            SetSelection(i, ESelectInfo::Direct);
+            return true;
+        }
+        return false;
+    };
+    return f(FindFirstNotParent) || f(FindFirstParent);
 }

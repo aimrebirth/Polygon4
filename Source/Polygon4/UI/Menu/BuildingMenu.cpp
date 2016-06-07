@@ -85,7 +85,7 @@ void TextDecorator::ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& Ou
     const FString* const FontSizeString = InRunInfo.MetaData.Find(TEXT("size"));
     const FString* const FontStyleString = InRunInfo.MetaData.Find(TEXT("style"));
     const FString* const FontColorString = InRunInfo.MetaData.Find(TEXT("color"));
-    const FString* const ObjString = InRunInfo.MetaData.Find(TEXT("object"));
+    const FString* const ObjString = InRunInfo.MetaData.Find(TEXT("item"));
     const FString* const BldString = InRunInfo.MetaData.Find(TEXT("building"));
 
     if (FontFamilyString)
@@ -142,13 +142,35 @@ void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
     {
         addThemeBuilding(*NameString);
     }
-    else if (*IdString == TEXT("object"))
+    else if (*IdString == TEXT("item"))
     {
-        addThemeObject(*NameString);
+        addThemeItem(*NameString);
+    }
+    else if (*IdString == TEXT("message"))
+    {
+        addThemeMessage(*NameString);
+    }
+    else if (*IdString == TEXT("script"))
+    {
+        scriptCallback(polygon4::String(*NameString).toString());
     }
 
     // refresh themes tree view
     ThemesTV->Reset(&themes);
+}
+
+FSlateWidgetRun::FWidgetRunInfo SBuildingMenu::WidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const
+{
+    TSharedRef<SWidget> Widget = SNew(SEditableTextBox)
+        .MinDesiredWidth(200)
+        .Font(FSlateFontInfo("Tahoma", 14))
+        .OnTextCommitted_Lambda([this](const FText &NewText, ETextCommit::Type Type)
+    {
+        if (!mechanoid->setName(NewText))
+            mechanoid->setName(L"");
+    })
+        ;
+    return FSlateWidgetRun::FWidgetRunInfo(Widget, 0);
 }
 
 void SBuildingMenu::Construct(const FArguments& InArgs)
@@ -187,10 +209,18 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
     // set decorators
     TArray< TSharedRef< class ITextDecorator > > TextDecorators;
+    // text
     TextDecorators.Add(MakeShareable(new TextDecorator(FontStyle)));
 
+    // hyperlinks
     TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("building", this, &SBuildingMenu::OnHyperlinkClick));
-    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("object", this, &SBuildingMenu::OnHyperlinkClick));
+    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("item", this, &SBuildingMenu::OnHyperlinkClick));
+    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("message", this, &SBuildingMenu::OnHyperlinkClick));
+    // add separate style for scripts
+    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("script", this, &SBuildingMenu::OnHyperlinkClick));
+
+    // widgets
+    TextDecorators.Add(SRichTextBlock::WidgetDecorator("edit", this, &SBuildingMenu::WidgetDecorator));
 
     ChildSlot
         .HAlign(HAlign_Fill)
@@ -321,20 +351,17 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                 .VAlign(VAlign_Fill)
                                 .HAlign(HAlign_Fill)
                                 [
-                                    SNew(SBorder)
-                                    .Padding(10)
+                                    SNew(SScrollBox)
+                                    + SScrollBox::Slot()
+                                    .VAlign(VAlign_Fill)
+                                    .HAlign(HAlign_Fill)
                                     [
-                                        SNew(SVerticalBox)
-                                        + SVerticalBox::Slot()
-                                        [
-                                            // for rich text: default text style, decorators
-                                            SAssignNew(Text, TextWidget)
-                                            .TextStyle(&FontStyle)
-                                            .Decorators(TextDecorators)
-                                            .Text(this, &SBuildingMenu::getFText)
-                                            .AutoWrapText(true)
-                                            //+ TextDecorator::Create(MakeShareable(new FTextLayout), )
-                                        ]
+                                        // for rich text: default text style, decorators
+                                        SAssignNew(Text, TextWidget)
+                                        .TextStyle(&FontStyle)
+                                        .Decorators(TextDecorators)
+                                        .Text(this, &SBuildingMenu::getFText)
+                                        .AutoWrapText(true)
                                     ]
                                 ]
                             ]
@@ -676,6 +703,11 @@ FReply SBuildingMenu::OnSaveDelete()
 
 FReply SBuildingMenu::OnJournal()
 {
+    refresh();
+    saveScreenText();
+    if (!JournalTV->SelectFirstNotParent())
+        clearText();
+
     BackRightVB->SetVisibility(EVisibility::Visible);
     JournalVB->SetVisibility(EVisibility::Visible);
     ThemesVB->SetVisibility(EVisibility::Collapsed);
@@ -684,6 +716,11 @@ FReply SBuildingMenu::OnJournal()
 
 FReply SBuildingMenu::OnGlider()
 {
+    refresh();
+    saveScreenText();
+    if (!GliderTV->SelectFirstNotParent())
+        clearText();
+
     BackLeftVB->SetVisibility(EVisibility::Visible);
     JournalVB->SetVisibility(EVisibility::Collapsed);
     GliderVB->SetVisibility(EVisibility::Visible);
@@ -694,8 +731,27 @@ FReply SBuildingMenu::OnGlider()
     return FReply::Handled();
 }
 
+FReply SBuildingMenu::OnTrade()
+{
+    refresh();
+    saveScreenText();
+    if (!HoldStoreTV->SelectFirstNotParent())
+        clearText();
+
+    BackLeftVB->SetVisibility(EVisibility::Visible);
+    JournalVB->SetVisibility(EVisibility::Collapsed);
+    HoldStoreVB->SetVisibility(EVisibility::Visible);
+    GoodsStoreVB->SetVisibility(EVisibility::Visible);
+    BackRightVB->SetVisibility(EVisibility::Collapsed);
+    ButtonsVB->SetVisibility(EVisibility::Collapsed);
+    ThemesVB->SetVisibility(EVisibility::Collapsed);
+    return FReply::Handled();
+}
+
 FReply SBuildingMenu::OnBack()
 {
+    loadScreenText();
+
     BackLeftVB->SetVisibility(EVisibility::Collapsed);
     BackRightVB->SetVisibility(EVisibility::Collapsed);
     JournalVB->SetVisibility(EVisibility::Collapsed);
@@ -705,17 +761,5 @@ FReply SBuildingMenu::OnBack()
     GoodsStoreVB->SetVisibility(EVisibility::Collapsed);
     ButtonsVB->SetVisibility(EVisibility::Visible);
     ThemesVB->SetVisibility(EVisibility::Visible);
-    return FReply::Handled();
-}
-
-FReply SBuildingMenu::OnTrade()
-{
-    BackLeftVB->SetVisibility(EVisibility::Visible);
-    JournalVB->SetVisibility(EVisibility::Collapsed);
-    HoldStoreVB->SetVisibility(EVisibility::Visible);
-    GoodsStoreVB->SetVisibility(EVisibility::Visible);
-    BackRightVB->SetVisibility(EVisibility::Collapsed);
-    ButtonsVB->SetVisibility(EVisibility::Collapsed);
-    ThemesVB->SetVisibility(EVisibility::Collapsed);
     return FReply::Handled();
 }

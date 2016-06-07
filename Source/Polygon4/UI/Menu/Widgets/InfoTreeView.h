@@ -52,6 +52,8 @@ public:
     void Construct(const FArguments& InArgs);
     void Reset(P4InfoTreeItem *P4RootItem);
 
+    bool SelectFirstNotParent();
+
 private:
     ListItem RootItem;
     P4InfoTreeItem *P4RootItem;
