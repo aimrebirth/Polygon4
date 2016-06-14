@@ -352,7 +352,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
     auto MapName = GWorld->GetOuter()->GetName();
     auto modification = (Modification *)Item->P4Item->object;
     IdPtr<Map> map;
-    Text name = MapName.GetCharArray().GetData();
+    polygon4::String name = MapName.GetCharArray().GetData();
     for (auto &m : modification->maps)
     {
         if (m->map->resource == name)
@@ -468,7 +468,7 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
     auto MapName = GWorld->GetOuter()->GetName();
     auto modification = (Modification *)Item->P4Item->object;
     IdPtr<Map> map;
-    Text name = MapName.GetCharArray().GetData();
+    polygon4::String name = MapName.GetCharArray().GetData();
     for (auto &m : modification->maps)
     {
         if (m->map->resource == name)

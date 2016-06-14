@@ -21,6 +21,7 @@
 
 #include <Polygon4/Mechanoid.h>
 
+#include "TextDecorators.h"
 #include "Widgets/MenuButton.h"
 #include "Widgets/SavedGamesListView.h"
 #include "Widgets/InfoTreeView.h"
@@ -30,107 +31,6 @@
 
 #define LOCTEXT_NAMESPACE "BuildingMenu"
 
-TextDecorator::TextDecorator(const FTextBlockStyle &DefaultStyle)
-    : DefaultStyle(DefaultStyle)
-{
-}
-
-bool TextDecorator::Supports(const FTextRunParseResults& RunInfo, const FString& Text) const
-{
-    return
-        RunInfo.Name == TEXT("span") ||
-        //RunInfo.Name == TEXT("ref") ||
-        0;
-}
-
-TSharedRef<ISlateRun> TextDecorator::Create(const TSharedRef<FTextLayout>& TextLayout, const FTextRunParseResults& RunParseResult, const FString& OriginalText, const TSharedRef<FString>& InOutModelText, const ISlateStyle* Style)
-{
-    FRunInfo RunInfo(RunParseResult.Name);
-    for (const TPair<FString, FTextRange>& Pair : RunParseResult.MetaData)
-    {
-        RunInfo.MetaData.Add(Pair.Key, OriginalText.Mid(Pair.Value.BeginIndex, Pair.Value.EndIndex - Pair.Value.BeginIndex));
-    }
-
-    FTextRange ModelRange;
-    ModelRange.BeginIndex = InOutModelText->Len();
-    *InOutModelText += OriginalText.Mid(RunParseResult.ContentRange.BeginIndex, RunParseResult.ContentRange.EndIndex - RunParseResult.ContentRange.BeginIndex);
-    ModelRange.EndIndex = InOutModelText->Len();
-
-    return CreateRun(TextLayout, RunInfo, InOutModelText, CreateTextBlockStyle(RunInfo), ModelRange);
-}
-
-TSharedRef<ISlateRun> TextDecorator::CreateRun(const TSharedRef<FTextLayout>& TextLayout, const FRunInfo& InRunInfo, const TSharedRef< const FString >& InText, const FTextBlockStyle& Style, const FTextRange& InRange)
-{
-    return FSlateTextRun::Create(InRunInfo, InText, Style, InRange);
-}
-
-FTextBlockStyle TextDecorator::CreateTextBlockStyle(const FRunInfo& InRunInfo) const
-{
-    FSlateFontInfo Font;
-    FLinearColor FontColor;
-    ExplodeRunInfo(InRunInfo, Font, FontColor);
-
-    FTextBlockStyle TextBlockStyle;
-    TextBlockStyle.SetFont(Font);
-    TextBlockStyle.SetColorAndOpacity(FontColor);
-
-    return TextBlockStyle;
-}
-
-void TextDecorator::ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& OutFont, FLinearColor& OutFontColor) const
-{
-    OutFont = DefaultStyle.Font;
-
-    const FString* const FontFamilyString = InRunInfo.MetaData.Find(TEXT("font"));
-    const FString* const FontSizeString = InRunInfo.MetaData.Find(TEXT("size"));
-    const FString* const FontStyleString = InRunInfo.MetaData.Find(TEXT("style"));
-    const FString* const FontColorString = InRunInfo.MetaData.Find(TEXT("color"));
-    const FString* const ObjString = InRunInfo.MetaData.Find(TEXT("item"));
-    const FString* const BldString = InRunInfo.MetaData.Find(TEXT("building"));
-
-    if (FontFamilyString)
-    {
-        FStringAssetReference Font(**FontFamilyString);
-        if (UObject* FontAsset = Font.TryLoad())
-        {
-            OutFont.FontObject = FontAsset;
-        }
-    }
-
-    if (FontSizeString)
-    {
-        OutFont.Size = static_cast<uint8>(FPlatformString::Atoi(**FontSizeString));
-    }
-
-    if (FontStyleString)
-    {
-        OutFont.TypefaceFontName = FName(**FontStyleString);
-    }
-
-    OutFontColor = DefaultStyle.ColorAndOpacity.GetSpecifiedColor();
-    if (FontColorString)
-    {
-        auto FontColorStringRef = FontColorString->ToLower();
-
-        // Is Hex color?
-        if (!FontColorStringRef.IsEmpty() && FontColorStringRef[0] == TCHAR('#'))
-        {
-            OutFontColor = FLinearColor(FColor::FromHex(FontColorStringRef));
-        }
-#define CHANGE_COLOR(c, cc) else if (FontColorStringRef == L ## #c) { OutFontColor = cc; }
-        CHANGE_COLOR(green, P4_COLOR_GREEN)
-        CHANGE_COLOR(blue, P4_COLOR_BLUE)
-        CHANGE_COLOR(red, P4_COLOR_RED)
-        CHANGE_COLOR(yellow, P4_COLOR_YELLOW)
-        // add more text colors here
-    }
-    else
-    {
-        if (ObjString || BldString)
-            OutFontColor = P4_COLOR_BLUE;
-    }
-}
-
 void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
 {
     const FString* const IdString = Map.Find(TEXT("id"));
@@ -138,28 +38,16 @@ void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
 
     if (!IdString || !NameString)
         return;
-    if (*IdString == TEXT("building"))
-    {
-        addThemeBuilding(*NameString);
-    }
-    else if (*IdString == TEXT("item"))
-    {
-        addThemeItem(*NameString);
-    }
-    else if (*IdString == TEXT("message"))
-    {
-        addThemeMessage(*NameString);
-    }
-    else if (*IdString == TEXT("script"))
-    {
+    if (*IdString == TEXT("script"))
         scriptCallback(polygon4::String(*NameString).toString());
-    }
+    else
+        addTheme(*NameString);
 
     // refresh themes tree view
     ThemesTV->Reset(&themes);
 }
 
-FSlateWidgetRun::FWidgetRunInfo SBuildingMenu::WidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const
+FSlateWidgetRun::FWidgetRunInfo SBuildingMenu::EditWidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const
 {
     TSharedRef<SWidget> Widget = SNew(SEditableTextBox)
         .MinDesiredWidth(200)
@@ -194,18 +82,25 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     FontStyle.SetFont(FSlateFontInfo("Tahoma", 14));
     FontStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_WHITE));
 
-    FTextBlockStyle HyperlinkStyle = FontStyle;
-    HyperlinkStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_BLUE));
+    FTextBlockStyle HyperlinkTextStyle;
+    HyperlinkTextStyle.SetFont(FSlateFontInfo("Tahoma", 14));
+    HyperlinkTextStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_BLUE));
     //HyperlinkStyle.SetHighlightColor(FLinearColor::White);
 
-    // set default hyperlink style
-    // hack: modify const object
-    // TODO: find another way to change it
-    const FHyperlinkStyle &style = FCoreStyle::Get().GetWidgetStyle<FHyperlinkStyle>(L"Hyperlink");
-    auto style_ptr = (FHyperlinkStyle*)&style;
-    style_ptr->SetTextStyle(HyperlinkStyle);
-    //style_ptr->UnderlineStyle.Normal = style_ptr->UnderlineStyle.Disabled;
-    //style_ptr->UnderlineStyle.Hovered = style_ptr->UnderlineStyle.Disabled;
+    FTextBlockStyle HyperlinkTextStyle2;
+    HyperlinkTextStyle2.SetFont(FSlateFontInfo("Tahoma", 14));
+    HyperlinkTextStyle2.SetColorAndOpacity(FLinearColor(P4_COLOR_RED));
+
+    // set hyperlink styles
+    FSlateStyleSet &ss = (FSlateStyleSet&)FCoreStyle::Get();
+
+    ss.Set<FTextBlockStyle>("p4blue", HyperlinkTextStyle);
+    ss.Set<FTextBlockStyle>("p4red", HyperlinkTextStyle2);
+
+    //ss.Set<FHyperlinkStyle>("p4blue_hl", HyperlinkStyle2);
+    //ss.Set<FHyperlinkStyle>("p4red_hl", HyperlinkStyle2);
+    //FHyperlinkStyle->UnderlineStyle.Normal = style_ptr->UnderlineStyle.Disabled;
+    //FHyperlinkStyle->UnderlineStyle.Hovered = style_ptr->UnderlineStyle.Disabled;
 
     // set decorators
     TArray< TSharedRef< class ITextDecorator > > TextDecorators;
@@ -213,14 +108,12 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     TextDecorators.Add(MakeShareable(new TextDecorator(FontStyle)));
 
     // hyperlinks
-    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("building", this, &SBuildingMenu::OnHyperlinkClick));
-    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("item", this, &SBuildingMenu::OnHyperlinkClick));
-    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("message", this, &SBuildingMenu::OnHyperlinkClick));
-    // add separate style for scripts
+    TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("object", this, &SBuildingMenu::OnHyperlinkClick));
     TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("script", this, &SBuildingMenu::OnHyperlinkClick));
+    //FSlateHyperlinkRun::FOnClick::CreateSP( InUserObjectPtr, NavigateFunc )
 
     // widgets
-    TextDecorators.Add(SRichTextBlock::WidgetDecorator("edit", this, &SBuildingMenu::WidgetDecorator));
+    TextDecorators.Add(SRichTextBlock::WidgetDecorator("edit", this, &SBuildingMenu::EditWidgetDecorator));
 
     ChildSlot
         .HAlign(HAlign_Fill)

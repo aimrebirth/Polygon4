@@ -130,5 +130,8 @@ public:
 };
 
 POLYGON4_API
+#ifdef _MSC_VER
+__declspec(noinline)
+#endif
 P4Engine *GP4Engine(P4Engine *Engine = nullptr);
 

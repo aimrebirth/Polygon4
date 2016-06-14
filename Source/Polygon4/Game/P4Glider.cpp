@@ -203,6 +203,13 @@ void AP4Glider::Tick(float DeltaSeconds)
     rpmHeavy += DeltaSeconds;
     EnergyShieldTimer += DeltaSeconds;
 
+    // send this glider to HUD for update screen values
+    if (PlayerController)
+    {
+        auto HUD = Cast<AGliderHUD>(PlayerController->GetHUD());
+        HUD->SetCurrentGlider(this);
+    }
+
     // mouse pos
     if (PlayerController)
     {

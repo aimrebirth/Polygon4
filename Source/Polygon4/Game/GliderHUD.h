@@ -23,14 +23,25 @@
 
 class SBar;
 
+class AP4Glider;
+
 UCLASS()
 class POLYGON4_API AGliderHUD : public AHUD
 {
 	GENERATED_BODY()
 
+public:
+    AGliderHUD(const FObjectInitializer& ObjectInitializer);
+
+	virtual void DrawHUD() override;
+
+    void SetMousePosition(FVector2D Position) { MousePosition = Position; }
+    void SetVisible(bool Visible) { this->Visible = Visible; }
+    void SetCurrentGlider(AP4Glider *Glider) { this->Glider = Glider; }
+
 private:
     UTexture2D* CrosshairTex;
-    FVector2D MousePosition = {-1, -1};
+    FVector2D MousePosition = { -1, -1 };
     bool Visible = true;
 
     bool WidgetsDrawn = false;
@@ -39,11 +50,5 @@ private:
     TSharedPtr<SBar> ArmorBar;
     TSharedPtr<SBar> EnergyBar;
 
-public:
-    AGliderHUD(const FObjectInitializer& ObjectInitializer);
-
-	virtual void DrawHUD() override;
-    void SetMousePosition(FVector2D Position) { MousePosition = Position; }
-
-    void SetVisible(bool Visible) { this->Visible = Visible; }
+    AP4Glider *Glider = nullptr;
 };

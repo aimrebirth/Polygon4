@@ -21,12 +21,20 @@
 
 #include <UI/Game/SBar.h>
 
+#include "P4Glider.h"
+
 AGliderHUD::AGliderHUD(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
 {
     static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("Texture2D'/Game/Mods/Common/HUD/crosshair.crosshair'"));
     CrosshairTex = CrosshairTexObj.Object;
 
+    EnergyBar = SNew(SBar)
+        .Max(100)
+        .Current(100)
+        .Text(FText::FromString("Energy"))
+        .Color(FLinearColor::Yellow * 0.65f)
+        ;
     EnergyShieldBar = SNew(SBar)
         .Max(100)
         .Current(10)
@@ -38,12 +46,6 @@ AGliderHUD::AGliderHUD(const FObjectInitializer& ObjectInitializer)
         .Current(50)
         .Text(FText::FromString("Armor"))
         .Color(FLinearColor::Green * 0.65f)
-        ;
-    EnergyBar = SNew(SBar)
-        .Max(100)
-        .Current(100)
-        .Text(FText::FromString("Energy"))
-        .Color(FLinearColor::Yellow * 0.65f)
         ;
 }
 
@@ -64,7 +66,7 @@ void AGliderHUD::DrawHUD()
         }
         return;
     }
-    
+
     decltype(MousePosition) Position(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
     if (MousePosition.X != -1)
         Position = MousePosition;
@@ -78,54 +80,69 @@ void AGliderHUD::DrawHUD()
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
 
-    if (!WidgetsDrawn)
+    if (Glider)
     {
-        WidgetsDrawn = true;
+        auto m = Glider->GetMechanoid();
+        auto c = m->getConfiguration();
 
-        auto Viewport = GetWorld()->GetGameViewport();
-        auto PlayerController = GetWorld()->GetFirstPlayerController();
+        EnergyBar->SetMaxValue(1000);
+        EnergyShieldBar->SetMaxValue(100);
+        ArmorBar->SetMaxValue(c->getMaxArmor());
 
-        Viewport->AddViewportWidgetForPlayer(PlayerController->GetLocalPlayer(),
-            SAssignNew(BarsWidget, SVerticalBox)
-            + SVerticalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Top)
-            .AutoHeight()
-            .Padding(30, 30, 10, 10)
-            [
-                SNew(SBox)
-                .WidthOverride(500)
+        EnergyBar->SetCurrentValue(c->energy);
+        EnergyShieldBar->SetCurrentValue(c->energy_shield);
+        ArmorBar->SetCurrentValue(c->armor);
+    }
+
+    // draw only once
+    if (WidgetsDrawn)
+        return;
+
+    WidgetsDrawn = true;
+
+    auto Viewport = GetWorld()->GetGameViewport();
+    auto PlayerController = GetWorld()->GetFirstPlayerController();
+
+    Viewport->AddViewportWidgetForPlayer(PlayerController->GetLocalPlayer(),
+        SAssignNew(BarsWidget, SVerticalBox)
+        + SVerticalBox::Slot()
+        .HAlign(HAlign_Left)
+        .VAlign(VAlign_Top)
+        .AutoHeight()
+        .Padding(30, 30, 10, 10)
+        [
+            SNew(SBox)
+            .WidthOverride(500)
             .HeightOverride(40)
             [
                 EnergyBar.ToSharedRef()
             ]
-            ]
-        + SVerticalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Top)
-            .AutoHeight()
-            .Padding(30, 10, 10, 10)
-            [
-                SNew(SBox)
-                .WidthOverride(500)
+        ]
+    + SVerticalBox::Slot()
+        .HAlign(HAlign_Left)
+        .VAlign(VAlign_Top)
+        .AutoHeight()
+        .Padding(30, 10, 10, 10)
+        [
+            SNew(SBox)
+            .WidthOverride(500)
             .HeightOverride(40)
             [
                 EnergyShieldBar.ToSharedRef()
             ]
-            ]
-        + SVerticalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Top)
-            .AutoHeight()
-            .Padding(30, 10, 10, 10)
-            [
-                SNew(SBox)
-                .WidthOverride(500)
+        ]
+    + SVerticalBox::Slot()
+        .HAlign(HAlign_Left)
+        .VAlign(VAlign_Top)
+        .AutoHeight()
+        .Padding(30, 10, 10, 10)
+        [
+            SNew(SBox)
+            .WidthOverride(500)
             .HeightOverride(40)
             [
                 ArmorBar.ToSharedRef()
             ]
-            ], 0
-            );
-    }
+        ], 0
+        );
 }
