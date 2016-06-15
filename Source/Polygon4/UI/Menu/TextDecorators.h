@@ -37,30 +37,3 @@ protected:
 private:
     FTextBlockStyle DefaultStyle;
 };
-
-class HyperlinkDecorator : public ITextDecorator
-{
-public:
-    static TSharedRef<HyperlinkDecorator> Create(FString Id, const FTextBlockStyle &DefaultStyle, const FSlateHyperlinkRun::FOnClick &NavigateDelegate, const FSlateHyperlinkRun::FOnGetTooltipText &InToolTipTextDelegate = FSlateHyperlinkRun::FOnGetTooltipText(), const FSlateHyperlinkRun::FOnGenerateTooltip &InToolTipDelegate = FSlateHyperlinkRun::FOnGenerateTooltip());
-
-public:
-    virtual ~HyperlinkDecorator() {}
-
-public:
-    virtual bool Supports(const FTextRunParseResults &RunParseResult, const FString &Text) const override;
-    virtual TSharedRef<ISlateRun> Create(const TSharedRef<class FTextLayout> &TextLayout, const FTextRunParseResults &RunParseResult, const FString &OriginalText, const TSharedRef<FString> &InOutModelText, const ISlateStyle *Style) override;
-
-protected:
-    HyperlinkDecorator(FString InId, const FTextBlockStyle &DefaultStyle, const FSlateHyperlinkRun::FOnClick &InNavigateDelegate, const FSlateHyperlinkRun::FOnGetTooltipText &InToolTipTextDelegate, const FSlateHyperlinkRun::FOnGenerateTooltip &InToolTipDelegate);
-
-protected:
-    FSlateHyperlinkRun::FOnClick NavigateDelegate;
-
-protected:
-    FString Id;
-    FSlateHyperlinkRun::FOnGetTooltipText ToolTipTextDelegate;
-    FSlateHyperlinkRun::FOnGenerateTooltip ToolTipDelegate;
-
-private:
-    FTextBlockStyle DefaultStyle;
-};

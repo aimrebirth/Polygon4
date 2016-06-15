@@ -49,7 +49,7 @@ struct ArmedTimedValue
 
     ArmedTimedValue(float cooldown = 3)
     {
-        this->max = cooldown;
+        max = cooldown;
     }
 
     ArmedTimedValue& operator+=(float tick)
@@ -362,14 +362,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
 private:
-    ArmedTimedValue rpmLight;
-    ArmedTimedValue rpmHeavy;
     bool LeftGun = true;
     UClass *projectileLight;
     UClass *projectileHeavy;
+
     FVector GunOffsetLeft;
     FVector GunOffsetRight;
     FVector GunOffsetTop;
+    FVector GunOffsetTopLeft;
+    FVector GunOffsetTopRight;
 
     UPrimitiveComponent* Body;
     USoundWave* JumpSound = nullptr;

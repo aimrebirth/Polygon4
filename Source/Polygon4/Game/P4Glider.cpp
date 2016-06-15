@@ -19,6 +19,8 @@
 #include "Polygon4.h"
 #include "P4Glider.h"
 
+#include <Polygon4/ConfigurationWeapon.h>
+
 #include "Projectile.h"
 
 #include "GliderMovement.h"
@@ -126,6 +128,8 @@ AP4Glider::AP4Glider()
     GunOffsetLeft = FVector(150.0f, -100.0f, 0.0f);
     GunOffsetRight = FVector(150.0f, 100.0f, 0.0f);
     GunOffsetTop = FVector(150.0f, 0.0f, 100.0f);
+    GunOffsetTopLeft = FVector(150.0f, -100.0f, 100.0f);
+    GunOffsetTopRight = FVector(150.0f, 1000.0f, 100.0f);
 
     static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
     if (light.Object)
@@ -135,8 +139,6 @@ AP4Glider::AP4Glider()
         projectileHeavy = heavy.Object;
 
     JumpTimeout = ArmedTimedValue(1.5);
-    rpmLight = ArmedTimedValue(0.1f);
-    rpmHeavy = ArmedTimedValue(1.5f);
     SlopeAngle = FloatDampingValue(50);
     EnergyShieldTimer = FloatFadedValue(2);
 }
@@ -199,8 +201,6 @@ void AP4Glider::Tick(float DeltaSeconds)
 
     // timers
     JumpTimeout += DeltaSeconds;
-    rpmLight += DeltaSeconds;
-    rpmHeavy += DeltaSeconds;
     EnergyShieldTimer += DeltaSeconds;
 
     // send this glider to HUD for update screen values
@@ -318,11 +318,14 @@ void AP4Glider::Tick(float DeltaSeconds)
     }
 
     // weapons
-    if (1)
-    {
-        float rpm1 = 60.f / 400.0f;
-        float rpm2 = 60.f / 60.0f;
+    auto c = Mechanoid->getConfiguration();
 
+    // weapon timers
+    for (auto &w : c->weapons)
+        w->addTime(DeltaSeconds);
+
+    if (!c->weapons.empty() && (FireLight || FireHeavy))
+    {
         FRotator SpawnRotation = rot;
         if (PlayerController)
         {
@@ -333,30 +336,39 @@ void AP4Glider::Tick(float DeltaSeconds)
         }
         SpawnRotation.Roll = 0;
 
-        const FVector SpawnLocationLeft = loc +SpawnRotation.RotateVector(GunOffsetLeft);
+        const FVector SpawnLocationLeft = loc + SpawnRotation.RotateVector(GunOffsetLeft);
         const FVector SpawnLocationRight = loc + SpawnRotation.RotateVector(GunOffsetRight);
         const FVector SpawnLocationTop = loc + SpawnRotation.RotateVector(GunOffsetTop);
+        const FVector SpawnLocationTopLeft = loc + SpawnRotation.RotateVector(GunOffsetTopLeft);
+        const FVector SpawnLocationTopRight = loc + SpawnRotation.RotateVector(GunOffsetTopRight);
 
-        AProjectile *p = nullptr;
-        if (FireLight && projectileLight && rpmLight)
+        for (auto &w : c->weapons)
         {
-            auto &loc = LeftGun ? SpawnLocationLeft : SpawnLocationRight;
-            p = (AProjectile *)GetWorld()->SpawnActor(projectileLight, &loc, &SpawnRotation);
-            LeftGun = !LeftGun;
-            //WeaponAudioComponent->Sound = LightSound;
-            //WeaponAudioComponent->Play();
-            UGameplayStatics::PlaySoundAtLocation(this, LightSound, loc);
-        }
-        if (FireHeavy && projectileHeavy && rpmHeavy)
-        {
-            p = (AProjectile *)GetWorld()->SpawnActor(projectileHeavy, &SpawnLocationTop, &SpawnRotation);
-            //WeaponAudioComponent->Sound = HeavySound;
-            //WeaponAudioComponent->Play();
-            UGameplayStatics::PlaySoundAtLocation(this, HeavySound, SpawnLocationTop);
-        }
-        if (p)
-        {
-            p->SetOwner(this);
+            if (w->weapon->type == polygon4::detail::WeaponType::BombLauncher ||
+                w->weapon->type == polygon4::detail::WeaponType::RocketLauncher)
+                continue;
+
+            AProjectile *p = nullptr;
+            if (FireLight && projectileLight &&
+                w->weapon->type == polygon4::detail::WeaponType::Light &&
+                w->shoot())
+            {
+                auto &loc = LeftGun ? SpawnLocationLeft : SpawnLocationRight;
+                p = (AProjectile *)GetWorld()->SpawnActor(projectileLight, &loc, &SpawnRotation);
+                LeftGun = !LeftGun;
+                UGameplayStatics::PlaySoundAtLocation(this, LightSound, loc);
+            }
+            else if (FireHeavy && projectileHeavy &&
+                w->weapon->type == polygon4::detail::WeaponType::Heavy &&
+                w->shoot())
+            {
+                p = (AProjectile *)GetWorld()->SpawnActor(projectileHeavy, &SpawnLocationTop, &SpawnRotation);
+                UGameplayStatics::PlaySoundAtLocation(this, HeavySound, SpawnLocationTop);
+            }
+            if (p)
+            {
+                p->SetOwner(this);
+            }
         }
     }
 

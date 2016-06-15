@@ -113,8 +113,18 @@ public class Polygon4 : ModuleRules
     bool RemoveLogs(string dst)
     {
         bool removed = true;
+
+        string log_info = dst + ".log.info";
+        try
+        {
+            File.Delete(log_info);
+        }
+        catch (System.Exception)
+        {
+            removed = false;
+        }
+
         string log_debug = dst + ".log.debug";
-        string log_trace = dst + ".log.trace";
         try
         {
             File.Delete(log_debug);
@@ -123,6 +133,8 @@ public class Polygon4 : ModuleRules
         {
             removed = false;
         }
+
+        string log_trace = dst + ".log.trace";
         try
         {
             File.Delete(log_trace);
@@ -131,6 +143,7 @@ public class Polygon4 : ModuleRules
         {
             removed = false;
         }
+
         return removed;
     }
 

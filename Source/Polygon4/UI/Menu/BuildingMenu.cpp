@@ -71,9 +71,9 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
     auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
     FSlateBrush *BackgroundBrush;
-    /*if (BackgroundTexture)
-        BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
-    else*/
+    //if (BackgroundTexture)
+    //    BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
+    //else
         BackgroundBrush = new FSlateColorBrush(FColor::Black);
 
     LeftMenuButtons.resize(polygon4::bbMax);
@@ -552,6 +552,13 @@ FReply SBuildingMenu::OnSave()
 
 FReply SBuildingMenu::OnExit()
 {
+    if (GET_SETTINGS().flags[polygon4::gfReplenishEnergyOnBuildingExit])
+    {
+        auto c = mechanoid->getConfiguration();
+        c->energy = c->getMaxEnergy();
+        c->energy_shield = c->getMaxEnergyShield();
+    }
+
     OnBack();
     GP4Engine()->HideBuildingMenu();
     GP4Engine()->spawnCurrentPlayer();

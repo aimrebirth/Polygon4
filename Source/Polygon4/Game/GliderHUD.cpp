@@ -85,13 +85,13 @@ void AGliderHUD::DrawHUD()
         auto m = Glider->GetMechanoid();
         auto c = m->getConfiguration();
 
-        EnergyBar->SetMaxValue(1000);
-        EnergyShieldBar->SetMaxValue(100);
+        EnergyBar->SetMaxValue(c->getMaxEnergy());
+        EnergyShieldBar->SetMaxValue(c->getMaxEnergyShield());
         ArmorBar->SetMaxValue(c->getMaxArmor());
 
-        EnergyBar->SetCurrentValue(c->energy);
-        EnergyShieldBar->SetCurrentValue(c->energy_shield);
-        ArmorBar->SetCurrentValue(c->armor);
+        EnergyBar->SetCurrentValue(c->getCurrentEnergy());
+        EnergyShieldBar->SetCurrentValue(c->getCurrentEnergyShield());
+        ArmorBar->SetCurrentValue(c->getCurrentArmor());
     }
 
     // draw only once
