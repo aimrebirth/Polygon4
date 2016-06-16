@@ -19,6 +19,8 @@
 #include "Polygon4.h"
 #include "Projectile.h"
 
+#include "P4Glider.h"
+
 AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -59,6 +61,22 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	{
         if (OtherComp->IsSimulatingPhysics())
 		    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());
+        if (auto Glider = Cast<AP4Glider>(OtherActor))
+        {
+            if (auto m = Glider->GetMechanoid())
+            {
+                m->configuration->hit(Projectile);
+                if (m->configuration->isDead())
+                {
+                    Glider->Destroy();
+                    // TODO: spawn mechanoid here, show explosion etc.
+                }
+                else
+                {
+                    Glider->FireLightOn(); // for tests
+                }
+            }
+        }
     }
     if (OtherActor != this)
         Destroy();

@@ -33,6 +33,7 @@
 #include <UI/Menu/BuildingMenu.h>
 #include <UI/Menu/PauseMenu.h>
 
+#include <Polygon4/Configuration.h>
 #include <Polygon4/ConfigurationWeapon.h>
 #include <Polygon4/Glider.h>
 
@@ -98,6 +99,7 @@ void P4Engine::initChildren()
     REPLACE(mapObjects, P4MapObject);
     REPLACE(mapBuildings, P4MapBuilding);
     REPLACE(gliders, polygon4::Glider);
+    REPLACE(configurations, polygon4::Configuration);
     REPLACE(configurationWeapons, polygon4::ConfigurationWeapon);
 }
 

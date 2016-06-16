@@ -359,7 +359,14 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
+
+    void BoostOn() { boost = true; }
+    void BoostOff() { boost = false; }
+    void FireLightOn() { FireLight = true; }
+    void FireLightOff() { FireLight = false; }
+    void FireHeavyOn() { FireHeavy = true; }
+    void FireHeavyOff() { FireHeavy = false; }
 
 private:
     bool LeftGun = true;
@@ -401,13 +408,6 @@ private:
     bool boost = false;
     bool FireLight = false;
     bool FireHeavy = false;
-
-    void BoostOn() { boost = true; }
-    void BoostOff() { boost = false; }
-    void FireLightOn() { FireLight = true; }
-    void FireLightOff() { FireLight = false; }
-    void FireHeavyOn() { FireHeavy = true; }
-    void FireHeavyOff() { FireHeavy = false; }
 
     float Lifetime = 0.0f;
 
