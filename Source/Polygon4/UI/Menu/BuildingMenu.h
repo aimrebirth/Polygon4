@@ -29,6 +29,7 @@ namespace polygon4 {
 }
 
 class InfoTreeView;
+class SBar;
 
 class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
 {
@@ -59,6 +60,8 @@ private:
     TSharedPtr<STextBlock> MoneyTB;
     TSharedPtr<STextBlock> RatingTB;
     TSharedPtr<STextBlock> MassTB;
+    TSharedPtr<SBar> RatingBar;
+    TSharedPtr<SBar> MassBar;
 
     TSharedPtr<SVerticalBox> ButtonsVB;
 
@@ -94,6 +97,7 @@ private:
     FReply OnSaveDelete();
 
     SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
+    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const;
 
     void OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &map);
     FSlateWidgetRun::FWidgetRunInfo EditWidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const;

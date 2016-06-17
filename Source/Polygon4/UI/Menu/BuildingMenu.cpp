@@ -28,6 +28,7 @@
 
 #include <Game/P4Engine.h>
 #include <UI/Colors.h>
+#include <UI/Game/SBar.h>
 
 #define LOCTEXT_NAMESPACE "BuildingMenu"
 
@@ -39,7 +40,13 @@ void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
     if (!IdString || !NameString)
         return;
     if (*IdString == TEXT("script"))
-        scriptCallback(polygon4::String(*NameString).toString());
+    {
+        polygon4::ScriptParameters params;
+        int n = 1;
+        while (const FString* const ParamString = Map.Find((L"param" + std::to_wstring(n++)).c_str()))
+            params.push_back(*ParamString);
+        scriptCallback(polygon4::String(*NameString).toString(), params);
+    }
     else
         addTheme(*NameString);
 
@@ -114,6 +121,18 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
     // widgets
     TextDecorators.Add(SRichTextBlock::WidgetDecorator("edit", this, &SBuildingMenu::EditWidgetDecorator));
+
+    SAssignNew(RatingBar, SBar)
+        .Max(100)
+        .Current(100)
+        .Text(FText::FromString("Rating"))
+        .Color(FLinearColor::Blue * 0.65f)
+        ;
+    SAssignNew(MassBar, SBar)
+        .Max(100)
+        .Current(100)
+        .Text(FText::FromString("Mass"))
+        .Color(FLinearColor::Green * 0.65f);
 
     ChildSlot
         .HAlign(HAlign_Fill)
@@ -349,8 +368,8 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                         [
                             SNew(SVerticalBox)
                             + BottomText(LOCTEXT("MoneyLabel", "Money: "), MoneyTB)
-                            + BottomText(LOCTEXT("RatingLabel", "Rating: "), RatingTB)
-                            + BottomText(LOCTEXT("MassLabel", "Mass: "), MassTB)
+                            + BottomText(LOCTEXT("RatingLabel", "Rating: "), RatingTB, RatingBar)
+                            + BottomText(LOCTEXT("MassLabel", "Mass: "), MassTB, MassBar)
                         ]
                     ]
                 ]
@@ -490,6 +509,51 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock
         ];
 }
 
+SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const
+{
+    return
+        SVerticalBox::Slot()
+        [
+            SNew(SHorizontalBox)
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Center)
+            .AutoWidth()
+            [
+				SNew(STextBlock)
+				.ShadowColorAndOpacity(FLinearColor::Black)
+				.ColorAndOpacity(FLinearColor::White)
+				.ShadowOffset(FIntPoint(-1, 1))
+				.Font(FSlateFontInfo("Verdana", 18))
+				.Text(Name)
+            ]
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Center)
+            .AutoWidth()
+            [
+				SAssignNew(Var, STextBlock)
+				.ShadowColorAndOpacity(FLinearColor::Black)
+				.ColorAndOpacity(FLinearColor::White)
+				.ShadowOffset(FIntPoint(-1, 1))
+				.Font(FSlateFontInfo("Verdana", 18))
+            ]
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Right)
+            .VAlign(VAlign_Center)
+            .Padding(10, 0, 0, 0)
+            //.AutoWidth()
+            [
+                SNew(SBox)
+                .WidthOverride(500)
+                .HeightOverride(25)
+                [
+                    Bar.ToSharedRef()
+                ]
+            ]
+        ];
+}
+
 void SBuildingMenu::refresh()
 {
     if (building)
@@ -511,11 +575,17 @@ void SBuildingMenu::refresh()
         rat = rat + "/" + caps + " (Level: " + std::to_string(level) + ")";
         RatingTB->SetText(FString(rat.c_str()));
 
+        RatingBar->SetMaxValue(cap);
+        RatingBar->SetCurrentValue((int)mechanoid->rating);
+
         auto conf = mechanoid->getConfiguration();
         auto m = std::to_string((int)conf->getMass());
         auto c = std::to_string((int)conf->getCapacity());
         m = m + "/" + c;
         MassTB->SetText(FString(m.c_str()));
+
+        MassBar->SetMaxValue((int)conf->getCapacity());
+        MassBar->SetCurrentValue((int)conf->getMass());
     }
 
     update();

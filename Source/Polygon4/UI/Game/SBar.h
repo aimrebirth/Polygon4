@@ -31,7 +31,7 @@ private:
         SLATE_ARGUMENT(value_type, Max)
         SLATE_ARGUMENT(value_type, Current)
         SLATE_ARGUMENT(FText, Text)
-        SLATE_ARGUMENT(FLinearColor, Color)            
+        SLATE_ARGUMENT(FLinearColor, Color)
     SLATE_END_ARGS()
 
 public:

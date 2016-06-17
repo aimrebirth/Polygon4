@@ -69,23 +69,31 @@ AP4Glider::AP4Glider()
 
     static ConstructorHelpers::FObjectFinder<USoundWave> JumpSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
     if (JumpSoundAsset.Succeeded())
+    {
         JumpSound = JumpSoundAsset.Object;
-    JumpSound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationJump"));
+        JumpSound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationJump"));
+    }
 
     static ConstructorHelpers::FObjectFinder<USoundWave> EngineSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/engine.engine'"));
     if (EngineSoundAsset.Succeeded())
+    {
         EngineSound = EngineSoundAsset.Object;
-    EngineSound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationEngine"));
+        EngineSound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationEngine"));
+    }
 
     static ConstructorHelpers::FObjectFinder<USoundWave> LightSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Weapon/light.light'"));
     if (LightSoundAsset.Succeeded())
+    {
         LightSound = LightSoundAsset.Object;
-    LightSound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationLight"));
+        LightSound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationLight"));
+    }
 
     static ConstructorHelpers::FObjectFinder<USoundWave> HeavySoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Weapon/heavy.heavy'"));
     if (HeavySoundAsset.Succeeded())
+    {
         HeavySound = HeavySoundAsset.Object;
-    HeavySound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationHeavy"));
+        HeavySound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationHeavy"));
+    }
 
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
     FirstPersonCameraComponent->SetupAttachment(RootComponent);
@@ -324,14 +332,10 @@ void AP4Glider::Tick(float DeltaSeconds)
         }
     }
 
-    // weapons
     auto c = Mechanoid->getConfiguration();
     c->tick(DeltaSeconds); // tick: update equipment etc.
 
-    // weapon timers
-    for (auto &w : c->weapons)
-        w->addTime(DeltaSeconds);
-
+    // weapons
     if (!c->weapons.empty() && (FireLight || FireHeavy))
     {
         FRotator SpawnRotation = rot;

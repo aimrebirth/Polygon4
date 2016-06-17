@@ -118,7 +118,7 @@ void AGliderHUD::DrawHUD()
                 EnergyBar.ToSharedRef()
             ]
         ]
-    + SVerticalBox::Slot()
+        + SVerticalBox::Slot()
         .HAlign(HAlign_Left)
         .VAlign(VAlign_Top)
         .AutoHeight()
@@ -131,7 +131,7 @@ void AGliderHUD::DrawHUD()
                 EnergyShieldBar.ToSharedRef()
             ]
         ]
-    + SVerticalBox::Slot()
+        + SVerticalBox::Slot()
         .HAlign(HAlign_Left)
         .VAlign(VAlign_Top)
         .AutoHeight()

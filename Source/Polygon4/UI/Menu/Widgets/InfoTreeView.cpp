@@ -113,7 +113,7 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
                 T = s.toFText();
             }
             Color = FSlateColor(P4_COLOR_YELLOW);
-            if (r->type == JournalRecordType::Completed)
+            if (r->type == QuestRecordType::Completed)
                 Color = FSlateColor(P4_COLOR_GRAY);
             break;
         }
