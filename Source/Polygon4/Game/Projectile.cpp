@@ -59,8 +59,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
         OtherActor != Owner &&
         (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry()))
 	{
-        if (OtherComp->IsSimulatingPhysics())
-		    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());
+        //if (OtherComp->IsSimulatingPhysics())
+		//    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());
         if (auto Glider = Cast<AP4Glider>(OtherActor))
         {
             if (auto m = Glider->GetMechanoid())
