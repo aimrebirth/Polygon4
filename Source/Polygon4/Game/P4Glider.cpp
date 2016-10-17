@@ -341,10 +341,10 @@ void AP4Glider::Tick(float DeltaSeconds)
         FRotator SpawnRotation = rot;
         if (PlayerController)
         {
-            FVector loc;
-            FVector rot;
-            PlayerController->DeprojectMousePositionToWorld(loc, rot);
-            SpawnRotation = rot.Rotation();
+            FVector loc2;
+            FVector rot2;
+            PlayerController->DeprojectMousePositionToWorld(loc2, rot2);
+            SpawnRotation = rot2.Rotation();
         }
         SpawnRotation.Roll = 0;
 
@@ -365,10 +365,10 @@ void AP4Glider::Tick(float DeltaSeconds)
                 w->weapon->type == polygon4::detail::WeaponType::Light &&
                 w->shoot())
             {
-                auto &loc = LeftGun ? SpawnLocationLeft : SpawnLocationRight;
-                p = (AProjectile *)GetWorld()->SpawnActor(projectileLight, &loc, &SpawnRotation);
+                auto &loc2 = LeftGun ? SpawnLocationLeft : SpawnLocationRight;
+                p = (AProjectile *)GetWorld()->SpawnActor(projectileLight, &loc2, &SpawnRotation);
                 LeftGun = !LeftGun;
-                UGameplayStatics::PlaySoundAtLocation(this, LightSound, loc);
+                UGameplayStatics::PlaySoundAtLocation(this, LightSound, loc2);
             }
             else if (FireHeavy && projectileHeavy &&
                 w->weapon->type == polygon4::detail::WeaponType::Heavy &&
@@ -728,9 +728,9 @@ void AP4Glider::HideUI()
     HUD->SetVisible(!UIHidden);
 }
 
-void AP4Glider::SetMechanoid(polygon4::detail::Mechanoid* Mechanoid)
+void AP4Glider::SetMechanoid(polygon4::detail::Mechanoid* MechanoidIn)
 {
-    this->Mechanoid = Mechanoid;
+    Mechanoid = MechanoidIn;
     Configuration = Mechanoid->getConfiguration();
     Glider = Configuration->glider;
 }

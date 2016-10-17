@@ -186,8 +186,6 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
                 OrderedObjectMap m;
                 std::tie(set, m) = Item->Data->object->getOrderedObjectMap(var.getId(), Storage.get());
 
-                bool enabled = set ? !m.empty() : true;
-
                 cb_item_array_ptr Items = MakeShareable(new cb_item_array);
                 cb_item_type SelectedItem;
 

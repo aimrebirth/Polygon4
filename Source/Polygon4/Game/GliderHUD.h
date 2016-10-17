@@ -36,8 +36,8 @@ public:
 	virtual void DrawHUD() override;
 
     void SetMousePosition(FVector2D Position) { MousePosition = Position; }
-    void SetVisible(bool Visible) { this->Visible = Visible; }
-    void SetCurrentGlider(AP4Glider *Glider) { this->Glider = Glider; }
+    void SetVisible(bool VisibleIn) { Visible = VisibleIn; }
+    void SetCurrentGlider(AP4Glider *GliderIn) { Glider = GliderIn; }
 
 private:
     UTexture2D* CrosshairTex;

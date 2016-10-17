@@ -62,16 +62,16 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
     // Draw text on health bar
     FSlateFontInfo MyFont(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Regular.ttf"), 15);
 
-    const FText Text = FText::FromString(FString::Printf(TEXT("%s: %.0f / %.0f"), this->Text.ToString().GetCharArray().GetData(), Current, Max));
+    const FText TextNew = FText::FromString(FString::Printf(TEXT("%s: %.0f / %.0f"), Text.ToString().GetCharArray().GetData(), Current, Max));
     const TSharedRef< FSlateFontMeasure > FontMeasureService = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
-    FVector2D DrawSize = FontMeasureService->Measure(Text, MyFont);
+    FVector2D DrawSize = FontMeasureService->Measure(TextNew, MyFont);
     FVector2D Pos = WidgetSize / 2.0f - DrawSize / 2.0f;
 
     FSlateDrawElement::MakeText(
         OutDrawElements,
         LayerId,
         AllottedGeometry.ToPaintGeometry(Pos, DrawSize),
-        Text,
+        TextNew,
         MyFont,
         MyClippingRect,
         ESlateDrawEffect::None,

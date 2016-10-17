@@ -477,7 +477,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     ;
 }
 
-SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock> &Var) const
+SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var) const
 {
     return
         SVerticalBox::Slot()
@@ -493,7 +493,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
 				.Font(FSlateFontInfo("Verdana", 18))
-				.Text(Name)
+				.Text(NameIn)
             ]
             + SHorizontalBox::Slot()
             .HAlign(HAlign_Fill)
@@ -509,7 +509,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock
         ];
 }
 
-SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const
+SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const
 {
     return
         SVerticalBox::Slot()
@@ -525,7 +525,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText Name, TSharedPtr<STextBlock
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
 				.Font(FSlateFontInfo("Verdana", 18))
-				.Text(Name)
+				.Text(NameIn)
             ]
             + SHorizontalBox::Slot()
             .HAlign(HAlign_Left)

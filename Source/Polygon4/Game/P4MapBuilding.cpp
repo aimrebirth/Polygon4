@@ -107,8 +107,8 @@ bool P4MapBuilding::spawn()
             Building = World->SpawnActor<AP4Building>(AP4Building::StaticClass(), pos, rot);
             Building->MapBuilding = this;
             Building->SetStaticMesh(o);
-            FVector scale(building->scale, building->scale, building->scale);
-            Building->SetActorScale3D(scale);
+            FVector new_scale(building->scale, building->scale, building->scale);
+            Building->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Building->SetActorLabel(building->getName());
 #endif

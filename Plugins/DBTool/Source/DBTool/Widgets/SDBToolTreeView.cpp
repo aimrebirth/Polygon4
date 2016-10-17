@@ -20,12 +20,12 @@
 #include "SDBToolTreeView.h"
 #include "SDBToolTableView.h"
 
-TSharedPtr<TreeItem> TreeItem::AddChild(const SPtrP4TreeItem &P4Item)
+TSharedPtr<TreeItem> TreeItem::AddChild(const SPtrP4TreeItem &P4ItemIn)
 {
     TSharedPtr<TreeItem> Item = MakeShareable(new TreeItem());
-    Item->P4Item = P4Item;
+    Item->P4Item = P4ItemIn;
     Item->Parent = this;
-    Item->Build(P4Item.get());
+    Item->Build(P4ItemIn.get());
     Item->UpdateName();
     Children.Add(Item);
     return Item;
@@ -80,9 +80,9 @@ void SDBToolTreeView::Construct(const FArguments& InArgs)
     ParentType::Construct(args);
 }
 
-void SDBToolTreeView::Reset(SPtrP4TreeItem P4RootItem)
+void SDBToolTreeView::Reset(SPtrP4TreeItem P4RootItemIn)
 {
-    this->P4RootItem = P4RootItem;
+    P4RootItem = P4RootItemIn;
     RootItem = MakeShareable(new TreeItem());
     RootItem->Build(P4RootItem.get());
     TreeItemsSource = &RootItem->Children;

@@ -24,12 +24,12 @@
 
 #define LOCTEXT_NAMESPACE "InfoTreeView"
 
-TSharedPtr<InfoTreeItem> InfoTreeItem::AddChild(P4InfoTreeItem *P4Item)
+TSharedPtr<InfoTreeItem> InfoTreeItem::AddChild(P4InfoTreeItem *P4ItemIn)
 {
     TSharedPtr<InfoTreeItem> Item = MakeShareable(new InfoTreeItem());
-    Item->P4Item = P4Item;
+    Item->P4Item = P4ItemIn;
     Item->Parent = this;
-    Item->Build(P4Item);
+    Item->Build(P4ItemIn);
     Children.Add(Item);
     return Item;
 }
@@ -69,9 +69,9 @@ void InfoTreeView::Construct(const FArguments& InArgs)
     SetExpandedItems(RootItem->Children);
 }
 
-void InfoTreeView::Reset(P4InfoTreeItem *P4RootItem)
+void InfoTreeView::Reset(P4InfoTreeItem *P4RootItemIn)
 {
-    this->P4RootItem = P4RootItem;
+    P4RootItem = P4RootItemIn;
     RootItem = MakeShareable(new InfoTreeItem());
     RootItem->Build(P4RootItem);
     TreeItemsSource = &RootItem->Children;

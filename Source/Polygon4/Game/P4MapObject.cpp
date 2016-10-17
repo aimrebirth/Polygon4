@@ -80,8 +80,8 @@ bool P4MapObject::spawn()
             Object = World->SpawnActor<AP4Object>(AP4Object::StaticClass(), pos, rot);
             Object->MapObject = this;
             Object->SetStaticMesh(o);
-            FVector scale(object->scale, object->scale, object->scale);
-            Object->SetActorScale3D(scale);
+            FVector new_scale(object->scale, object->scale, object->scale);
+            Object->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Object->SetActorLabel(object->getName());
 #endif
