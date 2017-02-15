@@ -154,19 +154,25 @@ public class Polygon4 : ModuleRules
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
-        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
-        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "DataManager/include"));
-        PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "../../DataManager/include"));
-        if (Target.Platform == UnrealTargetPlatform.Win64 || Target.Platform == UnrealTargetPlatform.Win32)
+        Definitions.Add("SCHEMA_API=__declspec(dllimport)");
+        Definitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
+        Definitions.Add("P4_ENGINE_API=__declspec(dllimport)");
+
+        // idirs, libs
         {
-            if (Target.Platform == UnrealTargetPlatform.Win64)
-            {
-                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win64/gen_RelWithDebInfo/include"));
-            }
-            if (Target.Platform == UnrealTargetPlatform.Win32)
-            {
-                PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, "Engine/win32/gen_RelWithDebInfo/include"));
-            }
+            var includes_file = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "includes.txt"));
+            var includes = includes_file.Split(';');
+            foreach (var s in includes)
+                PublicIncludePaths.Add(s);
+            PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
+
+            //foreach (var s in PublicIncludePaths)
+            //    Console.WriteLine(s);
+
+            var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "data_manager.txt"));
+            var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema.txt"));
+            PublicAdditionalLibraries.Add(data_manager.Replace("Debug", "RelWithDebInfo"));
+            PublicAdditionalLibraries.Add(schema.Replace("Debug", "RelWithDebInfo"));
         }
 
         string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";

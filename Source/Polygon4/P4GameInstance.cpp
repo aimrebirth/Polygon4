@@ -27,6 +27,8 @@
 #include <Polygon4/Memory.h>
 POLYGON4_UNREAL_MEMORY_STUB
 
+#include <MinimalWindowsApi.h>
+
 static void HotpatchEngine()
 {
 #ifdef WIN32
@@ -35,7 +37,7 @@ static void HotpatchEngine()
     auto fgd = FPaths::ConvertRelativePathToFull(gd);
     FPaths::CollapseRelativeDirectories(fgd);
     auto dll = polygon4::prepare_module_for_hotload(*fgd, "Engine");
-    if (!dll.empty() && !LoadLibraryW(dll.c_str()))
+    if (!dll.empty() && !Windows::LoadLibraryW(dll.c_str()))
     {
         UE_LOG(LogTemp, Warning, TEXT("LoadLibrary(%s) is failed!"), dll.c_str());
     }
