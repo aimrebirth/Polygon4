@@ -104,8 +104,10 @@ bool P4MapBuilding::spawn()
         auto o = LoadObject<UStaticMesh>(0, building->resource);
         if (o)
         {
-            Building = World->SpawnActor<AP4Building>(AP4Building::StaticClass(), pos, rot);
+            Building = World->SpawnActorDeferred<AP4Building>(AP4Building::StaticClass(), {});
             Building->MapBuilding = this;
+            UGameplayStatics::FinishSpawningActor(Building, { rot, pos });
+
             Building->SetStaticMesh(o);
             FVector new_scale(building->scale, building->scale, building->scale);
             Building->SetActorScale3D(new_scale);
