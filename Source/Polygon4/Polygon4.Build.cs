@@ -169,17 +169,19 @@ public class Polygon4 : ModuleRules
             //foreach (var s in PublicIncludePaths)
             //    Console.WriteLine(s);
 
-            var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "data_manager.txt"));
-            var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema.txt"));
-            PublicAdditionalLibraries.Add(data_manager.Replace("Debug", "RelWithDebInfo"));
-            PublicAdditionalLibraries.Add(schema.Replace("Debug", "RelWithDebInfo"));
+            var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "data_manager_RelWithDebInfo.txt"));
+            var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema_RelWithDebInfo.txt"));
+            //PublicAdditionalLibraries.Add(data_manager);
+            //PublicAdditionalLibraries.Add(schema);
+
+            //PublicDelayLoadDLLs.Add(data_manager.Replace(".lib", ".dll").Replace("/lib", "/bin"));
+            //PublicDelayLoadDLLs.Add(schema.Replace(".lib", ".dll").Replace("/lib", "/bin"));
         }
 
-        string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "x64" : "x86";
-        string BaseDir = Path.Combine(ThirdPartyPath, Name, "lib");
+        string BaseDir = Path.Combine(ThirdPartyPath, Name, "win64", "bin", "RelWithDebInfo");
         BaseDir = Path.GetFullPath(BaseDir);
 
-        string base_name = Name + "." + PlatformString;
+        string base_name = Name;
         int base_name_id = 0;
 
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");

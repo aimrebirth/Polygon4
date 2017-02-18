@@ -78,7 +78,7 @@ bool UJoyPathFollowComp::NavPoly_GetAllPolys(TArray<NavNodeRef>& Polys)
     for (int32 v = 0; v < NavMesh->GetNavMeshTilesCount(); v++)
     {
 
-        //CHECK IS VALID FIRST OR WILL CRASH!!! 
+        //CHECK IS VALID FIRST OR WILL CRASH!!!
         //     256 entries but only few are valid!
         // use continue in case the valid polys are not stored sequentially
         if (!TileIsValid(NavMesh, v))

@@ -39,26 +39,26 @@
 
 #include <Game/GliderHUD.h>
 
-#define DEFINE_MENU(name) \
-TSharedPtr<S ## name ## Menu> P4Engine::Get ## name ## Menu() \
-{ \
-    return StaticCastSharedPtr<S ## name ## Menu>(GetMenu(MenuType:: ## name ## Menu)); \
-} \
-\
-void P4Engine::Show ## name ## Menu() \
-{ \
-    ShowMenu(MenuType:: ## name ## Menu); \
-} \
-\
-void P4Engine::Hide ## name ## Menu() \
-{ \
-    HideMenu(MenuType:: ## name ## Menu); \
-} \
-\
-void P4Engine::Set ## name ## MenuVisibility(bool Visibility) \
-{ \
-    SetMenuVisibility(MenuType:: ## name ## Menu, Visibility); \
-}
+#define DEFINE_MENU(name)                                                           \
+    TSharedPtr<S##name##Menu> P4Engine::Get##name##Menu()                           \
+    {                                                                               \
+        return StaticCastSharedPtr<S##name##Menu>(GetMenu(MenuType::##name##Menu)); \
+    }                                                                               \
+                                                                                    \
+    void P4Engine::Show##name##Menu()                                               \
+    {                                                                               \
+        ShowMenu(MenuType::##name##Menu);                                           \
+    }                                                                               \
+                                                                                    \
+    void P4Engine::Hide##name##Menu()                                               \
+    {                                                                               \
+        HideMenu(MenuType::##name##Menu);                                           \
+    }                                                                               \
+                                                                                    \
+    void P4Engine::Set##name##MenuVisibility(bool Visibility)                       \
+    {                                                                               \
+        SetMenuVisibility(MenuType::##name##Menu, Visibility);                      \
+    }
 
 P4Engine *GP4Engine(P4Engine *Engine)
 {

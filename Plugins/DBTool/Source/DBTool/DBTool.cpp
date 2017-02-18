@@ -6,6 +6,7 @@
 
 #include "Landscape.h"
 #include "LandscapeEdit.h"
+#include "LandscapeInfo.h"
 
 #include "SlateBasics.h"
 #include "SlateExtras.h"
