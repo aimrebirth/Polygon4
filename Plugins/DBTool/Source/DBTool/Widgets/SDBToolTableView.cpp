@@ -129,8 +129,10 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
 
     if (ColumnName == "Name")
     {
+        auto dn = var.getDisplayName();
+        auto s = polygon4::tr(dn);
         SAssignNew(Widget, STextBlock)
-            .Text(polygon4::tr(var.getDisplayName()).toFText())
+            .Text(s.toFText())
             ;
     }
     else if (ColumnName == "Type")

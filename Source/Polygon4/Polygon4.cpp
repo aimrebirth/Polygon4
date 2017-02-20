@@ -35,7 +35,7 @@ public:
             auto fn = polygon4::read_orig_module_filename_store();
             std::ofstream ofile(fn);
             if (ofile)
-                ofile << "Engine.x64.dll";
+                ofile << "Engine.dll";
         }
         {
             auto gd = FPaths::GameDir();

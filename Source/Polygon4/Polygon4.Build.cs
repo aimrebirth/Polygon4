@@ -171,11 +171,14 @@ public class Polygon4 : ModuleRules
 
             var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "data_manager_RelWithDebInfo.txt"));
             var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema_RelWithDebInfo.txt"));
-            //PublicAdditionalLibraries.Add(data_manager);
-            //PublicAdditionalLibraries.Add(schema);
+            PublicAdditionalLibraries.Add(data_manager);
+            PublicAdditionalLibraries.Add(schema);
 
-            //PublicDelayLoadDLLs.Add(data_manager.Replace(".lib", ".dll").Replace("/lib", "/bin"));
-            //PublicDelayLoadDLLs.Add(schema.Replace(".lib", ".dll").Replace("/lib", "/bin"));
+            //PublicDelayLoadDLLs.Add("k:/AIM/Polygon4/ThirdParty/Engine/win64/bin/RelWithDebInfo/loc.4b3e2adf.DataManager.data_manager-local.dll");
+            //PublicDelayLoadDLLs.Add("k:/AIM/Polygon4/ThirdParty/Engine/win64/bin/RelWithDebInfo/loc.4b3e2adf.DataManager.schema-local.dll");
+
+            //foreach (var s in PublicDelayLoadDLLs)
+            //    Console.WriteLine(s);
         }
 
         string BaseDir = Path.Combine(ThirdPartyPath, Name, "win64", "bin", "RelWithDebInfo");
@@ -185,7 +188,7 @@ public class Polygon4 : ModuleRules
         int base_name_id = 0;
 
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
-        PublicDelayLoadDLLs.Add(base_name + ".dll");
+        //PublicDelayLoadDLLs.Add(base_name + ".dll");
 
         string dst_base_name = Path.Combine(ModuleDirectory, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
         dst_base_name = Path.GetFullPath(dst_base_name);

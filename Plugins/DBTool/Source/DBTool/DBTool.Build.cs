@@ -88,8 +88,8 @@ public class DBTool : ModuleRules
 
             var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "data_manager_RelWithDebInfo.txt"));
             var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema_RelWithDebInfo.txt"));
-            //PublicAdditionalLibraries.Add(data_manager);
-            //PublicAdditionalLibraries.Add(schema);
+            PublicAdditionalLibraries.Add(data_manager);
+            PublicAdditionalLibraries.Add(schema);
 
             //PublicDelayLoadDLLs.Add(data_manager.Replace(".lib", ".dll").Replace("/lib", "/bin"));
             //PublicDelayLoadDLLs.Add(schema.Replace(".lib", ".dll").Replace("/lib", "/bin"));
@@ -100,6 +100,6 @@ public class DBTool : ModuleRules
         string base_name = Name;
 
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
-        PublicDelayLoadDLLs.Add(base_name + ".dll");
+        //PublicDelayLoadDLLs.Add(base_name + ".dll");
     }
 }

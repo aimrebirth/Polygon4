@@ -20,6 +20,7 @@
 
 #include "SlateBasics.h"
 
+#include <Polygon4/DataManager/TreeItem.h>
 #include <Polygon4/DataManager/Types.h>
 
 using P4TreeItem = polygon4::TreeItem;

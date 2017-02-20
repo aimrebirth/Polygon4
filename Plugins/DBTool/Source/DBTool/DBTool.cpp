@@ -21,7 +21,7 @@
 #include "Widgets/SDBToolTableView.h"
 
 #include <Polygon4/Memory.h>
-POLYGON4_UNREAL_MEMORY_STUB
+//POLYGON4_UNREAL_MEMORY_STUB
 
 #include <Polygon4/DataManager/Database.h>
 #include <Polygon4/DataManager/Schema.h>
