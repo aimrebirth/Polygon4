@@ -5,6 +5,7 @@
 *.sln
 /*.db
 /*.opendb
+/.vs
 
 # dirs
 Binaries

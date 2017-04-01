@@ -34,8 +34,8 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //	  Per Tick Modification of Path Following
-    //			this is how you really customize 
-    //				how units follow the path! 
+    //			this is how you really customize
+    //				how units follow the path!
 
     /** follow current path segment */
     //virtual void FollowPathSegment(float DeltaTime) override;

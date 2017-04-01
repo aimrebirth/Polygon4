@@ -23,6 +23,7 @@
 
 #include "Projectile.h"
 
+#include "BotController.h"
 #include "GliderMovement.h"
 #include "GliderHUD.h"
 
@@ -165,6 +166,9 @@ void AP4Glider::BeginPlay()
 
     Body->SetPhysicsMaxAngularVelocity(90);
     Body->SetMassOverrideInKg(NAME_None, 4000.0f);
+
+    if (!Mechanoid->isPlayer())
+        Controller = new ABotController;
 
     Super::BeginPlay();
 }
