@@ -25,7 +25,7 @@ UCLASS()
 class POLYGON4_API AMenuGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
 public:
     virtual void BeginPlay() override;
 };

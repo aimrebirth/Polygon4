@@ -31,7 +31,7 @@ void SMenuButton::Construct(const FArguments& InArgs)
             .ShadowColorAndOpacity(FLinearColor::Black)
             .ColorAndOpacity(FLinearColor::White)
             .ShadowOffset(FIntPoint(-1, 1))
-            .Font(FSlateFontInfo("Verdana", 40))
+            .Font(FSlateFontInfo(RobotoFont, 40))
             .Text(Text)
         ];
 }

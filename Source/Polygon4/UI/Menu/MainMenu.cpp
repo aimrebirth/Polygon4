@@ -32,6 +32,43 @@
 
 void SMainMenu::Construct(const FArguments& InArgs)
 {
+	// lang combobox
+	LanguageItems = MakeShareable(new cb_item_array);
+	cb_item_type SelectedItem;
+
+#define ADD_LANGUAGE(l, i)                                                                                        \
+    LanguageItems->Add(MakeShareable(new LanguageComboBoxItem{polygon4::tr(#l), polygon4::LocalizationType::l})); \
+    if (polygon4::LocalizationType::l == polygon4::getCurrentLocalizationId())                                    \
+        SelectedItem = LanguageItems->Last();
+#include <Polygon4/DataManager/Languages.inl>
+#undef ADD_LANGUAGE
+
+    LangWidget = SNew(cb_type)
+		.OptionsSource(LanguageItems.Get())
+		.InitiallySelectedItem(SelectedItem)
+		.OnSelectionChanged_Lambda([this]
+		(const cb_item_type &InItem, ESelectInfo::Type type)
+	{
+		polygon4::getCurrentLocalizationId(InItem->id);
+        CurrentLangItem->SetText(InItem->Text);
+	})
+		.OnGenerateWidget_Lambda([](const cb_item_type &InItem)
+	{
+		return
+			SNew(STextBlock)
+			.Text(InItem->Text)
+			.Font(FSlateFontInfo(RobotoFont, 20))
+            ;
+	})
+		.Content()
+		[
+			SAssignNew(CurrentLangItem, STextBlock)
+			.Text(SelectedItem->Text)
+			.Font(FSlateFontInfo(RobotoFont, 20))
+		]
+	;
+
+	//
     auto PlayerController = GWorld->GetFirstPlayerController();
     if (PlayerController)
     {
@@ -43,7 +80,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
         .ShadowColorAndOpacity(FLinearColor::Black)
         .ColorAndOpacity(FLinearColor::Red)
         .ShadowOffset(FIntPoint(-1, 1))
-        .Font(FSlateFontInfo("Verdana", 30));
+        .Font(FSlateFontInfo(RobotoFont, 30));
 
     FString Ver = LOCTEXT("VersionLabel", "Version").ToString();
     Ver += ": " + GetPolygon4Version();
@@ -65,7 +102,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Verdana", 100))
+				.Font(FSlateFontInfo(RobotoFont, 100))
 				.Text(FText::FromString("Polygon-4"))
 			]
             // Other
@@ -120,7 +157,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				            .ShadowColorAndOpacity(FLinearColor::Black)
 				            .ColorAndOpacity(FLinearColor::White)
 				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo("Verdana", 30))
+				            .Font(FSlateFontInfo(RobotoFont, 30))
 				            .Text(LOCTEXT("ModsLabel", "Available Mods"))
                         ]
                         // List View
@@ -145,7 +182,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
                                 .ShadowColorAndOpacity(FLinearColor::Black)
                                 .ColorAndOpacity(FLinearColor::White)
                                 .ShadowOffset(FIntPoint(-1, 1))
-                                .Font(FSlateFontInfo("Verdana", 40))
+                                .Font(FSlateFontInfo(RobotoFont, 40))
                                 .Text(LOCTEXT("ReloadModsButtonLabel", "Reload mod list"))
                             ]
                         ]
@@ -165,7 +202,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				            .ShadowColorAndOpacity(FLinearColor::Black)
 				            .ColorAndOpacity(FLinearColor::White)
 				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo("Verdana", 30))
+				            .Font(FSlateFontInfo(RobotoFont, 30))
 				            .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
                         ]
                         // List View
@@ -191,15 +228,49 @@ void SMainMenu::Construct(const FArguments& InArgs)
             // version
             + SVerticalBox::Slot()
             .VAlign(VAlign_Bottom)
-            .HAlign(HAlign_Right)
+            .HAlign(HAlign_Fill)
             .AutoHeight()
             [
-                SNew(STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::Green)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo("Verdana", 20))
-                .Text(Version)
+				SNew(SHorizontalBox)
+				// lang caption
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Left)
+				.AutoWidth()
+				.Padding(Padding)
+				[
+					SNew(STextBlock)
+					.ShadowColorAndOpacity(FLinearColor::Black)
+					.ColorAndOpacity(FLinearColor::Black)
+					.ShadowOffset(FIntPoint(-1, 1))
+					.Font(FSlateFontInfo(RobotoFont, 20))
+					.Text(LOCTEXT("LanguageLabel", "Language:"))
+				]
+				// lang selector
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Fill)
+				.AutoWidth()
+				[
+					LangWidget.ToSharedRef()
+				]
+				// space
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Fill)
+				// Left part of the screen (buttons)
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Right)
+				.AutoWidth()
+				[
+					SNew(STextBlock)
+					.ShadowColorAndOpacity(FLinearColor::Black)
+					.ColorAndOpacity(FLinearColor::Green)
+					.ShadowOffset(FIntPoint(-1, 1))
+					.Font(FSlateFontInfo(RobotoFont, 20))
+					.Text(Version)
+				]
             ]
 		];
 }

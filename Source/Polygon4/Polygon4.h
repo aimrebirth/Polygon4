@@ -25,6 +25,8 @@
 #define DUMMY_OBJECT TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'")
 #define DUMMY_BUILDING DUMMY_OBJECT
 
+extern UFont *RobotoFont;
+
 template <typename T>
 TSharedPtr<T> MakeTSharedPtr(const T &value)
 {
@@ -50,5 +52,14 @@ TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_con
 }
 
 UClass* LoadClass(const TCHAR* Name);
+
+template <typename ObjClass>
+FORCEINLINE ObjClass* LoadObjFromPath(const FName& Path)
+{
+    if (Path == NAME_None)
+        return NULL;
+
+    return Cast<ObjClass>(StaticLoadObject(ObjClass::StaticClass(), NULL, *Path.ToString()));
+}
 
 DECLARE_LOG_CATEGORY_EXTERN(Polygon4, Log, All);

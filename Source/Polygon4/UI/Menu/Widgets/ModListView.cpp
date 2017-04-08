@@ -132,7 +132,7 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
                 .ShadowColorAndOpacity(FLinearColor::Black)
                 .ColorAndOpacity(FLinearColor::White)
                 .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo("Verdana", 24))
+                .Font(FSlateFontInfo(RobotoFont, 24))
                 .Text(FText::FromString(ItemText))
                 .ColorAndOpacity(FSlateColor(FLinearColor(FColor(0, 0, 0, 255))))
                 ;

@@ -106,7 +106,7 @@ TSharedRef<ITableRow> SSavedGamesListView::OnGenerateWidgetForList( ListItem InI
                 .ShadowColorAndOpacity(FLinearColor::Black)
                 .ColorAndOpacity(FLinearColor::White)
                 .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo("Verdana", 24))
+                .Font(FSlateFontInfo(RobotoFont, 24))
                 .Text(ItemText)
                 ;
         }

@@ -53,6 +53,9 @@ void UP4GameInstance::Init()
     Engine = P4Engine::create<P4Engine>(FPaths::GameDir(), this);
 
     Super::Init();
+
+    // do some global loads
+    RobotoFont = LoadObjFromPath<UFont>(TEXT("/Engine/EngineFonts/Roboto"));
 }
 
 void UP4GameInstance::Shutdown()

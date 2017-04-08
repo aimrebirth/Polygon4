@@ -58,7 +58,7 @@ FSlateWidgetRun::FWidgetRunInfo SBuildingMenu::EditWidgetDecorator(const FTextRu
 {
     TSharedRef<SWidget> Widget = SNew(SEditableTextBox)
         .MinDesiredWidth(200)
-        .Font(FSlateFontInfo("Tahoma", 14))
+        .Font(FSlateFontInfo(RobotoFont, 14))
         .OnTextCommitted_Lambda([this](const FText &NewText, ETextCommit::Type Type)
     {
         if (!mechanoid->setName(NewText))
@@ -86,16 +86,16 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     LeftMenuButtons.resize(polygon4::bbMax);
 
     FTextBlockStyle FontStyle;
-    FontStyle.SetFont(FSlateFontInfo("Tahoma", 14));
+    FontStyle.SetFont(FSlateFontInfo(RobotoFont, 14));
     FontStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_WHITE));
 
     FTextBlockStyle HyperlinkTextStyle;
-    HyperlinkTextStyle.SetFont(FSlateFontInfo("Tahoma", 14));
+    HyperlinkTextStyle.SetFont(FSlateFontInfo(RobotoFont, 14));
     HyperlinkTextStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_BLUE));
     //HyperlinkStyle.SetHighlightColor(FLinearColor::White);
 
     FTextBlockStyle HyperlinkTextStyle2;
-    HyperlinkTextStyle2.SetFont(FSlateFontInfo("Tahoma", 14));
+    HyperlinkTextStyle2.SetFont(FSlateFontInfo(RobotoFont, 14));
     HyperlinkTextStyle2.SetColorAndOpacity(FLinearColor(P4_COLOR_RED));
 
     // set hyperlink styles
@@ -163,7 +163,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                             .HAlign(HAlign_Center)
                             [
                                 SAssignNew(Name, STextBlock)
-                                .Font(FSlateFontInfo("Tahoma", 14))
+                                .Font(FSlateFontInfo(RobotoFont, 14))
                                 .Text(FText::FromString(L"Building Name"))
                             ]
                         ]
@@ -388,7 +388,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 				        .ShadowColorAndOpacity(FLinearColor::Black)
 				        .ColorAndOpacity(FLinearColor::White)
 				        .ShadowOffset(FIntPoint(-1, 1))
-				        .Font(FSlateFontInfo("Verdana", 100))
+				        .Font(FSlateFontInfo(RobotoFont, 100))
 				        .Text(FText::FromString("Polygon-4"))
 			        ]
                     // Other
@@ -428,7 +428,7 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 				                    .ShadowColorAndOpacity(FLinearColor::Black)
 				                    .ColorAndOpacity(FLinearColor::White)
 				                    .ShadowOffset(FIntPoint(-1, 1))
-				                    .Font(FSlateFontInfo("Verdana", 30))
+				                    .Font(FSlateFontInfo(RobotoFont, 30))
 				                    .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
                                 ]
                                 // List View
@@ -458,14 +458,14 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                     [
                                         SNew(STextBlock)
                                         .Text(LOCTEXT("SaveNameLabel", "Save Name: "))
-                                        .Font(FSlateFontInfo("Verdana", 30))
+                                        .Font(FSlateFontInfo(RobotoFont, 30))
                                     ]
                                     + SHorizontalBox::Slot()
                                     .HAlign(HAlign_Fill)
                                     [
                                         SAssignNew(SaveNameTB, SEditableTextBox)
                                         .RevertTextOnEscape(true)
-                                        .Font(FSlateFontInfo("Verdana", 30))
+                                        .Font(FSlateFontInfo(RobotoFont, 30))
                                     ]
                                 ]
                             ]
@@ -492,7 +492,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlo
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Verdana", 18))
+				.Font(FSlateFontInfo(RobotoFont, 18))
 				.Text(NameIn)
             ]
             + SHorizontalBox::Slot()
@@ -504,7 +504,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlo
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Verdana", 18))
+				.Font(FSlateFontInfo(RobotoFont, 18))
             ]
         ];
 }
@@ -524,7 +524,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlo
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Verdana", 18))
+				.Font(FSlateFontInfo(RobotoFont, 18))
 				.Text(NameIn)
             ]
             + SHorizontalBox::Slot()
@@ -536,7 +536,7 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlo
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Verdana", 18))
+				.Font(FSlateFontInfo(RobotoFont, 18))
             ]
             + SHorizontalBox::Slot()
             .HAlign(HAlign_Right)

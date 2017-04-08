@@ -143,7 +143,7 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
         [
             SAssignNew(InItem->Widget, STextBlock)
             .Text(FT)
-            .Font(FSlateFontInfo("Tahoma", 16))
+            .Font(FSlateFontInfo(RobotoFont, 16))
             .ColorAndOpacity(Color)
         ];
 }

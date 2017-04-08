@@ -40,7 +40,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
         .ShadowColorAndOpacity(FLinearColor::Black)
         .ColorAndOpacity(FLinearColor::Red)
         .ShadowOffset(FIntPoint(-1, 1))
-        .Font(FSlateFontInfo("Verdana", 30));
+        .Font(FSlateFontInfo(RobotoFont, 30));
 
     // Create GUI
 	ChildSlot
@@ -58,7 +58,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
 				.ShadowColorAndOpacity(FLinearColor::Black)
 				.ColorAndOpacity(FLinearColor::White)
 				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo("Verdana", 100))
+				.Font(FSlateFontInfo(RobotoFont, 100))
 				.Text(FText::FromString("Polygon-4"))
 			]
             // Other
@@ -126,7 +126,7 @@ void SPauseMenu::Construct(const FArguments& InArgs)
 				            .ShadowColorAndOpacity(FLinearColor::Black)
 				            .ColorAndOpacity(FLinearColor::White)
 				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo("Verdana", 30))
+				            .Font(FSlateFontInfo(RobotoFont, 30))
 				            .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
                         ]
                         // List View
@@ -157,14 +157,14 @@ void SPauseMenu::Construct(const FArguments& InArgs)
                             [
                                 SNew(STextBlock)
                                 .Text(LOCTEXT("SaveNameLabel", "Save Name: "))
-                                .Font(FSlateFontInfo("Verdana", 30))
+                                .Font(FSlateFontInfo(RobotoFont, 30))
                             ]
                             + SHorizontalBox::Slot()
                             .HAlign(HAlign_Fill)
                             [
                                 SAssignNew(SaveNameTB, SEditableTextBox)
                                 .RevertTextOnEscape(true)
-                                .Font(FSlateFontInfo("Verdana", 30))
+                                .Font(FSlateFontInfo(RobotoFont, 30))
                             ]
                         ]
                     ]

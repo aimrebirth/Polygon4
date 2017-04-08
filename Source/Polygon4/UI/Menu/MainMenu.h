@@ -20,6 +20,19 @@
 
 #include "Menu.h"
 
+#include <Polygon4/DataManager/Localization.h>
+
+struct LanguageComboBoxItem
+{
+	FText Text;
+	polygon4::LocalizationType id = polygon4::LocalizationType::max;
+};
+
+using cb_item_type = TSharedPtr<LanguageComboBoxItem>;
+using cb_item_array = TArray<cb_item_type>;
+using cb_item_array_ptr = TSharedPtr<cb_item_array>;
+using cb_type = SComboBox<cb_item_type>;
+
 class SMainMenu : public SMenu
 {
 public:
@@ -49,6 +62,10 @@ public:
     void ReloadMods();
 
 private:
+	TSharedPtr<cb_type> LangWidget;
+	cb_item_array_ptr LanguageItems;
+    TSharedPtr<STextBlock> CurrentLangItem;
+
     template <typename F>
     SVerticalBox::FSlot& MainMenuButton(FText Text, F function) const;
 

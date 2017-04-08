@@ -22,6 +22,8 @@
 
 #include <Polygon4/Hotpatch.h>
 
+UFont *RobotoFont;
+
 class FPolygon4ModuleImpl : public FDefaultGameModuleImpl
 {
 public:
