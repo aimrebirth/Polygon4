@@ -15,4 +15,4 @@ if not defined ValueName (
 )
 
 set exe=%ValueValue%\Engine\Binaries\Win64\UE4Editor.exe
-start "" "%exe%" %cd%\Polygon4.uproject -ansimalloc
+start "" "%exe%" %cd%\Polygon4.uproject -ansimalloc %*
