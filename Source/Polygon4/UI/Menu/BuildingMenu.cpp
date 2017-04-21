@@ -70,11 +70,8 @@ FSlateWidgetRun::FWidgetRunInfo SBuildingMenu::EditWidgetDecorator(const FTextRu
 
 void SBuildingMenu::Construct(const FArguments& InArgs)
 {
-    auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController();
-    if (PlayerController)
-    {
+    if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
         PlayerController->bShowMouseCursor = true;
-    }
 
     auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
     FSlateBrush *BackgroundBrush;
@@ -605,11 +602,8 @@ void SBuildingMenu::OnShow()
 
 void SBuildingMenu::OnHide()
 {
-    auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController();
-    if (PlayerController)
-    {
+    if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
         PlayerController->bShowMouseCursor = false;
-    }
     GP4Engine()->SetPauseMenuBindings();
 }
 

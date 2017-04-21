@@ -60,9 +60,8 @@ void AGliderHUD::DrawHUD()
             WidgetsDrawn = false;
 
             auto Viewport = GetWorld()->GetGameViewport();
-            auto PlayerController = GetWorld()->GetFirstPlayerController();
-
-            Viewport->RemoveViewportWidgetForPlayer(PlayerController->GetLocalPlayer(), BarsWidget.ToSharedRef());
+            if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+                Viewport->RemoveViewportWidgetForPlayer(PlayerController->GetLocalPlayer(), BarsWidget.ToSharedRef());
         }
         return;
     }
@@ -100,49 +99,49 @@ void AGliderHUD::DrawHUD()
 
     WidgetsDrawn = true;
 
-    auto Viewport = GetWorld()->GetGameViewport();
-    auto PlayerController = GetWorld()->GetFirstPlayerController();
-
-    Viewport->AddViewportWidgetForPlayer(PlayerController->GetLocalPlayer(),
-        SAssignNew(BarsWidget, SVerticalBox)
-        + SVerticalBox::Slot()
-        .HAlign(HAlign_Left)
-        .VAlign(VAlign_Top)
-        .AutoHeight()
-        .Padding(30, 30, 10, 10)
-        [
-            SNew(SBox)
-            .WidthOverride(500)
-            .HeightOverride(40)
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+    {
+        GetWorld()->GetGameViewport()->AddViewportWidgetForPlayer(PlayerController->GetLocalPlayer(),
+            SAssignNew(BarsWidget, SVerticalBox)
+            + SVerticalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Top)
+            .AutoHeight()
+            .Padding(30, 30, 10, 10)
             [
-                EnergyBar.ToSharedRef()
+                SNew(SBox)
+                .WidthOverride(500)
+                .HeightOverride(40)
+                [
+                    EnergyBar.ToSharedRef()
+                ]
             ]
-        ]
-        + SVerticalBox::Slot()
-        .HAlign(HAlign_Left)
-        .VAlign(VAlign_Top)
-        .AutoHeight()
-        .Padding(30, 10, 10, 10)
-        [
-            SNew(SBox)
-            .WidthOverride(500)
-            .HeightOverride(40)
+            + SVerticalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Top)
+            .AutoHeight()
+            .Padding(30, 10, 10, 10)
             [
-                EnergyShieldBar.ToSharedRef()
+                SNew(SBox)
+                .WidthOverride(500)
+                .HeightOverride(40)
+                [
+                    EnergyShieldBar.ToSharedRef()
+                ]
             ]
-        ]
-        + SVerticalBox::Slot()
-        .HAlign(HAlign_Left)
-        .VAlign(VAlign_Top)
-        .AutoHeight()
-        .Padding(30, 10, 10, 10)
-        [
-            SNew(SBox)
-            .WidthOverride(500)
-            .HeightOverride(40)
+            + SVerticalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Top)
+            .AutoHeight()
+            .Padding(30, 10, 10, 10)
             [
-                ArmorBar.ToSharedRef()
-            ]
-        ], 0
-        );
+                SNew(SBox)
+                .WidthOverride(500)
+                .HeightOverride(40)
+                [
+                    ArmorBar.ToSharedRef()
+                ]
+            ], 0
+            );
+    }
 }

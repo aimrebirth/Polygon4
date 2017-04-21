@@ -71,7 +71,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
                     Glider->Destroy();
                     // TODO: spawn mechanoid here, show explosion etc.
                 }
-                else
+                else if (m->isPlayer())
                 {
                     Glider->FireLightOn(); // for tests
                 }

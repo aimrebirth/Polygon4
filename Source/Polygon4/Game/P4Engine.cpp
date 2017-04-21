@@ -174,7 +174,8 @@ void P4Engine::ShowMenu(MenuType Type)
     }
     m->SetVisibility(EVisibility::Visible);
     m->OnShow();
-    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+        PlayerController->bShowMouseCursor = true;
     FSlateApplication::Get().ReleaseMouseCapture();
 }
 
@@ -194,7 +195,8 @@ void P4Engine::HideMenu(MenuType Type)
             m->OnHide();
         }
     }
-    GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
+        PlayerController->bShowMouseCursor = false;
     FSlateApplication::Get().SetAllUserFocusToGameViewport();
 }
 
@@ -228,16 +230,13 @@ UWorld* P4Engine::GetWorld() const
 
 void P4Engine::Exit()
 {
-    auto world = GetWorld();
-    auto c = world->GetFirstPlayerController();
-    if (c)
+    if (auto c = GetWorld()->GetFirstPlayerController())
         c->ConsoleCommand("quit");
 }
 
 void P4Engine::SetPauseMenuBindings()
 {
-    auto PlayerController = GetWorld()->GetFirstPlayerController();
-    if (PlayerController)
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
     {
         auto PlayerInputComponent = PlayerController->InputComponent;
         if (PlayerInputComponent)
@@ -262,8 +261,7 @@ void P4Engine::SetPauseMenuBindings()
 
 void P4Engine::UnsetPauseMenuBindings() const
 {
-    auto PlayerController = GetWorld()->GetFirstPlayerController();
-    if (PlayerController)
+    if (auto PlayerController = GetWorld()->GetFirstPlayerController())
     {
         auto PlayerInputComponent = PlayerController->InputComponent;
         if (PlayerInputComponent)
@@ -308,7 +306,8 @@ void UDummyObject::ShowPauseMenuFromBinding()
 {
     GP4Engine()->paused = !GP4Engine()->paused;
 
-    GP4Engine()->GetWorld()->GetFirstPlayerController()->SetPause(GP4Engine()->paused);
+    if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
+        PlayerController->SetPause(GP4Engine()->paused);
 
     if (GP4Engine()->paused)
         GP4Engine()->ShowPauseMenu();

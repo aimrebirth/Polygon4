@@ -69,11 +69,8 @@ void SMainMenu::Construct(const FArguments& InArgs)
 	;
 
 	//
-    auto PlayerController = GWorld->GetFirstPlayerController();
-    if (PlayerController)
-    {
+    if (auto PlayerController = GWorld->GetFirstPlayerController())
         PlayerController->bShowMouseCursor = true;
-    }
 
     // create message line
     MessageLine = SNew(STextBlock)

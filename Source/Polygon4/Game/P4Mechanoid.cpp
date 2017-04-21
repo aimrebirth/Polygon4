@@ -46,11 +46,8 @@ bool P4Mechanoid::spawn()
 
     if (player)
     {
-        auto pc = GP4Engine()->GetWorld()->GetFirstPlayerController();
-        if (pc)
-        {
+        if (auto pc = GP4Engine()->GetWorld()->GetFirstPlayerController())
             pc->Possess(g);
-        }
     }
 
     return true;
