@@ -29,8 +29,9 @@ public class DBTool : ModuleRules
         get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../ThirdParty/")); }
     }
 
-    public DBTool(TargetInfo Target)
-	{
+    public DBTool(ReadOnlyTargetRules Target)
+        : base(Target)
+    {
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -69,7 +70,7 @@ public class DBTool : ModuleRules
         LoadCoreModule(Target, "Engine");
     }
 
-    public void LoadCoreModule(TargetInfo Target, string Name)
+    public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
     {
         Definitions.Add("SCHEMA_API=__declspec(dllimport)");
         Definitions.Add("DATA_MANAGER_API=__declspec(dllimport)");

@@ -31,7 +31,8 @@ public class Polygon4 : ModuleRules
 
     private static int NumberOfCalls = 0;
 
-	public Polygon4(TargetInfo Target)
+	public Polygon4(ReadOnlyTargetRules Target)
+        : base(Target)
 	{
 		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
@@ -147,7 +148,7 @@ public class Polygon4 : ModuleRules
         return removed;
     }
 
-    public void LoadCoreModule(TargetInfo Target, string Name)
+    public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
     {
         //System.Console.WriteLine("Enter LoadCoreModule");
 
