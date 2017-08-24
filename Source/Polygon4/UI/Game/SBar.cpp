@@ -39,7 +39,6 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
         LayerId,
         AllottedGeometry.ToPaintGeometry(),
         BrushResource,
-        MyClippingRect,
         ESlateDrawEffect::None,
         FLinearColor::Gray * 0.35f
         );
@@ -54,7 +53,6 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
         LayerId,
         AllottedGeometry.ToPaintGeometry(FVector2D::ZeroVector, FVector2D(HealthWidth, WidgetSize.Y)),
         BrushResource,
-        MyClippingRect,
         ESlateDrawEffect::None,
         Color
         );
@@ -73,7 +71,6 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
         AllottedGeometry.ToPaintGeometry(Pos, DrawSize),
         TextNew,
         MyFont,
-        MyClippingRect,
         ESlateDrawEffect::None,
         FLinearColor::White
         );

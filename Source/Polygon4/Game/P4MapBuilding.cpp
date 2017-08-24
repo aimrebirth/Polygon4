@@ -128,5 +128,6 @@ bool P4MapBuilding::spawn()
 
 void P4MapBuilding::initModificationMapBuilding()
 {
-    Building->InitModificationMapBuilding(modificationMapBuilding);
+    if (Building)
+        Building->InitModificationMapBuilding(modificationMapBuilding);
 }
