@@ -34,7 +34,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
 {
 	// lang combobox
 	LanguageItems = MakeShareable(new cb_item_array);
-	cb_item_type SelectedItem;
+    cb_item_type SelectedItem;
 
 #define ADD_LANGUAGE(l, i)                                                                                        \
     LanguageItems->Add(MakeShareable(new LanguageComboBoxItem{polygon4::tr(#l), polygon4::LocalizationType::l})); \

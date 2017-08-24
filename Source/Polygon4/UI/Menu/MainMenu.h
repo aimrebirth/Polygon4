@@ -25,7 +25,7 @@
 struct LanguageComboBoxItem
 {
 	FText Text;
-	polygon4::LocalizationType id = polygon4::LocalizationType::max;
+	polygon4::LocalizationType id;
 };
 
 using cb_item_type = TSharedPtr<LanguageComboBoxItem>;
