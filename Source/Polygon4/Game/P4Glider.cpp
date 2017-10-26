@@ -164,7 +164,7 @@ void AP4Glider::BeginPlay()
     SpringArm->bInheritPitch = false;
     SpringArm->bInheritYaw = true;
 
-    Body->SetPhysicsMaxAngularVelocity(90);
+    Body->SetPhysicsMaxAngularVelocityInDegrees(90);
     Body->SetMassOverrideInKg(NAME_None, 4000.0f);
 
     //if (!Mechanoid->isPlayer())
@@ -519,7 +519,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 int sign;
 
                 // left/right
-                Body->AddTorque(Position.X * GetActorUpVector() * 10000 * Body->GetMass());
+                Body->AddTorqueInRadians(Position.X * GetActorUpVector() * 10000 * Body->GetMass());
 
                 // top/bottom
                 float YawAngle = CalcAngle(FVector::UpVector, GetActorForwardVector());
@@ -532,11 +532,11 @@ void AP4Glider::Tick(float DeltaSeconds)
                 // auto torque
                 if (0);
                 else if (diff > 50)
-                    Body->AddTorque(sign * RightVector * (sign ? 50000 : 20000) * Body->GetMass());
+                    Body->AddTorqueInRadians(sign * RightVector * (sign ? 50000 : 20000) * Body->GetMass());
                 else if (diff > 25)
-                    Body->AddTorque(sign * RightVector * (sign ? 5000 : 3000) * Body->GetMass());
+                    Body->AddTorqueInRadians(sign * RightVector * (sign ? 5000 : 3000) * Body->GetMass());
                 // control torque
-                Body->AddTorque(Position.Y * RightVector * 6000 * Body->GetMass());
+                Body->AddTorqueInRadians(Position.Y * RightVector * 6000 * Body->GetMass());
 
                 // do not roll
                 float RollAngle = CalcAngle(Torque, GetActorRightVector());
@@ -547,20 +547,20 @@ void AP4Glider::Tick(float DeltaSeconds)
                 diff = fabs(diff);
                 if (0);
                 else if (diff > 50)
-                    Body->AddTorque(sign * GetActorForwardVector() * 20000 * Body->GetMass());
+                    Body->AddTorqueInRadians(sign * GetActorForwardVector() * 20000 * Body->GetMass());
                 else if (diff > 20)
-                    Body->AddTorque(sign * GetActorForwardVector() * 10000 * Body->GetMass());
+                    Body->AddTorqueInRadians(sign * GetActorForwardVector() * 10000 * Body->GetMass());
                 else if (diff > 10)
-                    Body->AddTorque(sign * GetActorForwardVector() * 5000 * Body->GetMass());
+                    Body->AddTorqueInRadians(sign * GetActorForwardVector() * 5000 * Body->GetMass());
                 else
-                    Body->AddTorque(sign * GetActorForwardVector() * 500 * Body->GetMass());
+                    Body->AddTorqueInRadians(sign * GetActorForwardVector() * 500 * Body->GetMass());
             }
         }
         else
         {
             Torque = Torque ^ -GetActorUpVector();
             Torque *= 10000;
-            Body->AddTorque(Torque * Body->GetMass());
+            Body->AddTorqueInRadians(Torque * Body->GetMass());
         }
     }
 

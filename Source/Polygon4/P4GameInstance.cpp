@@ -33,7 +33,7 @@ static void HotpatchEngine()
 {
 #ifdef WIN32
     UE_LOG(LogTemp, Warning, TEXT("UP4GameInstance::HotpatchEngine()"));
-    auto gd = FPaths::GameDir();
+    auto gd = FPaths::ProjectDir();
     auto fgd = FPaths::ConvertRelativePathToFull(gd);
     FPaths::CollapseRelativeDirectories(fgd);
     auto dll = polygon4::prepare_module_for_hotload(*fgd, "Engine");
@@ -50,7 +50,7 @@ void UP4GameInstance::Init()
     HotpatchEngine();
 #endif
 
-    Engine = P4Engine::create<P4Engine>(FPaths::GameDir(), this);
+    Engine = P4Engine::create<P4Engine>(FPaths::ProjectDir(), this);
 
     Super::Init();
 
