@@ -40,7 +40,7 @@ public:
                 ofile << "Engine.dll";
         }
         {
-            auto gd = FPaths::GameDir();
+            auto gd = FPaths::ProjectDir();
             auto fgd = FPaths::ConvertRelativePathToFull(gd);
             FPaths::CollapseRelativeDirectories(fgd);
             polygon4::write_module_last_write_time(*fgd, "Engine");
