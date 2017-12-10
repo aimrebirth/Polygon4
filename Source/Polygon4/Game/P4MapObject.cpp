@@ -23,7 +23,7 @@
 
 AP4Object::AP4Object()
 {
-	PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = false;
 
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
@@ -85,6 +85,7 @@ bool P4MapObject::spawn()
             FVector new_scale(object->scale, object->scale, object->scale);
             Object->SetActorScale3D(new_scale);
 #if WITH_EDITOR
+            Object->SetFolderPath("Objects");
             Object->SetActorLabel(object->getName());
 #endif
             return true;
@@ -94,6 +95,7 @@ bool P4MapObject::spawn()
     auto c = LoadClass(0);
     auto a = World->SpawnActor<AActor>(c, pos, rot);
 #if WITH_EDITOR
+    a->SetFolderPath("Objects");
     a->SetActorLabel(object->getName());
 #endif
     return true;

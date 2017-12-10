@@ -24,6 +24,8 @@
 
 #include "P4Glider.h"
 
+#include <string>
+
 P4Mechanoid::P4Mechanoid(const polygon4::detail::Mechanoid &rhs)
     : Base(rhs)
 {
@@ -55,39 +57,110 @@ bool P4Mechanoid::spawn()
 
 AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
 {
-    FString resource = M->getConfiguration()->glider->resource;
-    auto c = StaticLoadClass(AP4Glider::StaticClass(), nullptr, resource.GetCharArray().GetData());
-    if (!c)
-    {
-        auto name = FPaths::GetCleanFilename(resource);
-        resource = "Class'" + resource + "." + name + "_C'";
-        c = StaticLoadClass(AP4Glider::StaticClass(), nullptr, resource.GetCharArray().GetData());
-    }
-    if (!c)
-        return nullptr;
+    FTransform tr{
+        { M->pitch, M->yaw, M->roll },
+        { M->x, M->y, M->z }
+    };
 
-    FVector loc{ M->x, M->y, M->z };
-    FRotator rot{ M->pitch, M->yaw, M->roll };
-    FVector scale(M->getConfiguration()->glider->scale, M->getConfiguration()->glider->scale, M->getConfiguration()->glider->scale);
-    auto g = W->SpawnActor<AP4Glider>(c, loc, rot);
-    if (!g)
+    auto conf = M->getConfiguration();
+    auto glider = conf->glider;
+
+    FString resource = glider->resource;
+    if (resource.IsEmpty())
     {
-        // place is busy
-        auto z0 = loc.Z;
-        auto z1 = z0 + 10000;
-        while (!g && loc.Z < z1)
-        {
-            loc.Z += 250;
-            g = W->SpawnActor<AP4Glider>(c, loc, rot);
-        }
-        if (!g)
-            return nullptr;
+        /*auto c = LoadClass(0);
+        auto a = W->SpawnActor<AActor>(c, pos, FRotator(rot));
+#if WITH_EDITOR
+        a->SetFolderPath("Mechanoids");
+        a->SetActorLabel(M->getName());
+#endif*/
+        return nullptr;
     }
-    g->SetActorScale3D(scale);
+
+    AP4Glider *g = nullptr;
+    auto o = LoadObject<UStaticMesh>(0, resource.GetCharArray().GetData());
+    if (o)
+    {
+        g = W->SpawnActorDeferred<AP4Glider>(AP4Glider::StaticClass(), tr);
+        if (!g)
+        {
+            // place is busy
+            auto t = tr.GetTranslation();
+            auto z0 = t.Z;
+            auto z1 = z0 + 10000;
+            while (!g && t.Z < z1)
+            {
+                t.Z += 250;
+                tr.SetTranslation(t);
+                g = W->SpawnActorDeferred<AP4Glider>(AP4Glider::StaticClass(), tr);
+            }
+            if (!g)
+                return g;
+        }
+
+        g->SetStaticMesh(o);
+        FVector new_scale(glider->scale * 3, glider->scale * 3, glider->scale * 3);
+        g->SetActorScale3D(new_scale);
+    }
+
+    int light_id = 0;
+    int heavy_id = 0;
+    for (auto &nw : conf->getWeapons())
+    {
+        auto w = (polygon4::detail::Weapon*)nw.second;
+        if (!w->resource.empty())
+        {
+            auto r = LoadObject<UStaticMesh>(0, w->resource);
+            if (r)
+            {
+                FAttachmentTransformRules rules(EAttachmentRule::KeepRelative, true);
+                /*rules.LocationRule = EAttachmentRule::SnapToTarget;
+                rules.RotationRule = EAttachmentRule::KeepRelative;
+                rules.ScaleRule = EAttachmentRule::SnapToTarget;*/
+
+                {
+                    auto w1 = W->SpawnActorDeferred<AActor>(AActor::StaticClass(), {});
+                    auto r1 = NewObject<UStaticMeshComponent>(w1, TEXT("weapon"));
+                    r1->SetStaticMesh(r);
+                    r1->SetSimulatePhysics(false);
+                    r1->SetVisibility(true);
+                    w1->SetRootComponent(r1);
+                    if (w->type == polygon4::detail::WeaponType::Light)
+                        w1->AttachToActor(g, rules, ("WeaponLight_" + std::to_string(light_id++)).c_str());
+                    else if (w->type == polygon4::detail::WeaponType::Heavy)
+                        w1->AttachToActor(g, rules, ("WeaponHeavy_" + std::to_string(heavy_id++)).c_str());
+                    w1->FinishSpawning({});
+                    w1->SetActorHiddenInGame(false);
+#if WITH_EDITOR
+                    w1->SetActorLabel(w->getName());
+#endif
+                }
+
+                if (w->type == polygon4::detail::WeaponType::Light)
+                {
+                    auto w1 = W->SpawnActorDeferred<AActor>(AActor::StaticClass(), {});
+                    auto r1 = NewObject<UStaticMeshComponent>(w1, TEXT("weapon"));
+                    r1->SetStaticMesh(r);
+                    r1->SetSimulatePhysics(false);
+                    r1->SetVisibility(true);
+                    r1->SetRelativeScale3D({ 1,-1,-1 });
+                    w1->SetRootComponent(r1);
+                    w1->AttachToActor(g, rules, ("WeaponLight_" + std::to_string(light_id++)).c_str());
+                    w1->FinishSpawning({});
+#if WITH_EDITOR
+                    w1->SetActorLabel(w->getName());
+#endif
+                }
+            }
+        }
+    }
+    g->FinishSpawning(tr);
+
     g->SetMechanoid(M);
     g->Data.TextID = M->text_id.toFString();
 #if WITH_EDITOR
-    g->SetActorLabel(g->Data.TextID);
+    g->SetFolderPath("Mechanoids");
+    g->SetActorLabel(M->getName());
 #endif
     return g;
 }

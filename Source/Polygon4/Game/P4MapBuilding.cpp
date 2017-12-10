@@ -24,7 +24,7 @@
 
 AP4Building::AP4Building()
 {
-	PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = false;
 
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
@@ -112,6 +112,7 @@ bool P4MapBuilding::spawn()
             FVector new_scale(building->scale, building->scale, building->scale);
             Building->SetActorScale3D(new_scale);
 #if WITH_EDITOR
+            Building->SetFolderPath("Buildings");
             Building->SetActorLabel(building->getName());
 #endif
             return true;
@@ -121,6 +122,7 @@ bool P4MapBuilding::spawn()
     auto c = LoadClass(0);
     auto a = World->SpawnActor<AActor>(c, pos, rot);
 #if WITH_EDITOR
+    a->SetFolderPath("Buildings");
     a->SetActorLabel(building->getName());
 #endif
     return false;

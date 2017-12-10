@@ -327,25 +327,27 @@ class POLYGON4_API AP4Glider : public APawn
         Max
     };
 
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FirstPersonCameraComponent;
+    /** First person camera */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+    class UCameraComponent* FirstPersonCameraComponent;
 
     /** Third person camera */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     class UCameraComponent* ThirdPersonCameraComponent;
 
     /** Spring arm for TPCamera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* SpringArm;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+    class USpringArmComponent* SpringArm;
 
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
 
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* EnergyShield;
+
+    // spot light
 
     int GliderView = EGliderView::FPS;
 
@@ -354,11 +356,11 @@ public:
     FGliderData Data;
 
 public:
-	// Sets default values for this pawn's properties
-	AP4Glider();
+    // Sets default values for this pawn's properties
+    AP4Glider();
 
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
     void BoostOn() { boost = true; }
@@ -429,8 +431,8 @@ private:
 
 private:
     polygon4::detail::Mechanoid* Mechanoid = nullptr;
-    polygon4::detail::Configuration* Configuration;
-    polygon4::detail::Glider* Glider;
+    polygon4::detail::Configuration* Configuration = nullptr;
+    polygon4::detail::Glider* Glider = nullptr;
 
 public:
     void SetMechanoid(polygon4::detail::Mechanoid* Mechanoid);
@@ -438,6 +440,8 @@ public:
 
     float GetLifetime() const { return Lifetime; }
     bool CanEnterBuilding() const { return GetLifetime() > 3.0f; }
+
+    void SetStaticMesh(UStaticMesh *mesh);
 
 public:
     UFUNCTION()

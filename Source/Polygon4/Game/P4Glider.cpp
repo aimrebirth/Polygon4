@@ -49,7 +49,7 @@ FPowerUpProperties::FPowerUpProperties()
 
 AP4Glider::AP4Glider()
 {
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
 
     //AutoPossessPlayer = EAutoReceiveInput::Player0;
     //AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -61,11 +61,11 @@ AP4Glider::AP4Glider()
     Body = VisibleComponent;
 
     EngineAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudioComponent"));
-    EngineAudioComponent->SetupAttachment(RootComponent);
+    EngineAudioComponent->SetupAttachment(VisibleComponent);
     //EngineAudioComponent->bOverrideAttenuation = true;
 
     WeaponAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudioComponent"));
-    WeaponAudioComponent->SetupAttachment(RootComponent);
+    WeaponAudioComponent->SetupAttachment(VisibleComponent);
     //WeaponAudioComponent->bOverrideAttenuation = true;
 
     static ConstructorHelpers::FObjectFinder<USoundWave> JumpSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
@@ -97,11 +97,11 @@ AP4Glider::AP4Glider()
     }
 
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
-    FirstPersonCameraComponent->SetupAttachment(RootComponent);
+    FirstPersonCameraComponent->SetupAttachment(VisibleComponent);
 
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraSpringArm"));
     SpringArm->bUsePawnControlRotation = false;
-    SpringArm->SetupAttachment(RootComponent);
+    SpringArm->SetupAttachment(VisibleComponent);
     SpringArm->RelativeRotation = FRotator(-15.f, 0.f, 0.f);
     SpringArm->TargetArmLength = 500.0f;
     SpringArm->bEnableCameraLag = true;
@@ -116,8 +116,8 @@ AP4Glider::AP4Glider()
     {
         EnergyShield = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EnergyShield"));
         EnergyShield->SetStaticMesh(EnergyShieldAsset.Object);
-        EnergyShield->SetWorldScale3D({ 6.2,6.2,6.2 });
-        EnergyShield->SetupAttachment(RootComponent);
+        EnergyShield->SetWorldScale3D({ 2,2,2 });
+        EnergyShield->SetupAttachment(VisibleComponent);
         EnergyShield->SetSimulatePhysics(false);
         EnergyShield->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         EnergyShield->SetOwnerNoSee(true);
@@ -144,7 +144,8 @@ AP4Glider::AP4Glider()
     GunOffsetTopLeft = FVector(150.0f, -100.0f, 100.0f);
     GunOffsetTopRight = FVector(150.0f, 1000.0f, 100.0f);
 
-    static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
+    //static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
+    static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/ImpulseRed/SimpleProjectile.SimpleProjectile_C'"));
     if (light.Object)
         projectileLight = light.Object;
     static ConstructorHelpers::FObjectFinder<UClass> heavy(TEXT("Class'/Game/Mods/Common/Projectiles/HeavyProjectile.HeavyProjectile_C'"));
@@ -574,7 +575,7 @@ void AP4Glider::Tick(float DeltaSeconds)
 
 void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
 {
-	Super::SetupPlayerInputComponent(InInputComponent);
+    Super::SetupPlayerInputComponent(InInputComponent);
 
     InInputComponent->BindAction("View", IE_Pressed, this, &AP4Glider::ChangeView);
 
@@ -582,7 +583,7 @@ void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponen
     InInputComponent->BindAxis("Strafe", this, &AP4Glider::Strafe);
 
     //InInputComponent->BindAxis("Turn", this, &AP4Glider::Turn);
-	//InInputComponent->BindAxis("LookUp", this, &AP4Glider::LookUp);
+    //InInputComponent->BindAxis("LookUp", this, &AP4Glider::LookUp);
     InInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
     InInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
@@ -768,4 +769,12 @@ void AP4Glider::OnEnergyShieldBeginOverlap(UPrimitiveComponent* HitComponent, AA
 
 void AP4Glider::OnEnergyShieldEndOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+}
+
+void AP4Glider::SetStaticMesh(UStaticMesh *mesh)
+{
+    if (mesh)
+    {
+        VisibleComponent->SetStaticMesh(mesh);
+    }
 }
