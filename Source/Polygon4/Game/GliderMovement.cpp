@@ -29,10 +29,11 @@ void UGliderMovement::TickComponent(float DeltaTime, enum ELevelTick TickType, F
         return;
     }
 
-    float speed = 5000;
+    //float speed = 5000;
+    float speed = Velocity.Size();
 
     FVector DesiredMovementThisFrame = ConsumeInputVector().GetClampedToMaxSize(1.0f) * DeltaTime * speed;
-    /*if (!DesiredMovementThisFrame.IsNearlyZero())
+    if (!DesiredMovementThisFrame.IsNearlyZero())
     {
         FHitResult Hit;
         SafeMoveUpdatedComponent(DesiredMovementThisFrame, UpdatedComponent->GetComponentRotation(), true, Hit);
@@ -42,5 +43,5 @@ void UGliderMovement::TickComponent(float DeltaTime, enum ELevelTick TickType, F
         {
             SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);
         }
-    }*/
-};
+    }
+}

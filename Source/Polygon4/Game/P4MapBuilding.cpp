@@ -19,6 +19,8 @@
 #include "Polygon4.h"
 #include "P4MapBuilding.h"
 
+#include "Landscape.h"
+
 #include "P4Engine.h"
 #include "P4Glider.h"
 
@@ -93,29 +95,44 @@ P4MapBuilding::P4MapBuilding(const polygon4::detail::MapBuilding &rhs)
 
 bool P4MapBuilding::spawn()
 {
-    auto World = GP4Engine()->GetWorld();
-    auto WorldScale = GP4Engine()->GetWorldScale();
+    Building = ::spawn(this, GP4Engine()->GetWorld());
+    if (Building)
+        Building->MapBuilding = this;
+    return !!Building;
+}
 
-    FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
-    FRotator rot(pitch + building->pitch, yaw + building->yaw, roll + building->roll);
+void P4MapBuilding::initModificationMapBuilding()
+{
+    if (Building)
+        Building->InitModificationMapBuilding(modificationMapBuilding);
+}
 
-    if (!building->resource.empty())
+AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W)
+{
+    auto World = W;
+    TActorIterator<ALandscape> landscapeIterator(World);
+    ALandscape* landscape = *landscapeIterator;
+    auto WorldScale = landscape->GetActorScale() / 100.0f;
+
+    FVector pos(B->x * 10 * WorldScale.X + B->map->bx, B->y * 10 * WorldScale.Y + B->map->by, B->z * 10);
+    FRotator rot(B->pitch + B->building->pitch, B->yaw + B->building->yaw, B->roll + B->building->roll);
+
+    if (!B->building->resource.empty())
     {
-        auto o = LoadObject<UStaticMesh>(0, building->resource);
+        auto o = LoadObject<UStaticMesh>(0, B->building->resource);
         if (o)
         {
-            Building = World->SpawnActorDeferred<AP4Building>(AP4Building::StaticClass(), {});
-            Building->MapBuilding = this;
+            auto Building = World->SpawnActorDeferred<AP4Building>(AP4Building::StaticClass(), {});
             UGameplayStatics::FinishSpawningActor(Building, { rot, pos });
 
             Building->SetStaticMesh(o);
-            FVector new_scale(building->scale, building->scale, building->scale);
+            FVector new_scale(B->building->scale, B->building->scale, B->building->scale);
             Building->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Building->SetFolderPath("Buildings");
-            Building->SetActorLabel(building->getName());
+            Building->SetActorLabel(B->building->getName());
 #endif
-            return true;
+            return Building;
         }
     }
 
@@ -123,13 +140,7 @@ bool P4MapBuilding::spawn()
     auto a = World->SpawnActor<AActor>(c, pos, rot);
 #if WITH_EDITOR
     a->SetFolderPath("Buildings");
-    a->SetActorLabel(building->getName());
+    a->SetActorLabel(B->building->getName());
 #endif
-    return false;
-}
-
-void P4MapBuilding::initModificationMapBuilding()
-{
-    if (Building)
-        Building->InitModificationMapBuilding(modificationMapBuilding);
+    return nullptr;
 }

@@ -32,49 +32,49 @@ public class DBTool : ModuleRules
     public DBTool(ReadOnlyTargetRules Target)
         : base(Target)
     {
-		PublicDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Core",
-				// ... add other public dependencies that you statically link with here ...
-			}
-			);
+        PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "Core",
+                // ... add other public dependencies that you statically link with here ...
+            }
+            );
 
 
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Projects",
-				"InputCore",
-				"UnrealEd",
-				"LevelEditor",
-				"CoreUObject",
-				"Engine",
-				"Slate",
-				"SlateCore",
-				// ... add private dependencies that you statically link with here ...
+        PrivateDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "Projects",
+                "InputCore",
+                "UnrealEd",
+                "LevelEditor",
+                "CoreUObject",
+                "Engine",
+                "Slate",
+                "SlateCore",
+                // ... add private dependencies that you statically link with here ...
                 "Landscape",
                 //
                 "Polygon4",
             }
-			);
+            );
 
 
-		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
+        DynamicallyLoadedModuleNames.AddRange(
+            new string[]
             {
-				// ... add any modules that your module loads dynamically here ...
+                // ... add any modules that your module loads dynamically here ...
             }
-			);
+            );
 
         LoadCoreModule(Target, "Engine");
     }
 
     public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
     {
-        Definitions.Add("SCHEMA_API=__declspec(dllimport)");
-        Definitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
-        Definitions.Add("P4_ENGINE_API=__declspec(dllimport)");
+        PublicDefinitions.Add("SCHEMA_API=__declspec(dllimport)");
+        PublicDefinitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
+        PublicDefinitions.Add("P4_ENGINE_API=__declspec(dllimport)");
 
         // idirs, libs
         {

@@ -20,6 +20,7 @@
 
 #include "SlateBasics.h"
 
+#include <Polygon4/DataManager/TreeItem.h>
 #include <Polygon4/DataManager/Types.h>
 #include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>
@@ -71,7 +72,7 @@ class SButtonRowWidget : public SMultiColumnTableRow<SDBToolTableView::ListItem>
     SLATE_END_ARGS()
 
     using ListItem = SDBToolTableView::ListItem;
-        
+
 private:
     SDBToolTableView* TableView;
     std::shared_ptr<polygon4::detail::Storage> Storage;

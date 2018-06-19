@@ -23,12 +23,12 @@ namespace polygon4
 class FDBToolModule : public IModuleInterface
 {
 public:
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+    virtual void StartupModule() override;
+    virtual void ShutdownModule() override;
 
-	void PluginButtonClicked();
+    void PluginButtonClicked();
 
-	void AddToolbarExtension(FToolBarBuilder& Builder);
+    void AddToolbarExtension(FToolBarBuilder& Builder);
     void AddMenuExtension(FMenuBuilder& Builder);
 
     void SetDataChanged();
@@ -37,7 +37,7 @@ public:
     TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 
 private:
-	TSharedPtr<class FUICommandList> PluginCommands;
+    TSharedPtr<class FUICommandList> PluginCommands;
     TSharedPtr<FToolBarBuilder> ToolBarBuilder;
     TSharedPtr<class SDBToolTableView> TableView;
     TSharedPtr<class SDBToolTreeView> TreeView;
@@ -56,6 +56,9 @@ private:
 
     void LoadMapMechanoidsFromDB();
     void SaveMapMechanoidsToDB();
+
+    void LoadMapObjectsFromDB();
+    void SaveMapObjectsToDB();
 
     void LoadMapHeightmap();
 };

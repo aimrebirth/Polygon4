@@ -31,15 +31,15 @@ public class Polygon4 : ModuleRules
 
     private static int NumberOfCalls = 0;
 
-	public Polygon4(ReadOnlyTargetRules Target)
+    public Polygon4(ReadOnlyTargetRules Target)
         : base(Target)
-	{
-		PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
-		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+    {
+        PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         GenerateVersion();
         LoadCoreModule(Target, "Engine");
-	}
+    }
 
     void GenerateVersion()
     {
@@ -155,9 +155,9 @@ public class Polygon4 : ModuleRules
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
-        Definitions.Add("SCHEMA_API=__declspec(dllimport)");
-        Definitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
-        Definitions.Add("P4_ENGINE_API=__declspec(dllimport)");
+        PublicDefinitions.Add("SCHEMA_API=__declspec(dllimport)");
+        PublicDefinitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
+        PublicDefinitions.Add("P4_ENGINE_API=__declspec(dllimport)");
 
         // idirs, libs
         {

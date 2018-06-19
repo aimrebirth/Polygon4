@@ -22,12 +22,8 @@
 
 #include "GameFramework/Pawn.h"
 #include <Polygon4/DataManager/Types.h>
+#include "GliderMovement.h"
 #include "P4Glider.generated.h"
-
-class UGliderMovement;
-class SBar;
-
-class P4Mechanoid;
 
 USTRUCT()
 struct FGliderData
@@ -347,6 +343,8 @@ class POLYGON4_API AP4Glider : public APawn
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* EnergyShield;
 
+    UGliderMovement *GliderMovement;
+
     // spot light
 
     int GliderView = EGliderView::FPS;
@@ -369,6 +367,8 @@ public:
     void FireLightOff() { FireLight = false; }
     void FireHeavyOn() { FireHeavy = true; }
     void FireHeavyOff() { FireHeavy = false; }
+
+    virtual UGliderMovement *GetMovementComponent() const override;
 
 private:
     bool LeftGun = true;

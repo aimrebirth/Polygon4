@@ -8,13 +8,13 @@
 class FDBToolCommands : public TCommands<FDBToolCommands>
 {
 public:
-	FDBToolCommands()
-		: TCommands<FDBToolCommands>(TEXT("DBTool"), NSLOCTEXT("Contexts", "DBTool", "DBTool Plugin"), NAME_None, FDBToolStyle::GetStyleSetName())
-	{
-	}
+    FDBToolCommands()
+        : TCommands<FDBToolCommands>(TEXT("DBTool"), NSLOCTEXT("Contexts", "DBTool", "DBTool Plugin"), NAME_None, FDBToolStyle::GetStyleSetName())
+    {
+    }
 
-	// TCommands<> interface
-	virtual void RegisterCommands() override;
+    // TCommands<> interface
+    virtual void RegisterCommands() override;
 
 public:
     TSharedPtr< FUICommandInfo > OpenPluginWindow;
@@ -29,5 +29,8 @@ public:
     TSharedPtr< FUICommandInfo > LoadMapMechanoidsFromDB;
     TSharedPtr< FUICommandInfo > SaveMapMechanoidsToDB;
 
-    TSharedPtr< FUICommandInfo > LoadMapHeightmap;    
+    TSharedPtr< FUICommandInfo > LoadMapObjectsFromDB;
+    TSharedPtr< FUICommandInfo > SaveMapObjectsToDB;
+
+    TSharedPtr< FUICommandInfo > LoadMapHeightmap;
 };

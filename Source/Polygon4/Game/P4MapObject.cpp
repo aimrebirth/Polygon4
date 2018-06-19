@@ -19,6 +19,8 @@
 #include "Polygon4.h"
 #include "P4MapObject.h"
 
+#include "Landscape.h"
+
 #include "P4Engine.h"
 
 AP4Object::AP4Object()
@@ -66,29 +68,38 @@ P4MapObject::P4MapObject(const polygon4::detail::MapObject &rhs)
 
 bool P4MapObject::spawn()
 {
-    auto World = GP4Engine()->GetWorld();
-    auto WorldScale = GP4Engine()->GetWorldScale();
+    Object = ::spawn(this, GP4Engine()->GetWorld());
+    if (Object)
+        Object->MapObject = this;
+    return !!Object;
+}
 
-    FVector pos(x * 10 * WorldScale.X + map->bx, y * 10 * WorldScale.Y + map->by, z * 10);
-    FRotator rot(pitch + object->pitch, yaw + object->yaw, roll + object->roll);
+AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
+{
+    auto World = W;
+    TActorIterator<ALandscape> landscapeIterator(World);
+    ALandscape* landscape = *landscapeIterator;
+    auto WorldScale = landscape->GetActorScale() / 100.0f;
 
-    if (!object->resource.empty())
+    FVector pos(O->x * 10 * WorldScale.X + O->map->bx, O->y * 10 * WorldScale.Y + O->map->by, O->z * 10);
+    FRotator rot(O->pitch + O->object->pitch, O->yaw + O->object->yaw, O->roll + O->object->roll);
+
+    if (!O->object->resource.empty())
     {
-        auto o = LoadObject<UStaticMesh>(0, object->resource);
+        auto o = LoadObject<UStaticMesh>(0, O->object->resource);
         if (o)
         {
-            Object = World->SpawnActorDeferred<AP4Object>(AP4Object::StaticClass(), {});
-            Object->MapObject = this;
+            auto Object = World->SpawnActorDeferred<AP4Object>(AP4Object::StaticClass(), {});
             UGameplayStatics::FinishSpawningActor(Object, { rot, pos });
 
             Object->SetStaticMesh(o);
-            FVector new_scale(object->scale, object->scale, object->scale);
+            FVector new_scale(O->object->scale, O->object->scale, O->object->scale);
             Object->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Object->SetFolderPath("Objects");
-            Object->SetActorLabel(object->getName());
+            Object->SetActorLabel(O->object->getName());
 #endif
-            return true;
+            return Object;
         }
     }
 
@@ -96,7 +107,7 @@ bool P4MapObject::spawn()
     auto a = World->SpawnActor<AActor>(c, pos, rot);
 #if WITH_EDITOR
     a->SetFolderPath("Objects");
-    a->SetActorLabel(object->getName());
+    a->SetActorLabel(O->object->getName());
 #endif
-    return true;
+    return nullptr;
 }

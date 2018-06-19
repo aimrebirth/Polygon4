@@ -60,6 +60,9 @@ AP4Glider::AP4Glider()
     RootComponent = VisibleComponent;
     Body = VisibleComponent;
 
+    GliderMovement = CreateDefaultSubobject<UGliderMovement>(TEXT("MovementComponent"));
+    GliderMovement->UpdatedComponent = RootComponent;
+
     EngineAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudioComponent"));
     EngineAudioComponent->SetupAttachment(VisibleComponent);
     //EngineAudioComponent->bOverrideAttenuation = true;
@@ -121,6 +124,7 @@ AP4Glider::AP4Glider()
         EnergyShield->SetSimulatePhysics(false);
         EnergyShield->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         EnergyShield->SetOwnerNoSee(true);
+        EnergyShield->RelativeLocation = { 0,0,0 };
 
         static ConstructorHelpers::FObjectFinder<UMaterial> EnergyShieldMat(TEXT("Material'/Game/Mods/Common/Materials/EnergyShield.EnergyShield'"));
         if (EnergyShieldMat.Succeeded())
@@ -155,6 +159,11 @@ AP4Glider::AP4Glider()
     JumpTimeout = ArmedTimedValue(1.5);
     SlopeAngle = FloatDampingValue(50);
     EnergyShieldTimer = FloatFadedValue(2);
+}
+
+UGliderMovement *AP4Glider::GetMovementComponent() const
+{
+    return GliderMovement;
 }
 
 void AP4Glider::BeginPlay()
@@ -366,6 +375,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 continue;
 
             AProjectile *p = nullptr;
+
             if (FireLight && projectileLight &&
                 w->weapon->type == polygon4::detail::WeaponType::Light &&
                 w->shoot())
@@ -375,15 +385,21 @@ void AP4Glider::Tick(float DeltaSeconds)
                 LeftGun = !LeftGun;
                 UGameplayStatics::PlaySoundAtLocation(this, LightSound, loc2);
             }
-            else if (FireHeavy && projectileHeavy &&
+            else if (
+                FireHeavy && projectileHeavy &&
                 w->weapon->type == polygon4::detail::WeaponType::Heavy &&
                 w->shoot())
             {
                 p = (AProjectile *)GetWorld()->SpawnActor(projectileHeavy, &SpawnLocationTop, &SpawnRotation);
                 UGameplayStatics::PlaySoundAtLocation(this, HeavySound, SpawnLocationTop);
             }
+
             if (p)
             {
+                // if laser weapon, no velocity correction?
+                // if projectile weapon, correct velocity
+                p->GetProjectileMovement()->Velocity += GetVelocity();
+
                 p->SetOwner(this);
                 if (w->weapon->projectile)
                     p->SetProjectile(w->weapon->projectile);
@@ -746,6 +762,8 @@ void AP4Glider::OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
     {
         EnergyShieldTimer.start();
     }
+    if (!Cast<APlayerController>(GetController()))
+        FireLight = true;
 }
 
 void AP4Glider::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

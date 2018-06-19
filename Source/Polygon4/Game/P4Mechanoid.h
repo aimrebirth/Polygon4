@@ -33,4 +33,4 @@ public:
 };
 
 POLYGON4_API
-AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W);
+AP4Glider *spawn(polygon4::detail::Mechanoid *M, UWorld *W);

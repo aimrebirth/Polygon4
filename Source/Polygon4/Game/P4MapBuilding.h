@@ -29,7 +29,7 @@ class P4MapBuilding;
 UCLASS()
 class POLYGON4_API AP4Building : public AActor
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* VisibleComponent;
@@ -69,3 +69,6 @@ public:
 private:
     AP4Building *Building;
 };
+
+POLYGON4_API
+AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W);

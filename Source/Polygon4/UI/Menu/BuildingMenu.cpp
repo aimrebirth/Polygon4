@@ -18,6 +18,7 @@
 
 #include "Polygon4.h"
 #include "BuildingMenu.h"
+#include "SceneViewport.h"
 
 #include <Polygon4/Mechanoid.h>
 
@@ -73,11 +74,12 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
         PlayerController->bShowMouseCursor = true;
 
-    auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
     FSlateBrush *BackgroundBrush;
-    //if (BackgroundTexture)
-    //    BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
-    //else
+    //auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
+    /*auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Blueprint'/Game/Blueprints/BLD_INTERIOR/BP_BLD_INTERIOR.BP_BLD_INTERIOR'"));
+    if (BackgroundTexture)
+        BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
+    else*/
         BackgroundBrush = new FSlateColorBrush(FColor::Black);
 
     LeftMenuButtons.resize(polygon4::bbMax);
@@ -118,6 +120,11 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
 
     // widgets
     TextDecorators.Add(SRichTextBlock::WidgetDecorator("edit", this, &SBuildingMenu::EditWidgetDecorator));
+
+    // viewport
+    //auto SVP = MakeShared<ISlateViewport>();
+    //auto SVP = MakeShareable<ISlateViewport>(new SViewport);
+    //auto FVP = MakeShared<FSceneViewport>(nullptr, SVP);
 
     SAssignNew(RatingBar, SBar)
         .Max(100)
@@ -257,7 +264,8 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                 SNew(SVerticalBox)
                                 // text
                                 + SVerticalBox::Slot()
-                                .VAlign(VAlign_Fill)
+                                .FillHeight(0.25)
+                                .VAlign(VAlign_Top)
                                 .HAlign(HAlign_Fill)
                                 [
                                     SNew(SScrollBox)
@@ -272,6 +280,16 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                         .Text(this, &SBuildingMenu::getFText)
                                         .AutoWrapText(true)
                                     ]
+                                ]
+                                // view port
+                                + SVerticalBox::Slot()
+                                .FillHeight(0.25)
+                                .VAlign(VAlign_Bottom)
+                                .HAlign(HAlign_Fill)
+                                [
+                                    SNew(SViewport)
+                                    .ViewportInterface(nullptr)
+                                    //.ViewportInterface(SVP)
                                 ]
                             ]
                         ]
@@ -377,27 +395,27 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                     .Visibility(EVisibility::Collapsed)
                     // Label
                     + SVerticalBox::Slot()
-			        .VAlign(VAlign_Top)
-			        .HAlign(HAlign_Center)
+                    .VAlign(VAlign_Top)
+                    .HAlign(HAlign_Center)
                     .AutoHeight()
-			        [
-				        SNew(STextBlock)
-				        .ShadowColorAndOpacity(FLinearColor::Black)
-				        .ColorAndOpacity(FLinearColor::White)
-				        .ShadowOffset(FIntPoint(-1, 1))
-				        .Font(FSlateFontInfo(RobotoFont, 100))
-				        .Text(FText::FromString("Polygon-4"))
-			        ]
+                    [
+                        SNew(STextBlock)
+                        .ShadowColorAndOpacity(FLinearColor::Black)
+                        .ColorAndOpacity(FLinearColor::White)
+                        .ShadowOffset(FIntPoint(-1, 1))
+                        .Font(FSlateFontInfo(RobotoFont, 100))
+                        .Text(FText::FromString("Polygon-4"))
+                    ]
                     // Other
                     + SVerticalBox::Slot()
-			        .VAlign(VAlign_Fill)
-			        .HAlign(HAlign_Fill)
+                    .VAlign(VAlign_Fill)
+                    .HAlign(HAlign_Fill)
                     [
                         SNew(SHorizontalBox)
                         // Left part of the screen (buttons)
                         + SHorizontalBox::Slot()
-			            .VAlign(VAlign_Center)
-			            .HAlign(HAlign_Left)
+                        .VAlign(VAlign_Center)
+                        .HAlign(HAlign_Left)
                         .AutoWidth()
                         [
                             SNew(SVerticalBox)
@@ -407,8 +425,8 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                         ]
                         // right part of the screen
                         + SHorizontalBox::Slot()
-			            .VAlign(VAlign_Fill)
-			            .HAlign(HAlign_Fill)
+                        .VAlign(VAlign_Fill)
+                        .HAlign(HAlign_Fill)
                         [
                             SNew(SVerticalBox)
                             + SVerticalBox::Slot()
@@ -416,22 +434,22 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                 SNew(SVerticalBox)
                                 // label
                                 + SVerticalBox::Slot()
-			                    .VAlign(VAlign_Top)
-			                    .HAlign(HAlign_Center)
+                                .VAlign(VAlign_Top)
+                                .HAlign(HAlign_Center)
                                 .Padding(20)
                                 .AutoHeight()
                                 [
-				                    SNew(STextBlock)
-				                    .ShadowColorAndOpacity(FLinearColor::Black)
-				                    .ColorAndOpacity(FLinearColor::White)
-				                    .ShadowOffset(FIntPoint(-1, 1))
-				                    .Font(FSlateFontInfo(RobotoFont, 30))
-				                    .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
+                                    SNew(STextBlock)
+                                    .ShadowColorAndOpacity(FLinearColor::Black)
+                                    .ColorAndOpacity(FLinearColor::White)
+                                    .ShadowOffset(FIntPoint(-1, 1))
+                                    .Font(FSlateFontInfo(RobotoFont, 30))
+                                    .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
                                 ]
                                 // List View
                                 + SVerticalBox::Slot()
-			                    .VAlign(VAlign_Fill)
-			                    .HAlign(HAlign_Fill)
+                                .VAlign(VAlign_Fill)
+                                .HAlign(HAlign_Fill)
                                 .Padding(20)
                                 [
                                     SAssignNew(SavedGamesListView, SSavedGamesListView)
@@ -444,8 +462,8 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
                                 ]
                                 // save name edit
                                 + SVerticalBox::Slot()
-			                    .VAlign(VAlign_Top)
-			                    .HAlign(HAlign_Fill)
+                                .VAlign(VAlign_Top)
+                                .HAlign(HAlign_Fill)
                                 .Padding(20)
                                 [
                                     SNew(SHorizontalBox)
@@ -485,23 +503,23 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlo
             .VAlign(VAlign_Center)
             .AutoWidth()
             [
-				SNew(STextBlock)
-				.ShadowColorAndOpacity(FLinearColor::Black)
-				.ColorAndOpacity(FLinearColor::White)
-				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo(RobotoFont, 18))
-				.Text(NameIn)
+                SNew(STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
+                .Text(NameIn)
             ]
             + SHorizontalBox::Slot()
             .HAlign(HAlign_Fill)
             .VAlign(VAlign_Center)
             .AutoWidth()
             [
-				SAssignNew(Var, STextBlock)
-				.ShadowColorAndOpacity(FLinearColor::Black)
-				.ColorAndOpacity(FLinearColor::White)
-				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo(RobotoFont, 18))
+                SAssignNew(Var, STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
             ]
         ];
 }
@@ -517,23 +535,23 @@ SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlo
             .VAlign(VAlign_Center)
             .AutoWidth()
             [
-				SNew(STextBlock)
-				.ShadowColorAndOpacity(FLinearColor::Black)
-				.ColorAndOpacity(FLinearColor::White)
-				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo(RobotoFont, 18))
-				.Text(NameIn)
+                SNew(STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
+                .Text(NameIn)
             ]
             + SHorizontalBox::Slot()
             .HAlign(HAlign_Left)
             .VAlign(VAlign_Center)
             .AutoWidth()
             [
-				SAssignNew(Var, STextBlock)
-				.ShadowColorAndOpacity(FLinearColor::Black)
-				.ColorAndOpacity(FLinearColor::White)
-				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo(RobotoFont, 18))
+                SAssignNew(Var, STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
             ]
             + SHorizontalBox::Slot()
             .HAlign(HAlign_Right)
