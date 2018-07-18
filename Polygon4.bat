@@ -1,7 +1,7 @@
 @echo off
 
 setlocal ENABLEEXTENSIONS
-set KEY_NAME=HKEY_LOCAL_MACHINE\SOFTWARE\EpicGames\Unreal Engine\4.19
+set KEY_NAME=HKEY_LOCAL_MACHINE\SOFTWARE\EpicGames\Unreal Engine\4.20
 set VALUE_NAME=InstalledDirectory
 
 FOR /F "skip=2 tokens=1,2*" %%A IN ('%windir%\Sysnative\REG QUERY "%KEY_NAME%" /v "%VALUE_NAME%" 2^>nul') DO (
@@ -31,4 +31,4 @@ if not defined ValueName (
 )
 
 set exe=%ValueValue%\Engine\Binaries\Win64\UE4Editor.exe
-start "" "%exe%" %cd%\Polygon4.uproject -ansimalloc %*
+start "" "%exe%" %~dp0\Polygon4.uproject -ansimalloc %*

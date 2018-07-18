@@ -37,6 +37,7 @@
 #include <Polygon4/Mechanoid.h>
 
 #include <memory>
+//#include <optional>!!!
 #include <tuple>
 
 static const FName DBToolTabName("DBTool");
@@ -323,6 +324,7 @@ void error_text(const FText &Title, const FText &Text)
     FMessageDialog::Open(EAppMsgType::Ok, Text, &Title);
 }
 
+// make optional<>
 std::unique_ptr<std::tuple<polygon4::detail::Modification*, polygon4::IdPtr<polygon4::detail::Map>>>
 GetCurrentMap(SDBToolTreeView *TreeView)
 {

@@ -40,7 +40,7 @@ AP4Object::AP4Object()
 
 void AP4Object::BeginPlay()
 {
-    if (MapObject->interactive)
+    if (MapObject && MapObject->interactive)
         VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Object::OnHit);
 
     Super::BeginPlay();

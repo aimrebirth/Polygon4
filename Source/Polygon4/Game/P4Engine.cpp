@@ -246,9 +246,9 @@ void P4Engine::SetPauseMenuBindings()
             for (auto i = 0; i < n_binds; ++i)
             {
                 auto &b = PlayerInputComponent->GetActionBinding(i);
-                if (b.ActionName == "Exit")
+                if (b.GetActionName() == "Exit")
                     exit = true;
-                else if (b.ActionName == "Pause")
+                else if (b.GetActionName() == "Pause")
                     pause = true;
             }
             if (!exit)
@@ -270,7 +270,7 @@ void P4Engine::UnsetPauseMenuBindings() const
             for (auto i = n_binds - 1; i >= 0; --i)
             {
                 auto &b = PlayerInputComponent->GetActionBinding(i);
-                if (b.ActionName == "Exit" || b.ActionName == "Pause")
+                if (b.GetActionName() == "Exit" || b.GetActionName() == "Pause")
                 {
                     PlayerInputComponent->RemoveActionBinding(i);
                 }

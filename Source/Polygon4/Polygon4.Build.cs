@@ -85,7 +85,15 @@ public class Polygon4 : ModuleRules
             version += "+" + stdout;
         }
         version = "\"" + version + "\"";
-        File.WriteAllText(Path.Combine(ModuleDirectory, "Generated/Version.h"), version);
+        var p = Path.Combine(ModuleDirectory, "Generated/Version.h");
+        if (File.Exists(p))
+        {
+            var t = File.ReadAllText(p);
+            if (t != version)
+                File.WriteAllText(p, version);
+        }
+        else
+            File.WriteAllText(p, version);
     }
 
     bool RemoveLibrary(string dst)

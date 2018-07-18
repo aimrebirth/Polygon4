@@ -54,6 +54,7 @@ public class DBTool : ModuleRules
                 "SlateCore",
                 // ... add private dependencies that you statically link with here ...
                 "Landscape",
+                "Foliage",
                 //
                 "Polygon4",
             }
@@ -68,6 +69,8 @@ public class DBTool : ModuleRules
             );
 
         LoadCoreModule(Target, "Engine");
+
+        //AppendCLArguments_CPP("-std=c++17");
     }
 
     public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
