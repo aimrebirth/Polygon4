@@ -163,8 +163,12 @@ public class Polygon4 : ModuleRules
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
-        PublicDefinitions.Add("SCHEMA_API=__declspec(dllimport)");
-        PublicDefinitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
+        PrivatePCHHeaderFile = "Polygon4.h";
+
+        PublicDefinitions.Add("SCHEMA_API=");
+        PublicDefinitions.Add("DATA_MANAGER_API=");
+        //PublicDefinitions.Add("SCHEMA_API=__declspec(dllimport)");
+        //PublicDefinitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
         PublicDefinitions.Add("P4_ENGINE_API=__declspec(dllimport)");
 
         // idirs, libs
@@ -182,9 +186,6 @@ public class Polygon4 : ModuleRules
             var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema_RelWithDebInfo.txt"));
             PublicAdditionalLibraries.Add(data_manager);
             PublicAdditionalLibraries.Add(schema);
-
-            //PublicDelayLoadDLLs.Add("k:/AIM/Polygon4/ThirdParty/Engine/win64/bin/RelWithDebInfo/loc.4b3e2adf.DataManager.data_manager-local.dll");
-            //PublicDelayLoadDLLs.Add("k:/AIM/Polygon4/ThirdParty/Engine/win64/bin/RelWithDebInfo/loc.4b3e2adf.DataManager.schema-local.dll");
 
             //foreach (var s in PublicDelayLoadDLLs)
             //    Console.WriteLine(s);

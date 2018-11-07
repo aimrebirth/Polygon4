@@ -29,6 +29,8 @@ AGliderHUD::AGliderHUD(const FObjectInitializer& ObjectInitializer)
     static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("Texture2D'/Game/Mods/Common/HUD/crosshair.crosshair'"));
     CrosshairTex = CrosshairTexObj.Object;
 
+    //"WidgetBlueprint'/Game/Mods/Common/HUD/WG_INT_HUD_M1.WG_INT_HUD_M1'";
+
     EnergyBar = SNew(SBar)
         .Max(100)
         .Current(100)

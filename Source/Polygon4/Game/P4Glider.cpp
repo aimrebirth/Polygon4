@@ -149,6 +149,7 @@ AP4Glider::AP4Glider()
     GunOffsetTopRight = FVector(150.0f, 1000.0f, 100.0f);
 
     //static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
+    //static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/HawkProjectile.HawkProjectile_C'"));
     static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/ImpulseRed/SimpleProjectile.SimpleProjectile_C'"));
     if (light.Object)
         projectileLight = light.Object;
