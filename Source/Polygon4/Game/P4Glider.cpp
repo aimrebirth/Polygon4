@@ -702,7 +702,7 @@ FHitResult AP4Glider::HoverTrace(float Altitude) const
     //GetWorld()->DebugDrawTraceTag = HoverTraceTag;
 
     FCollisionQueryParams TraceParams(HoverTraceTag, true, this);
-    TraceParams.bTraceAsyncScene = true;
+    //TraceParams.bTraceAsyncScene = true;
     //TraceParams.TraceTag = HoverTraceTag;
 
     auto begin = GetActorLocation();
@@ -725,7 +725,7 @@ FHitResult AP4Glider::HoverTrace(FVector Vector, float Altitude) const
     //GetWorld()->DebugDrawTraceTag = HoverTraceTag;
 
     FCollisionQueryParams TraceParams(HoverTraceTag, true, this);
-    TraceParams.bTraceAsyncScene = true;
+    //TraceParams.bTraceAsyncScene = true;
     //TraceParams.TraceTag = HoverTraceTag;
 
     auto begin = GetActorLocation();

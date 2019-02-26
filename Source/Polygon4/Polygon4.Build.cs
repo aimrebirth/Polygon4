@@ -163,38 +163,47 @@ public class Polygon4 : ModuleRules
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
 
+        CppStandard = CppStandardVersion.Cpp17;
+
         PrivatePCHHeaderFile = "Polygon4.h";
 
-        PublicDefinitions.Add("SCHEMA_API=");
-        PublicDefinitions.Add("DATA_MANAGER_API=");
+        //PublicDefinitions.Add("SCHEMA_API=");
+        //PublicDefinitions.Add("DATA_MANAGER_API=");
         //PublicDefinitions.Add("SCHEMA_API=__declspec(dllimport)");
         //PublicDefinitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
         PublicDefinitions.Add("P4_ENGINE_API=__declspec(dllimport)");
 
         // idirs, libs
         {
-            var includes_file = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "includes.txt"));
-            var includes = includes_file.Split(';');
+            var defs = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "definitions_ReleaseWithDebugInformation.txt"));
+            foreach (var s in defs)
+                if (!s.StartsWith("P4_ENGINE_API="))
+                    PublicDefinitions.Add(s);
+
+            var includes = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "includes_ReleaseWithDebugInformation.txt"));
             foreach (var s in includes)
                 PublicIncludePaths.Add(s);
-            PublicIncludePaths.Add(Path.Combine(ThirdPartyPath, Name, "include"));
 
             //foreach (var s in PublicIncludePaths)
             //    Console.WriteLine(s);
 
-            var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "data_manager_RelWithDebInfo.txt"));
-            var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "schema_RelWithDebInfo.txt"));
+            /*var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "data_manager_ReleaseWithDebugInformation.txt"));
+            var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "schema_ReleaseWithDebugInformation.txt"));
             PublicAdditionalLibraries.Add(data_manager);
-            PublicAdditionalLibraries.Add(schema);
+            PublicAdditionalLibraries.Add(schema);*/
+
+            var ll = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "link_libraries_ReleaseWithDebugInformation.txt"));
+            foreach (var s in ll)
+                PublicAdditionalLibraries.Add(s);
 
             //foreach (var s in PublicDelayLoadDLLs)
             //    Console.WriteLine(s);
         }
 
-        string BaseDir = Path.Combine(ThirdPartyPath, Name, "win64", "bin", "RelWithDebInfo");
+        string BaseDir = Path.Combine(ThirdPartyPath, Name, ".sw", "windows_x86_64_msvc_19.16_static_ReleaseWithDebugInformation_a02100");
         BaseDir = Path.GetFullPath(BaseDir);
 
-        string base_name = Name;
+        string base_name = "Polygon4.Engine-master";
         int base_name_id = 0;
 
         PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");

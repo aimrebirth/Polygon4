@@ -69,12 +69,13 @@ public class DBTool : ModuleRules
             );
 
         LoadCoreModule(Target, "Engine");
-
-        //AppendCLArguments_CPP("-std=c++17");
     }
 
     public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
     {
+        PCHUsage = PCHUsageMode.NoSharedPCHs;
+        CppStandard = CppStandardVersion.Cpp17;
+
         PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
 
         var sqlite3 = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "sqlite3_RelWithDebInfo.txt"));
