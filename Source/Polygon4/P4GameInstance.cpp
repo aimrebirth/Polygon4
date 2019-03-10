@@ -47,7 +47,7 @@ static void HotpatchEngine()
 void UP4GameInstance::Init()
 {
 #if !IS_MONOLITHIC
-    HotpatchEngine();
+    //HotpatchEngine();
 #endif
 
     Engine = P4Engine::create<P4Engine>(FPaths::ProjectDir(), this);

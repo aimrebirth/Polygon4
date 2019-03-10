@@ -18,9 +18,10 @@
 
 #include "Polygon4.h"
 
-#include <fstream>
-
 #include <Polygon4/Hotpatch.h>
+#include <primitives/executor.h>
+
+#include <fstream>
 
 UFont *RobotoFont;
 
@@ -43,7 +44,7 @@ public:
             auto gd = FPaths::ProjectDir();
             auto fgd = FPaths::ConvertRelativePathToFull(gd);
             FPaths::CollapseRelativeDirectories(fgd);
-            polygon4::write_module_last_write_time(*fgd, "Engine");
+            //polygon4::write_module_last_write_time(*fgd, "Engine");
         }
 #endif
 #endif
