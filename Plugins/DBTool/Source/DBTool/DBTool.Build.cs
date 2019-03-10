@@ -78,7 +78,7 @@ public class DBTool : ModuleRules
 
         PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
 
-        var sqlite3 = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, "win64", "sqlite3_RelWithDebInfo.txt"));
+        var sqlite3 = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "sqlite3_ReleaseWithDebugInformation.txt"));
         PublicAdditionalLibraries.Add(sqlite3);
     }
 }
