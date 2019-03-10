@@ -200,7 +200,7 @@ public class Polygon4 : ModuleRules
             //    Console.WriteLine(s);
         }
 
-        string BaseDir = Path.Combine(ThirdPartyPath, Name, ".sw", "windows_x86_64_msvc_19.16_static_ReleaseWithDebugInformation_a02100");
+        string BaseDir = Path.Combine(ThirdPartyPath, Name, ".sw", "windows_x86_64_msvc_19.20_static_ReleaseWithDebugInformation");
         BaseDir = Path.GetFullPath(BaseDir);
 
         string base_name = "Polygon4.Engine-master";
