@@ -200,16 +200,16 @@ public class Polygon4 : ModuleRules
             //    Console.WriteLine(s);
         }
 
-        string BaseDir = Path.Combine(ThirdPartyPath, Name, ".sw", "windows_x86_64_msvc_19.20_static_ReleaseWithDebugInformation");
-        BaseDir = Path.GetFullPath(BaseDir);
+        var ell = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "engine_ReleaseWithDebugInformation.txt"));
 
-        string base_name = "Polygon4.Engine-master";
-        int base_name_id = 0;
+        //string base_name = "Polygon4.Engine-master";
+        //int base_name_id = 0;
 
-        PublicAdditionalLibraries.Add(BaseDir + "/" + base_name + ".lib");
+        foreach (var s in ell)
+            PublicAdditionalLibraries.Add(s);
         //PublicDelayLoadDLLs.Add(base_name + ".dll");
 
-        string dst_base_name = Path.Combine(ModuleDirectory, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
+        /*string dst_base_name = Path.Combine(ModuleDirectory, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
         dst_base_name = Path.GetFullPath(dst_base_name);
 
         string src = Path.Combine(BaseDir, base_name);
@@ -244,6 +244,6 @@ public class Polygon4 : ModuleRules
                 break;
             if (base_name_id++ > 1000)
                 break;
-        }
+        }*/
     }
 }
