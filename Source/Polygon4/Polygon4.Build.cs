@@ -29,7 +29,7 @@ public class Polygon4 : ModuleRules
         get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../ThirdParty/")); }
     }
 
-    private static int NumberOfCalls = 0;
+    //private static int NumberOfCalls = 0;
 
     public Polygon4(ReadOnlyTargetRules Target)
         : base(Target)
