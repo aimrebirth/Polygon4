@@ -1,8 +1,4 @@
-// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
-
-#include "DBToolPrivatePCH.h"
-
-#include "Engine.h"
+#include "DBTool.h"
 
 #include "Landscape.h"
 #include "LandscapeEdit.h"
@@ -16,6 +12,7 @@
 
 #include "IPluginManager.h"
 #include "LevelEditor.h"
+#include "EngineUtils.h"
 
 #include "Widgets/SDBToolTreeView.h"
 #include "Widgets/SDBToolTableView.h"

@@ -32,6 +32,11 @@ public class DBTool : ModuleRules
     public DBTool(ReadOnlyTargetRules Target)
         : base(Target)
     {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
+        CppStandard = CppStandardVersion.Cpp17;
+        bEnforceIWYU = true;
+
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
@@ -73,10 +78,6 @@ public class DBTool : ModuleRules
 
     public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
     {
-        PCHUsage = PCHUsageMode.NoSharedPCHs;
-        CppStandard = CppStandardVersion.Cpp17;
-
-        PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
 
         var sqlite3 = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "sqlite3_ReleaseWithDebugInformation.txt"));
         PublicAdditionalLibraries.Add(sqlite3);

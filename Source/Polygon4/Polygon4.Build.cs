@@ -34,6 +34,11 @@ public class Polygon4 : ModuleRules
     public Polygon4(ReadOnlyTargetRules Target)
         : base(Target)
     {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePCHHeaderFile = "Polygon4.h";
+        CppStandard = CppStandardVersion.Cpp17;
+        bEnforceIWYU = true;
+
         PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
@@ -162,10 +167,6 @@ public class Polygon4 : ModuleRules
 
         if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
             return;
-
-        CppStandard = CppStandardVersion.Cpp17;
-
-        PrivatePCHHeaderFile = "Polygon4.h";
 
         //PublicDefinitions.Add("SCHEMA_API=");
         //PublicDefinitions.Add("DATA_MANAGER_API=");

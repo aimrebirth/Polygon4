@@ -25,6 +25,8 @@
 #include "GliderMovement.h"
 #include "P4Glider.generated.h"
 
+class USoundWave;
+
 USTRUCT()
 struct FGliderData
 {

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
 #include "P4MapObject.h"
 
 #include "Landscape.h"

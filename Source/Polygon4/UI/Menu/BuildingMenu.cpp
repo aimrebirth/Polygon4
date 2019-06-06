@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
 #include "BuildingMenu.h"
+
 #include "SceneViewport.h"
 
 #include <Polygon4/Mechanoid.h>

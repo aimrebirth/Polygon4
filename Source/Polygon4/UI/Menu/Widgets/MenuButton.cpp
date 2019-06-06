@@ -16,15 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
-
 #include "MenuButton.h"
 
 void SMenuButton::Construct(const FArguments& InArgs)
 {
     Text = InArgs._Text;
     ParentType::Construct(InArgs._ParentArguments);
-    
+
     ChildSlot
         [
             SNew(STextBlock)

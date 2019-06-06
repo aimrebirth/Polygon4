@@ -16,9 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Polygon4.h"
-
 #include "MainMenu.h"
+
 #include "Widgets/ModListView.h"
 #include "Widgets/SavedGamesListView.h"
 #include "Widgets/MenuButton.h"

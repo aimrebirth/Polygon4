@@ -16,8 +16,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "DBToolPrivatePCH.h"
 #include "SDBToolTreeView.h"
+
 #include "SDBToolTableView.h"
 
 TSharedPtr<TreeItem> TreeItem::AddChild(const SPtrP4TreeItem &P4ItemIn)
