@@ -1,6 +1,3 @@
 [submodule "ThirdParty/Engine"]
 	path = ThirdParty/Engine
 	url = https://github.com/aimrebirth/Engine.git
-[submodule "Content"]
-	path = Content
-	url = https://yakim3396@git.code.sf.net/p/polygon4/Content Content
