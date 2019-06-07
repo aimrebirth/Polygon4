@@ -17,7 +17,6 @@
  */
 
 #include "MainMenu.h"
-#include "Polygon4.h"
 
 #include "Widgets/ModListView.h"
 #include "Widgets/SavedGamesListView.h"

@@ -17,7 +17,6 @@
  */
 
 #include "P4MapObject.h"
-#include "Polygon4.h"
 
 #include "Landscape.h"
 

@@ -18,8 +18,6 @@
 
 #include "SavedGamesListView.h"
 
-#include "Polygon4.h"
-
 #include <Game/P4Engine.h>
 
 #define LOCTEXT_NAMESPACE "MainMenu"

@@ -17,7 +17,6 @@
 */
 
 #include "BotController.h"
-#include "Polygon4.h"
 
 ABotController::ABotController(const FObjectInitializer& ObjectInitializer)
     //: Super(ObjectInitializer.SetDefaultSubobjectClass<UJoyPathFollowComp>(TEXT("PathFollowingComponent")))

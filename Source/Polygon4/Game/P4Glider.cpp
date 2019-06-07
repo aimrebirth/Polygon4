@@ -17,7 +17,6 @@
  */
 
 #include "P4Glider.h"
-#include "Polygon4.h"
 
 #include <Polygon4/ConfigurationWeapon.h>
 

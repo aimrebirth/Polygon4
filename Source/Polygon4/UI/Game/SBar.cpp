@@ -17,7 +17,6 @@
 */
 
 #include "SBar.h"
-#include "Polygon4.h"
 
 
 void SBar::Construct(const FArguments& InArgs)

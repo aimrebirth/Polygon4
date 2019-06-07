@@ -18,7 +18,6 @@
 
 #include "MenuButton.h"
 
-#include "Polygon4.h"
 
 void SMenuButton::Construct(const FArguments& InArgs)
 {

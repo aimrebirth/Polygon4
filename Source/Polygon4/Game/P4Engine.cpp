@@ -17,9 +17,6 @@
  */
 
 #include "P4Engine.h"
-#include "Polygon4.h"
-
-#include "Landscape.h"
 
 #include "P4Modification.h"
 #include <P4GameInstance.h>

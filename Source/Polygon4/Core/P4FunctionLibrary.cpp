@@ -1,9 +1,9 @@
 //Copyright(c) 2019 Dmitry Yakimenko
 
 #include "P4FunctionLibrary.h"
+
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "Polygon4.h"
 
 
 //For UE4 Profiler ~ Stat

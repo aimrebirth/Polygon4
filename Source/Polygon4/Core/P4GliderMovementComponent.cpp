@@ -1,7 +1,6 @@
 //Copyright(c) 2019 Dmitry Yakimenko
 
 #include "P4GliderMovementComponent.h"
-#include "Polygon4.h"
 
 #include "DrawDebugHelpers.h"
 #include "P4FunctionLibrary.h" //

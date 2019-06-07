@@ -17,7 +17,6 @@
  */
 
 #include "PauseMenu.h"
-#include "Polygon4.h"
 
 #include "Widgets/MenuButton.h"
 #include "Widgets/SavedGamesListView.h"

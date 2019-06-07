@@ -17,7 +17,6 @@
  */
 
 #include "GliderHUD.h"
-#include "Polygon4.h"
 
 #include <UI/Game/SBar.h>
 

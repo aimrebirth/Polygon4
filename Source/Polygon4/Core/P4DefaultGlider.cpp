@@ -1,7 +1,7 @@
 //Copyright(c) 2019 Dmitry Yakimenko
 
 #include "P4DefaultGlider.h"
-#include "Polygon4.h"
+
 #include "Engine/CollisionProfile.h"
 #include "DisplayDebugHelpers.h"
 #include "Components/StaticMeshComponent.h"

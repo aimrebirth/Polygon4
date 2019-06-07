@@ -23,9 +23,6 @@
 #include "GameFramework/Pawn.h"
 #include <Polygon4/DataManager/Types.h>
 #include "GliderMovement.h"
-#include "Components/PrimitiveComponent.h"
-#include "Sound/SoundWave.h"
-#include "Components/AudioComponent.h"
 #include "P4Glider.generated.h"
 
 USTRUCT()
@@ -341,10 +338,10 @@ class POLYGON4_API AP4Glider : public APawn
     class USpringArmComponent* SpringArm;
 
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* VisibleComponent;
+    class UStaticMeshComponent* VisibleComponent;
 
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* EnergyShield;
+    class UStaticMeshComponent* EnergyShield;
 
     UGliderMovement *GliderMovement;
 
@@ -384,13 +381,13 @@ private:
     FVector GunOffsetTopLeft;
     FVector GunOffsetTopRight;
 
-    UPrimitiveComponent* Body;
-    USoundWave* JumpSound = nullptr;
-    USoundWave* EngineSound = nullptr;
-    USoundWave* LightSound = nullptr;
-    USoundWave* HeavySound = nullptr;
-    UAudioComponent* EngineAudioComponent;
-    UAudioComponent* WeaponAudioComponent;
+	class UPrimitiveComponent* Body;
+	class USoundWave* JumpSound = nullptr;
+	class USoundWave* EngineSound = nullptr;
+	class USoundWave* LightSound = nullptr;
+	class USoundWave* HeavySound = nullptr;
+	class UAudioComponent* EngineAudioComponent;
+	class UAudioComponent* WeaponAudioComponent;
 
     FloatFadedValue EnergyShieldTimer;
 
