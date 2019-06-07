@@ -18,11 +18,11 @@
 
 #include "ModListView.h"
 
-#include "Paths.h"
 #include "FileManagerGeneric.h"
+#include "Paths.h"
 
-#include <Game/P4Modification.h>
 #include <Game/P4Engine.h>
+#include <Game/P4Modification.h>
 
 #define LOCTEXT_NAMESPACE "MainMenu"
 
@@ -30,10 +30,8 @@ void SModListView::Construct(const FArguments& InArgs)
 {
     ReloadMods(false);
 
-    auto ListViewColumn = [](FName Name, FText Text)
-    {
-        return
-            SHeaderRow::Column(Name)
+    auto ListViewColumn = [](FName Name, FText Text) {
+        return SHeaderRow::Column(Name)
             .DefaultLabel(Text)
             .VAlignHeader(EVerticalAlignment::VAlign_Center)
             .HAlignHeader(EHorizontalAlignment::HAlign_Center)
@@ -42,22 +40,15 @@ void SModListView::Construct(const FArguments& InArgs)
     };
 
     ParentType::FArguments args;
-    args
-        .SelectionMode(ESelectionMode::Single)
+    args.SelectionMode(ESelectionMode::Single)
         .AllowOverscroll(EAllowOverscroll::No)
         .ItemHeight(40)
-        .ListItemsSource( &AvailableMods )
+        .ListItemsSource(&AvailableMods)
         .OnGenerateRow(this, &SModListView::OnGenerateWidgetForList)
-        .HeaderRow(
-            SNew(SHeaderRow)
-            + ListViewColumn("Name", LOCTEXT("ModsNameLabel", "Name"))
-            + ListViewColumn("Dir", LOCTEXT("ModsDirLabel", "Directory"))
-            + ListViewColumn("Author", LOCTEXT("ModsAuthorLabel", "Author"))
-            + ListViewColumn("Version", LOCTEXT("ModsVersionLabel", "Version"))
-            + ListViewColumn("DateCreated", LOCTEXT("ModsDateCreatedLabel", "Date Created"))
-            + ListViewColumn("DateModified", LOCTEXT("ModsDateModifiedLabel", "Date Modified"))
-            )
-        ;
+        .HeaderRow(SNew(SHeaderRow) + ListViewColumn("Name", LOCTEXT("ModsNameLabel", "Name")) + ListViewColumn("Dir", LOCTEXT("ModsDirLabel", "Directory")) +
+                   ListViewColumn("Author", LOCTEXT("ModsAuthorLabel", "Author")) + ListViewColumn("Version", LOCTEXT("ModsVersionLabel", "Version")) +
+                   ListViewColumn("DateCreated", LOCTEXT("ModsDateCreatedLabel", "Date Created")) +
+                   ListViewColumn("DateModified", LOCTEXT("ModsDateModifiedLabel", "Date Modified")));
     ParentType::Construct(args);
 }
 
@@ -78,13 +69,15 @@ void SModListView::ReloadMods(bool reload)
     }
 }
 
-TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable )
+TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable)
 {
     class SButtonRowWidget : public SMultiColumnTableRow<ListItem>
     {
         ListItem Item;
 
-        SLATE_BEGIN_ARGS(SButtonRowWidget){}
+        SLATE_BEGIN_ARGS(SButtonRowWidget)
+        {
+        }
         SLATE_END_ARGS()
 
         void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTable, ListItem InItem)
@@ -103,11 +96,11 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
             }
             else if (ColumnName == "Dir")
             {
-				ItemText = Item->Dir;
+                ItemText = Item->Dir;
             }
             else if (ColumnName == "Author")
             {
-				ItemText = Item->Author;
+                ItemText = Item->Author;
             }
             else if (ColumnName == "Version")
             {
@@ -115,25 +108,23 @@ TSharedRef<ITableRow> SModListView::OnGenerateWidgetForList( ListItem InItem, co
             }
             else if (ColumnName == "DateCreated")
             {
-				ItemText = Item->DateCreated;
+                ItemText = Item->DateCreated;
             }
             else if (ColumnName == "DateModified")
             {
-				ItemText = Item->DateModified;
+                ItemText = Item->DateModified;
             }
             else
             {
                 ItemText = "Unknown field!";
             }
-            return
-                SNew(STextBlock)
+            return SNew(STextBlock)
                 .ShadowColorAndOpacity(FLinearColor::Black)
                 .ColorAndOpacity(FLinearColor::White)
                 .ShadowOffset(FIntPoint(-1, 1))
                 .Font(FSlateFontInfo(RobotoFont, 24))
                 .Text(FText::FromString(ItemText))
-                .ColorAndOpacity(FSlateColor(FLinearColor(FColor(0, 0, 0, 255))))
-                ;
+                .ColorAndOpacity(FSlateColor(FLinearColor(FColor(0, 0, 0, 255))));
         }
     };
     return SNew(SButtonRowWidget, OwnerTable, InItem);

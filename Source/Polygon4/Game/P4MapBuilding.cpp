@@ -46,7 +46,7 @@ void AP4Building::BeginPlay()
     Super::BeginPlay();
 }
 
-void AP4Building::SetStaticMesh(UStaticMesh *mesh)
+void AP4Building::SetStaticMesh(UStaticMesh* mesh)
 {
     if (mesh)
     {
@@ -54,14 +54,14 @@ void AP4Building::SetStaticMesh(UStaticMesh *mesh)
     }
 }
 
-void AP4Building::InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding *mmb)
+void AP4Building::InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding* mmb)
 {
     if (!mmb)
         return;
     if (mmb->interactive)
     {
         VisibleComponent->SetCollisionProfileName("OverlapAllDynamic");
-        //VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Building::OnBodyHit);
+        // VisibleComponent->OnComponentHit.AddDynamic(this, &AP4Building::OnBodyHit);
         VisibleComponent->OnComponentBeginOverlap.AddDynamic(this, &AP4Building::OnBodyBeginOverlap);
     }
 }
@@ -71,7 +71,8 @@ void AP4Building::OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
     OnHit(OtherActor, OtherComp);
 }
 
-void AP4Building::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP4Building::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                     const FHitResult& SweepResult)
 {
     OnHit(OtherActor, OtherComp);
 }
@@ -90,8 +91,7 @@ void AP4Building::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp)
     M->enterBuilding(MapBuilding);
 }
 
-P4MapBuilding::P4MapBuilding(const polygon4::detail::MapBuilding &rhs)
-    : Base(rhs)
+P4MapBuilding::P4MapBuilding(const polygon4::detail::MapBuilding& rhs) : Base(rhs)
 {
 }
 
@@ -109,7 +109,7 @@ void P4MapBuilding::initModificationMapBuilding()
         Building->InitModificationMapBuilding(modificationMapBuilding);
 }
 
-AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W)
+AP4Building* spawn(polygon4::detail::MapBuilding* B, UWorld* W)
 {
     auto World = W;
     TActorIterator<ALandscape> landscapeIterator(World);
@@ -125,7 +125,7 @@ AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W)
         if (o)
         {
             auto Building = World->SpawnActorDeferred<AP4Building>(AP4Building::StaticClass(), {});
-            UGameplayStatics::FinishSpawningActor(Building, { rot, pos });
+            UGameplayStatics::FinishSpawningActor(Building, {rot, pos});
 
             Building->SetStaticMesh(o);
             FVector new_scale(B->building->scale, B->building->scale, B->building->scale);

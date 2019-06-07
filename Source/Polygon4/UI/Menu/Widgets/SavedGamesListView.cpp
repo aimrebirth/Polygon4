@@ -24,10 +24,8 @@
 
 void SSavedGamesListView::Construct(const FArguments& InArgs)
 {
-    auto ListViewColumn = [](FName Name, FText Text)
-    {
-        return
-            SHeaderRow::Column(Name)
+    auto ListViewColumn = [](FName Name, FText Text) {
+        return SHeaderRow::Column(Name)
             .DefaultLabel(Text)
             .VAlignHeader(EVerticalAlignment::VAlign_Center)
             .HAlignHeader(EHorizontalAlignment::HAlign_Center)
@@ -38,18 +36,13 @@ void SSavedGamesListView::Construct(const FArguments& InArgs)
     this->OnSelectionChanged = InArgs._OnSelectionChanged;
 
     Base::FArguments args;
-    args
-        .SelectionMode(ESelectionMode::Single)
+    args.SelectionMode(ESelectionMode::Single)
         .AllowOverscroll(EAllowOverscroll::No)
         .ItemHeight(40)
-        .ListItemsSource( &AvailableGames )
+        .ListItemsSource(&AvailableGames)
         .OnSelectionChanged(OnSelectionChanged)
         .OnGenerateRow(this, &SSavedGamesListView::OnGenerateWidgetForList)
-        .HeaderRow(
-            SNew(SHeaderRow)
-            + ListViewColumn("Name", LOCTEXT("ModsNameLabel", "Name"))
-            )
-        ;
+        .HeaderRow(SNew(SHeaderRow) + ListViewColumn("Name", LOCTEXT("ModsNameLabel", "Name")));
     Base::Construct(args);
 
     ReloadSaves();
@@ -60,7 +53,7 @@ void SSavedGamesListView::ReloadSaves(bool save)
     AvailableGames.Empty();
 
     auto games = GP4Engine()->getSavedGames(save);
-    for (auto &g : games)
+    for (auto& g : games)
     {
         ListItem i = MakeShareable(new SavedGameDesc);
         i->Name = g;
@@ -72,13 +65,15 @@ void SSavedGamesListView::ReloadSaves(bool save)
     RequestListRefresh();
 }
 
-TSharedRef<ITableRow> SSavedGamesListView::OnGenerateWidgetForList( ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable )
+TSharedRef<ITableRow> SSavedGamesListView::OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable)
 {
     class SButtonRowWidget : public SMultiColumnTableRow<ListItem>
     {
         ListItem Item;
 
-        SLATE_BEGIN_ARGS(SButtonRowWidget){}
+        SLATE_BEGIN_ARGS(SButtonRowWidget)
+        {
+        }
         SLATE_END_ARGS()
 
         void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTable, ListItem InItem)
@@ -99,14 +94,12 @@ TSharedRef<ITableRow> SSavedGamesListView::OnGenerateWidgetForList( ListItem InI
             {
                 ItemText = FText::FromString("Unknown field!");
             }
-            return
-                SNew(STextBlock)
+            return SNew(STextBlock)
                 .ShadowColorAndOpacity(FLinearColor::Black)
                 .ColorAndOpacity(FLinearColor::White)
                 .ShadowOffset(FIntPoint(-1, 1))
                 .Font(FSlateFontInfo(RobotoFont, 24))
-                .Text(ItemText)
-                ;
+                .Text(ItemText);
         }
     };
     return SNew(SButtonRowWidget, OwnerTable, InItem);

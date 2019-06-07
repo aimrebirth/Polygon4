@@ -1,20 +1,20 @@
 /*
-* Polygon-4
-* Copyright (C) 2015 lzwdgc
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as
-* published by the Free Software Foundation, either version 3 of the
-* License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Polygon-4
+ * Copyright (C) 2015 lzwdgc
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "InfoTreeView.h"
 
@@ -43,25 +43,21 @@ void InfoTreeItem::Build(P4InfoTreeItem *Root)
         AddChild(c.get());
 }
 
-void InfoTreeView::Construct(const FArguments& InArgs)
+void InfoTreeView::Construct(const FArguments &InArgs)
 {
     P4RootItem = InArgs._RootItem;
     RootItem = MakeShareable(new InfoTreeItem());
     RootItem->Build(P4RootItem);
 
     ParentType::FArguments args;
-    args
-        .SelectionMode(ESelectionMode::Single)
+    args.SelectionMode(ESelectionMode::Single)
         .ClearSelectionOnClick(false)
         .OnSelectionChanged(this, &InfoTreeView::OnSelectionChanged)
         .OnGenerateRow(this, &InfoTreeView::OnGenerateRow)
-        .OnGetChildren(this, &InfoTreeView::OnGetChildren)
-        ;
+        .OnGetChildren(this, &InfoTreeView::OnGetChildren);
     if (RootItem.IsValid())
     {
-        args
-            .TreeItemsSource(&RootItem->Children)
-            ;
+        args.TreeItemsSource(&RootItem->Children);
     }
     ParentType::Construct(args);
 
@@ -88,7 +84,7 @@ void InfoTreeView::SetExpandedItems(const TArray<TSharedPtr<InfoTreeItem>> &Item
     }
 }
 
-TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable)
+TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TSharedRef<STableViewBase> &OwnerTable)
 {
     using namespace polygon4;
     using namespace polygon4::detail;
@@ -138,16 +134,10 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
     if (FT.IsEmpty())
         FT = LOCTEXT("EmptyString", "Empty");
 
-    return SNew(STableRow<ListItem>, OwnerTable)
-        [
-            SAssignNew(InItem->Widget, STextBlock)
-            .Text(FT)
-            .Font(FSlateFontInfo(RobotoFont, 16))
-            .ColorAndOpacity(Color)
-        ];
+    return SNew(STableRow<ListItem>, OwnerTable)[SAssignNew(InItem->Widget, STextBlock).Text(FT).Font(FSlateFontInfo(RobotoFont, 16)).ColorAndOpacity(Color)];
 }
 
-void InfoTreeView::OnGetChildren(ListItem Item, TArray<ListItem>& OutChildren)
+void InfoTreeView::OnGetChildren(ListItem Item, TArray<ListItem> &OutChildren)
 {
     OutChildren.Append(Item->Children);
 }
@@ -168,18 +158,18 @@ void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInf
     switch (p->object->getType())
     {
     case polygon4::detail::EObjectType::Message:
-        bm->showMessage((polygon4::detail::Message*)p->object);
+        bm->showMessage((polygon4::detail::Message *)p->object);
         break;
     case polygon4::detail::EObjectType::JournalRecord:
-        bm->showMessage(((polygon4::detail::JournalRecord*)p->object)->message);
+        bm->showMessage(((polygon4::detail::JournalRecord *)p->object)->message);
         break;
 
-#define PRINT_DESCRIPTION(t) \
-    case polygon4::detail::EObjectType::t: \
-        if (((polygon4::detail::t*)p->object)->description) \
-            bm->showText(p->object->getName(), ((polygon4::detail::t*)p->object)->description->string); \
-        else \
-            bm->showText(p->object->getName()); \
+#define PRINT_DESCRIPTION(t)                                                                                                                                                       \
+    case polygon4::detail::EObjectType::t:                                                                                                                                         \
+        if (((polygon4::detail::t *)p->object)->description)                                                                                                                       \
+            bm->showText(p->object->getName(), ((polygon4::detail::t *)p->object)->description->string);                                                                           \
+        else                                                                                                                                                                       \
+            bm->showText(p->object->getName());                                                                                                                                    \
         break
 
         PRINT_DESCRIPTION(Building);
@@ -191,16 +181,17 @@ void InfoTreeView::OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInf
         PRINT_DESCRIPTION(Projectile);
         PRINT_DESCRIPTION(Modificator);
 
-#define PRINT_DESCRIPTION_VAR(t, v) \
-    case polygon4::detail::EObjectType::t: \
-    do { \
-        auto o = (polygon4::detail::t*)p->object; \
-        if (o->v->description) \
-            bm->showText(o->getName(), o->v->description->string); \
-        else \
-            bm->showText(o->getName()); \
-        break; \
-    } while (0)
+#define PRINT_DESCRIPTION_VAR(t, v)                                                                                                                                                \
+    case polygon4::detail::EObjectType::t:                                                                                                                                         \
+        do                                                                                                                                                                         \
+        {                                                                                                                                                                          \
+            auto o = (polygon4::detail::t *)p->object;                                                                                                                             \
+            if (o->v->description)                                                                                                                                                 \
+                bm->showText(o->getName(), o->v->description->string);                                                                                                             \
+            else                                                                                                                                                                   \
+                bm->showText(o->getName());                                                                                                                                        \
+            break;                                                                                                                                                                 \
+        } while (0)
 
         PRINT_DESCRIPTION_VAR(ConfigurationEquipment, equipment);
         PRINT_DESCRIPTION_VAR(ConfigurationGood, good);
@@ -245,8 +236,7 @@ static InfoTreeView::ListItem FindFirstNotParent(const InfoTreeView::ListItem &R
 
 bool InfoTreeView::SelectFirstNotParent()
 {
-    auto f = [this](auto &&f)
-    {
+    auto f = [this](auto &&f) {
         auto i = f(RootItem);
         if (i.IsValid())
         {

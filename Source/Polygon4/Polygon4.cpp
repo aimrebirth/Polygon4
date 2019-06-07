@@ -23,17 +23,17 @@
 
 #include <fstream>
 
-#include "Modules/ModuleManager.h"
-#include "Misc/Paths.h"
 #include "GameFramework/Actor.h"
+#include "Misc/Paths.h"
+#include "Modules/ModuleManager.h"
 
-UFont *RobotoFont;
+UFont* RobotoFont;
 
 class FPolygon4ModuleImpl : public FDefaultGameModuleImpl
 {
 public:
-	virtual void StartupModule() override
-	{
+    virtual void StartupModule() override
+    {
         FDefaultGameModuleImpl::StartupModule();
 
 #if !IS_MONOLITHIC
@@ -48,16 +48,16 @@ public:
             auto gd = FPaths::ProjectDir();
             auto fgd = FPaths::ConvertRelativePathToFull(gd);
             FPaths::CollapseRelativeDirectories(fgd);
-            //polygon4::write_module_last_write_time(*fgd, "Engine");
+            // polygon4::write_module_last_write_time(*fgd, "Engine");
         }
 #endif
 #endif
     }
 
-	virtual void ShutdownModule() override
-	{
+    virtual void ShutdownModule() override
+    {
         FDefaultGameModuleImpl::ShutdownModule();
-	}
+    }
 };
 
 UClass* LoadClass(const TCHAR* Name)
@@ -70,6 +70,6 @@ UClass* LoadClass(const TCHAR* Name)
     return StaticLoadClass(AActor::StaticClass(), 0, DUMMY_OBJECT);
 }
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FPolygon4ModuleImpl, Polygon4, "Polygon4" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FPolygon4ModuleImpl, Polygon4, "Polygon4");
 
 DEFINE_LOG_CATEGORY(Polygon4);

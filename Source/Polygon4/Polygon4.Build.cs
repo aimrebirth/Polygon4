@@ -40,7 +40,7 @@ public class Polygon4 : ModuleRules
         PrivatePCHHeaderFile = "Polygon4.h";
         CppStandard = CppStandardVersion.Cpp17;
 
-        PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         GenerateVersion();

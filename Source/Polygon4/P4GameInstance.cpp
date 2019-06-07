@@ -24,7 +24,7 @@
 #include "UI/Menu/MainMenu.h"
 
 #include <Polygon4/Memory.h>
-//POLYGON4_UNREAL_MEMORY_STUB
+// POLYGON4_UNREAL_MEMORY_STUB
 
 #include <MinimalWindowsApi.h>
 
@@ -46,7 +46,7 @@ static void HotpatchEngine()
 void UP4GameInstance::Init()
 {
 #if !IS_MONOLITHIC
-    //HotpatchEngine();
+    // HotpatchEngine();
 #endif
 
     Engine = P4Engine::create<P4Engine>(FPaths::ProjectDir(), this);

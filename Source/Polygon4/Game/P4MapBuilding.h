@@ -39,18 +39,19 @@ public:
 
     virtual void BeginPlay() override;
 
-    void SetStaticMesh(UStaticMesh *mesh);
-    void InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding *mmb);
+    void SetStaticMesh(UStaticMesh* mesh);
+    void InitModificationMapBuilding(polygon4::detail::ModificationMapBuilding* mmb);
 
     UFUNCTION()
     void OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
     UFUNCTION()
-    void OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    void OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                            const FHitResult& SweepResult);
 
     void OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 
 private:
-    P4MapBuilding *MapBuilding = nullptr;
+    P4MapBuilding* MapBuilding = nullptr;
 
     friend class P4MapBuilding;
 };
@@ -60,15 +61,15 @@ class P4MapBuilding : public polygon4::MapBuilding
     using Base = polygon4::MapBuilding;
 
 public:
-    P4MapBuilding(const polygon4::detail::MapBuilding &rhs);
+    P4MapBuilding(const polygon4::detail::MapBuilding& rhs);
 
     virtual bool spawn() override final;
 
     virtual void initModificationMapBuilding() override final;
 
 private:
-    AP4Building *Building;
+    AP4Building* Building;
 };
 
 POLYGON4_API
-AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W);
+AP4Building* spawn(polygon4::detail::MapBuilding* B, UWorld* W);

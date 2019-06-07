@@ -24,7 +24,7 @@
 UCLASS()
 class POLYGON4_API AP4GameMode : public AGameMode
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
     AP4GameMode(const FObjectInitializer& ObjectInitializer);

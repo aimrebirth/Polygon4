@@ -23,23 +23,23 @@
 #include "Projectile.h"
 
 #include "BotController.h"
-#include "GliderMovement.h"
 #include "GliderHUD.h"
+#include "GliderMovement.h"
 
-#include "P4Mechanoid.h"
 #include "P4MapBuilding.h"
+#include "P4Mechanoid.h"
 
-#include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/PlayerController.h"
-#include "ConstructorHelpers.h"
+#include "Components/AudioComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/AudioComponent.h"
-#include "Materials/Material.h"
+#include "ConstructorHelpers.h"
 #include "Engine/StaticMesh.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Materials/Material.h"
 
 const float k_mouse_x = 0.6;
 const float k_mouse_y = 0.8;
@@ -62,8 +62,8 @@ AP4Glider::AP4Glider()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    //AutoPossessPlayer = EAutoReceiveInput::Player0;
-    //AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+    // AutoPossessPlayer = EAutoReceiveInput::Player0;
+    // AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
     VisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisibleComponent"));
     VisibleComponent->SetupAttachment(RootComponent);
@@ -76,11 +76,11 @@ AP4Glider::AP4Glider()
 
     EngineAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudioComponent"));
     EngineAudioComponent->SetupAttachment(VisibleComponent);
-    //EngineAudioComponent->bOverrideAttenuation = true;
+    // EngineAudioComponent->bOverrideAttenuation = true;
 
     WeaponAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("WeaponAudioComponent"));
     WeaponAudioComponent->SetupAttachment(VisibleComponent);
-    //WeaponAudioComponent->bOverrideAttenuation = true;
+    // WeaponAudioComponent->bOverrideAttenuation = true;
 
     static ConstructorHelpers::FObjectFinder<USoundWave> JumpSoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
     if (JumpSoundAsset.Succeeded())
@@ -130,12 +130,12 @@ AP4Glider::AP4Glider()
     {
         EnergyShield = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EnergyShield"));
         EnergyShield->SetStaticMesh(EnergyShieldAsset.Object);
-        EnergyShield->SetWorldScale3D({ 2,2,2 });
+        EnergyShield->SetWorldScale3D({2, 2, 2});
         EnergyShield->SetupAttachment(VisibleComponent);
         EnergyShield->SetSimulatePhysics(false);
         EnergyShield->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         EnergyShield->SetOwnerNoSee(true);
-        EnergyShield->RelativeLocation = { 0,0,0 };
+        EnergyShield->RelativeLocation = {0, 0, 0};
 
         static ConstructorHelpers::FObjectFinder<UMaterial> EnergyShieldMat(TEXT("Material'/Game/Mods/Common/Materials/EnergyShield.EnergyShield'"));
         if (EnergyShieldMat.Succeeded())
@@ -148,8 +148,8 @@ AP4Glider::AP4Glider()
     Body->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     Body->OnComponentHit.AddDynamic(this, &AP4Glider::OnBodyHit);
     Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnBodyBeginOverlap);
-    //Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldBeginOverlap);
-    //Body->OnComponentEndOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldEndOverlap);
+    // Body->OnComponentBeginOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldBeginOverlap);
+    // Body->OnComponentEndOverlap.AddDynamic(this, &AP4Glider::OnEnergyShieldEndOverlap);
 
     UpdateView();
 
@@ -159,8 +159,8 @@ AP4Glider::AP4Glider()
     GunOffsetTopLeft = FVector(150.0f, -100.0f, 100.0f);
     GunOffsetTopRight = FVector(150.0f, 1000.0f, 100.0f);
 
-    //static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
-    //static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/HawkProjectile.HawkProjectile_C'"));
+    // static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/SimpleProjectile.SimpleProjectile_C'"));
+    // static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/HawkProjectile.HawkProjectile_C'"));
     static ConstructorHelpers::FObjectFinder<UClass> light(TEXT("Class'/Game/Mods/Common/Projectiles/ImpulseRed/SimpleProjectile.SimpleProjectile_C'"));
     if (light.Object)
         projectileLight = light.Object;
@@ -173,7 +173,7 @@ AP4Glider::AP4Glider()
     EnergyShieldTimer = FloatFadedValue(2);
 }
 
-UGliderMovement *AP4Glider::GetMovementComponent() const
+UGliderMovement* AP4Glider::GetMovementComponent() const
 {
     return GliderMovement;
 }
@@ -189,8 +189,8 @@ void AP4Glider::BeginPlay()
     Body->SetPhysicsMaxAngularVelocityInDegrees(90);
     Body->SetMassOverrideInKg(NAME_None, 4000.0f);
 
-    //if (!Mechanoid->isPlayer())
-        //Controller = new ABotController;
+    // if (!Mechanoid->isPlayer())
+    // Controller = new ABotController;
 
     Super::BeginPlay();
 }
@@ -224,19 +224,19 @@ void AP4Glider::Tick(float DeltaSeconds)
     Mechanoid->roll = rot.Roll;
 
     // conditions
-    //if (!PlayerController)
+    // if (!PlayerController)
     //    return;
 
     // engine sound
     {
         if (GetVelocity().Size() > 150 && !EngineAudioComponent->IsPlaying())
         {
-            //EngineAudioComponent->Play();
-            //EngineAudioComponent->bAlwaysPlay = true;
+            // EngineAudioComponent->Play();
+            // EngineAudioComponent->bAlwaysPlay = true;
         }
         else
         {
-            //EngineAudioComponent->bAlwaysPlay = false;
+            // EngineAudioComponent->bAlwaysPlay = false;
         }
     }
 
@@ -257,12 +257,11 @@ void AP4Glider::Tick(float DeltaSeconds)
         auto Viewport = GetWorld()->GetGameViewport();
         FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
         FIntPoint Center = ViewSize / 2;
-        //Center.Y -= 20;
+        // Center.Y -= 20;
         FVector2D Position;
         bool Focused1 = Viewport->IsFocused(Viewport->Viewport);
         bool Focused2 = Viewport->Viewport->HasFocus();
-        if ((Focused1 || Focused2) && PlayerController->GetMousePosition(Position.X, Position.Y) &&
-            (Position.X != Center.X || Position.Y != Center.Y))
+        if ((Focused1 || Focused2) && PlayerController->GetMousePosition(Position.X, Position.Y) && (Position.X != Center.X || Position.Y != Center.Y))
         {
             float mouse_diff_max = 3;
             auto mouse_diff_x = fabs(MousePosition.X - Position.X);
@@ -284,8 +283,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 Start,
                 End,
             };
-            auto NormPos = [](float &x, int len, float k)
-            {
+            auto NormPos = [](float& x, int len, float k) {
                 int window = len * k;
                 int pos = round(x);
                 int start = (len - window) / 2.0f;
@@ -312,7 +310,7 @@ void AP4Glider::Tick(float DeltaSeconds)
 
             if (changed)
             {
-                //if (changed_y == MouseChange::End)
+                // if (changed_y == MouseChange::End)
                 //    Position.X++;
                 Viewport->Viewport->SetMouse(Position.X, Position.Y);
             }
@@ -341,11 +339,9 @@ void AP4Glider::Tick(float DeltaSeconds)
                 }
                 NewPosition.X -= copysignf(base_k_x, kx);
                 NewPosition.Y -= copysignf(base_k_y, ky);
-                if ((NewPosition.X > Center.X && Position.X <= Center.X) ||
-                    (NewPosition.X < Center.X && Position.X >= Center.X))
+                if ((NewPosition.X > Center.X && Position.X <= Center.X) || (NewPosition.X < Center.X && Position.X >= Center.X))
                     NewPosition.X = Center.X;
-                if ((NewPosition.Y > Center.Y && Position.Y <= Center.Y) ||
-                    (NewPosition.Y < Center.Y && Position.Y >= Center.Y))
+                if ((NewPosition.Y > Center.Y && Position.Y <= Center.Y) || (NewPosition.Y < Center.Y && Position.Y >= Center.Y))
                     NewPosition.Y = Center.Y;
                 Viewport->Viewport->SetMouse(NewPosition.X, NewPosition.Y);
 
@@ -380,29 +376,23 @@ void AP4Glider::Tick(float DeltaSeconds)
         const FVector SpawnLocationTopLeft = loc + SpawnRotation.RotateVector(GunOffsetTopLeft);
         const FVector SpawnLocationTopRight = loc + SpawnRotation.RotateVector(GunOffsetTopRight);
 
-        for (auto &w : c->weapons)
+        for (auto& w : c->weapons)
         {
-            if (w->weapon->type == polygon4::detail::WeaponType::BombLauncher ||
-                w->weapon->type == polygon4::detail::WeaponType::RocketLauncher)
+            if (w->weapon->type == polygon4::detail::WeaponType::BombLauncher || w->weapon->type == polygon4::detail::WeaponType::RocketLauncher)
                 continue;
 
-            AProjectile *p = nullptr;
+            AProjectile* p = nullptr;
 
-            if (FireLight && projectileLight &&
-                w->weapon->type == polygon4::detail::WeaponType::Light &&
-                w->shoot())
+            if (FireLight && projectileLight && w->weapon->type == polygon4::detail::WeaponType::Light && w->shoot())
             {
-                auto &loc2 = LeftGun ? SpawnLocationLeft : SpawnLocationRight;
-                p = (AProjectile *)GetWorld()->SpawnActor(projectileLight, &loc2, &SpawnRotation);
+                auto& loc2 = LeftGun ? SpawnLocationLeft : SpawnLocationRight;
+                p = (AProjectile*)GetWorld()->SpawnActor(projectileLight, &loc2, &SpawnRotation);
                 LeftGun = !LeftGun;
                 UGameplayStatics::PlaySoundAtLocation(this, LightSound, loc2);
             }
-            else if (
-                FireHeavy && projectileHeavy &&
-                w->weapon->type == polygon4::detail::WeaponType::Heavy &&
-                w->shoot())
+            else if (FireHeavy && projectileHeavy && w->weapon->type == polygon4::detail::WeaponType::Heavy && w->shoot())
             {
-                p = (AProjectile *)GetWorld()->SpawnActor(projectileHeavy, &SpawnLocationTop, &SpawnRotation);
+                p = (AProjectile*)GetWorld()->SpawnActor(projectileHeavy, &SpawnLocationTop, &SpawnRotation);
                 UGameplayStatics::PlaySoundAtLocation(this, HeavySound, SpawnLocationTop);
             }
 
@@ -426,8 +416,7 @@ void AP4Glider::Tick(float DeltaSeconds)
         return;
     }
 
-    auto CalcAngle = [](const FVector &Vector1, const FVector &Vector2 = FVector::UpVector)
-    {
+    auto CalcAngle = [](const FVector& Vector1, const FVector& Vector2 = FVector::UpVector) {
         float dp = FVector::DotProduct(Vector1, Vector2);
         dp /= Vector1.Size() * Vector2.Size();
         float acos_ = acosf(dp);
@@ -445,7 +434,7 @@ void AP4Glider::Tick(float DeltaSeconds)
         bool on_slope = SlopeAngle > angle_max;
         if (on_slope)
         {
-            //ZTraceResults = HoverTrace(ZTraceResults.ImpactPoint);
+            // ZTraceResults = HoverTrace(ZTraceResults.ImpactPoint);
             if (!ZTraceResults.bBlockingHit)
                 return;
         }
@@ -455,8 +444,7 @@ void AP4Glider::Tick(float DeltaSeconds)
         float force = g;
         bool applied = false;
 
-        auto ForceUp = [this, &Altitude, &force, &applied]()
-        {
+        auto ForceUp = [this, &Altitude, &force, &applied]() {
             if (applied)
                 return;
             applied = true;
@@ -477,7 +465,7 @@ void AP4Glider::Tick(float DeltaSeconds)
             else if (!applied && Altitude < PowerUpProperties.HoverAltitude) // force up
             {
                 auto diff = PowerUpProperties.HoverAltitude - Altitude;
-                //force = g - (Altitude - PowerUpProperties.HoverAltitude) * 3;
+                // force = g - (Altitude - PowerUpProperties.HoverAltitude) * 3;
                 force = g * (1 + 3 * diff / PowerUpProperties.HoverAltitude);
             }
             else
@@ -522,7 +510,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 auto Viewport = GetWorld()->GetGameViewport();
                 FIntPoint ViewSize = Viewport->Viewport->GetSizeXY();
                 FIntPoint Center = ViewSize / 2;
-                //Center.Y -= 20;
+                // Center.Y -= 20;
                 if (fabs(Position.X - Center.X) > mouse_gap)
                     Position.X = (Position.X - Center.X) / (float)Center.X / k_mouse_x;
                 else
@@ -532,8 +520,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 else
                     Position.Y = 0;
 
-                auto ScalePosition = [](float &p)
-                {
+                auto ScalePosition = [](float& p) {
                     bool sign = signbit(p);
                     p *= 1;
                     p = p * p;
@@ -559,7 +546,8 @@ void AP4Glider::Tick(float DeltaSeconds)
                 diff = fabs(diff);
                 auto RightVector = GetActorRightVector();
                 // auto torque
-                if (0);
+                if (0)
+                    ;
                 else if (diff > 50)
                     Body->AddTorqueInRadians(sign * RightVector * (sign ? 50000 : 20000) * Body->GetMass());
                 else if (diff > 25)
@@ -574,7 +562,8 @@ void AP4Glider::Tick(float DeltaSeconds)
                 if (diff < 0)
                     sign = -1;
                 diff = fabs(diff);
-                if (0);
+                if (0)
+                    ;
                 else if (diff > 50)
                     Body->AddTorqueInRadians(sign * GetActorForwardVector() * 20000 * Body->GetMass());
                 else if (diff > 20)
@@ -596,7 +585,7 @@ void AP4Glider::Tick(float DeltaSeconds)
     // energy shield
     EnergyShield->SetVisibility(EnergyShieldTimer);
 
-    //UE_LOG(LogTemp, Warning, TEXT("Sphere radius = %f"), Body->Bounds.GetSphere().W);
+    // UE_LOG(LogTemp, Warning, TEXT("Sphere radius = %f"), Body->Bounds.GetSphere().W);
 
     // end
 }
@@ -610,13 +599,13 @@ void AP4Glider::SetupPlayerInputComponent(class UInputComponent* InInputComponen
     InInputComponent->BindAxis("Move", this, &AP4Glider::Move);
     InInputComponent->BindAxis("Strafe", this, &AP4Glider::Strafe);
 
-    //InInputComponent->BindAxis("Turn", this, &AP4Glider::Turn);
-    //InInputComponent->BindAxis("LookUp", this, &AP4Glider::LookUp);
+    // InInputComponent->BindAxis("Turn", this, &AP4Glider::Turn);
+    // InInputComponent->BindAxis("LookUp", this, &AP4Glider::LookUp);
     InInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
     InInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
     InInputComponent->BindAction("Jump", IE_Pressed, this, &AP4Glider::Jump);
-    //InInputComponent->BindAction("Jump", IE_Released, this, &AP4Glider::Jump);
+    // InInputComponent->BindAction("Jump", IE_Released, this, &AP4Glider::Jump);
 
     InInputComponent->BindAction("Boost", IE_Pressed, this, &AP4Glider::BoostOn);
     InInputComponent->BindAction("Boost", IE_Released, this, &AP4Glider::BoostOff);
@@ -641,7 +630,7 @@ void AP4Glider::Move(float AxisValue)
         if (!EngineAudioComponent->IsPlaying())
             EngineAudioComponent->Play();
 
-        //UGameplayStatics::PlaySoundAtLocation(this, EngineSound, GetActorLocation());
+        // UGameplayStatics::PlaySoundAtLocation(this, EngineSound, GetActorLocation());
     }
 }
 
@@ -655,7 +644,7 @@ void AP4Glider::Strafe(float AxisValue)
         if (!EngineAudioComponent->IsPlaying())
             EngineAudioComponent->Play();
 
-        //UGameplayStatics::PlaySoundAtLocation(this, EngineSound, GetActorLocation());
+        // UGameplayStatics::PlaySoundAtLocation(this, EngineSound, GetActorLocation());
     }
 }
 
@@ -694,7 +683,7 @@ void AP4Glider::UpdateView()
     switch (GliderView)
     {
     case FPS:
-    //case FPSWeapons:
+        // case FPSWeapons:
         FirstPersonCameraComponent->SetActive(true);
         ThirdPersonCameraComponent->SetActive(false);
         VisibleComponent->SetOwnerNoSee(true);
@@ -710,45 +699,35 @@ void AP4Glider::UpdateView()
 FHitResult AP4Glider::HoverTrace(float Altitude) const
 {
     static const FName HoverTraceTag("HoverTrace");
-    //GetWorld()->DebugDrawTraceTag = HoverTraceTag;
+    // GetWorld()->DebugDrawTraceTag = HoverTraceTag;
 
     FCollisionQueryParams TraceParams(HoverTraceTag, true, this);
-    //TraceParams.bTraceAsyncScene = true;
-    //TraceParams.TraceTag = HoverTraceTag;
+    // TraceParams.bTraceAsyncScene = true;
+    // TraceParams.TraceTag = HoverTraceTag;
 
     auto begin = GetActorLocation();
     auto end = begin;
     end.Z -= Altitude;
 
     FHitResult Hit(ForceInit);
-    GetWorld()->LineTraceSingleByChannel(
-        Hit,
-        begin,
-        end,
-        ECollisionChannel::ECC_Visibility,
-        TraceParams);
+    GetWorld()->LineTraceSingleByChannel(Hit, begin, end, ECollisionChannel::ECC_Visibility, TraceParams);
     return Hit;
 }
 
 FHitResult AP4Glider::HoverTrace(FVector Vector, float Altitude) const
 {
     static const FName HoverTraceTag("HoverTrace");
-    //GetWorld()->DebugDrawTraceTag = HoverTraceTag;
+    // GetWorld()->DebugDrawTraceTag = HoverTraceTag;
 
     FCollisionQueryParams TraceParams(HoverTraceTag, true, this);
-    //TraceParams.bTraceAsyncScene = true;
-    //TraceParams.TraceTag = HoverTraceTag;
+    // TraceParams.bTraceAsyncScene = true;
+    // TraceParams.TraceTag = HoverTraceTag;
 
     auto begin = GetActorLocation();
     auto end = (Vector - begin) * Altitude;
 
     FHitResult Hit(ForceInit);
-    GetWorld()->LineTraceSingleByChannel(
-        Hit,
-        begin,
-        end,
-        ECollisionChannel::ECC_Visibility,
-        TraceParams);
+    GetWorld()->LineTraceSingleByChannel(Hit, begin, end, ECollisionChannel::ECC_Visibility, TraceParams);
     return Hit;
 }
 
@@ -778,7 +757,8 @@ void AP4Glider::OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
         FireLight = true;
 }
 
-void AP4Glider::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP4Glider::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                   const FHitResult& SweepResult)
 {
     if (OtherActor == nullptr)
         return;
@@ -789,7 +769,8 @@ void AP4Glider::OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* Ot
     }
 }
 
-void AP4Glider::OnEnergyShieldBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP4Glider::OnEnergyShieldBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                           const FHitResult& SweepResult)
 {
     if (OtherActor != this && OtherComp != NULL)
     {
@@ -801,7 +782,7 @@ void AP4Glider::OnEnergyShieldEndOverlap(UPrimitiveComponent* HitComponent, AAct
 {
 }
 
-void AP4Glider::SetStaticMesh(UStaticMesh *mesh)
+void AP4Glider::SetStaticMesh(UStaticMesh* mesh)
 {
     if (mesh)
     {

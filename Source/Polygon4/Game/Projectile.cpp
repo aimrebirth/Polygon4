@@ -20,50 +20,46 @@
 
 #include "P4Glider.h"
 
+#include "Components/PrimitiveComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Components/PrimitiveComponent.h"
 
-AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	// Use a sphere as a simple collision representation
-	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(10.0f);
-	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+    // Use a sphere as a simple collision representation
+    CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+    CollisionComp->InitSphereRadius(10.0f);
+    CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
+    CollisionComp->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 
-	// Players can't walk on it
-	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	CollisionComp->CanCharacterStepUpOn = ECB_No;
+    // Players can't walk on it
+    CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+    CollisionComp->CanCharacterStepUpOn = ECB_No;
 
-	// Set as root component
-	RootComponent = CollisionComp;
+    // Set as root component
+    RootComponent = CollisionComp;
 
-	// Use a ProjectileMovementComponent to govern this projectile's movement
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 5000.f;
-	ProjectileMovement->MaxSpeed = 5000.f;
-	ProjectileMovement->bRotationFollowsVelocity = false;
-	ProjectileMovement->bShouldBounce = false;
+    // Use a ProjectileMovementComponent to govern this projectile's movement
+    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
+    ProjectileMovement->UpdatedComponent = CollisionComp;
+    ProjectileMovement->InitialSpeed = 5000.f;
+    ProjectileMovement->MaxSpeed = 5000.f;
+    ProjectileMovement->bRotationFollowsVelocity = false;
+    ProjectileMovement->bShouldBounce = false;
     ProjectileMovement->ProjectileGravityScale = 0;
 
-	// Die after 3 seconds by default
-	InitialLifeSpan = 15.0f;
+    // Die after 3 seconds by default
+    InitialLifeSpan = 15.0f;
 
     bCanBeDamaged = false;
 }
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    if (OtherActor != this &&
-        OtherComp != nullptr &&
-        OtherActor != Owner &&
-        (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry()))
-	{
-        //if (OtherComp->IsSimulatingPhysics())
-		//    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());
+    if (OtherActor != this && OtherComp != nullptr && OtherActor != Owner && (OtherComp->IsSimulatingPhysics() || OtherComp->IsWorldGeometry()))
+    {
+        // if (OtherComp->IsSimulatingPhysics())
+        //    OtherComp->AddImpulseAtLocation(GetVelocity() * Impulse, GetActorLocation());
         if (auto Glider = Cast<AP4Glider>(OtherActor))
         {
             if (auto m = Glider->GetMechanoid())

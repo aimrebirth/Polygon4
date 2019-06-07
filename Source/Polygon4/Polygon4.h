@@ -22,22 +22,20 @@
 
 #include "CoreMinimal.h"
 #include "Engine/EngineTypes.h"
-#include "Net/UnrealNetwork.h"
 #include "Engine/Font.h"
+#include "Net/UnrealNetwork.h"
 
 #define DUMMY_OBJECT TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'")
 #define DUMMY_BUILDING DUMMY_OBJECT
 
 extern UFont *RobotoFont;
 
-template <typename T>
-TSharedPtr<T> MakeTSharedPtr(const T &value)
+template <typename T> TSharedPtr<T> MakeTSharedPtr(const T &value)
 {
     return MakeShareable(new T(value));
 }
 
-template <class T, class U>
-TArray<U> MakeTArray(const T &stl_container)
+template <class T, class U> TArray<U> MakeTArray(const T &stl_container)
 {
     TArray<U> array;
     for (auto &v : stl_container)
@@ -45,8 +43,7 @@ TArray<U> MakeTArray(const T &stl_container)
     return array;
 }
 
-template <class T>
-TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_container)
+template <class T> TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_container)
 {
     TArray<TSharedPtr<typename T::value_type>> array;
     for (auto &v : stl_container)
@@ -54,10 +51,9 @@ TArray<TSharedPtr<typename T::value_type>> MakeTArrayTSharedPtr(const T &stl_con
     return array;
 }
 
-UClass* LoadClass(const TCHAR* Name);
+UClass *LoadClass(const TCHAR *Name);
 
-template <typename ObjClass>
-FORCEINLINE ObjClass* LoadObjFromPath(const FName& Path)
+template <typename ObjClass> FORCEINLINE ObjClass *LoadObjFromPath(const FName &Path)
 {
     if (Path == NAME_None)
         return NULL;

@@ -26,7 +26,9 @@ class SModListView : public SListView<TSharedPtr<ModificationDesc>>
 {
     using ListItem = TSharedPtr<ModificationDesc>;
 
-    SLATE_BEGIN_ARGS(SModListView) {}
+    SLATE_BEGIN_ARGS(SModListView)
+    {
+    }
     SLATE_END_ARGS()
 
     typedef SListView<ListItem> ParentType;
@@ -35,7 +37,7 @@ class SModListView : public SListView<TSharedPtr<ModificationDesc>>
     int Padding = 20;
 
 public:
-	void Construct(const FArguments& InArgs);
+    void Construct(const FArguments& InArgs);
     void ReloadMods(bool reload = true);
 
     TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);

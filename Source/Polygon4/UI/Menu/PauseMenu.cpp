@@ -21,9 +21,9 @@
 #include "Widgets/MenuButton.h"
 #include "Widgets/SavedGamesListView.h"
 
-#include <P4GameMode.h>
 #include <Game/P4Engine.h>
 #include <Game/P4Modification.h>
+#include <P4GameMode.h>
 
 #define LOCTEXT_NAMESPACE "PauseMenu"
 
@@ -35,166 +35,101 @@ void SPauseMenu::Construct(const FArguments& InArgs)
     }
 
     // create message line
-    MessageLine = SNew(STextBlock)
-        .ShadowColorAndOpacity(FLinearColor::Black)
-        .ColorAndOpacity(FLinearColor::Red)
-        .ShadowOffset(FIntPoint(-1, 1))
-        .Font(FSlateFontInfo(RobotoFont, 30));
+    MessageLine =
+        SNew(STextBlock).ShadowColorAndOpacity(FLinearColor::Black).ColorAndOpacity(FLinearColor::Red).ShadowOffset(FIntPoint(-1, 1)).Font(FSlateFontInfo(RobotoFont, 30));
 
     // Create GUI
-	ChildSlot
-		.VAlign(VAlign_Fill)
-		.HAlign(HAlign_Fill)
-		[
-			SNew(SVerticalBox)
-            // Label
-            + SVerticalBox::Slot()
-			.VAlign(VAlign_Top)
-			.HAlign(HAlign_Center)
-            .AutoHeight()
-			[
-				SNew(STextBlock)
-				.ShadowColorAndOpacity(FLinearColor::Black)
-				.ColorAndOpacity(FLinearColor::White)
-				.ShadowOffset(FIntPoint(-1, 1))
-				.Font(FSlateFontInfo(RobotoFont, 100))
-				.Text(FText::FromString("Polygon-4"))
-			]
-            // Other
-            + SVerticalBox::Slot()
-			.VAlign(VAlign_Fill)
-			.HAlign(HAlign_Fill)
-            [
-                SNew(SHorizontalBox)
-                // Left part of the screen (buttons)
-                + SHorizontalBox::Slot()
-			    .VAlign(VAlign_Center)
-			    .HAlign(HAlign_Left)
-                .AutoWidth()
-                [
-                    SNew(SVerticalBox)
-                    + SVerticalBox::Slot()
-                    [
-                        SAssignNew(MenuVB, SVerticalBox)
-                        + PauseMenuButton(LOCTEXT("ContinueGameButtonLabel" , "Continue Game"), &SPauseMenu::OnContinue)
-                        + PauseMenuButton(LOCTEXT("SaveGameButtonLabel" , "Save Game"), &SPauseMenu::OnSaveGame)
-                        + PauseMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SPauseMenu::OnLoadGame)
-                        //+ PauseMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SPauseMenu::OnNotImplemented)
-                        + PauseMenuButton(LOCTEXT("MainMenuButtonLabel" , "Exit to Menu"), &SPauseMenu::OnExitToMenu)
-                        + PauseMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SPauseMenu::OnExit)
-                    ]
-                    + SVerticalBox::Slot()
-                    [
-                        SAssignNew(LoadVB, SVerticalBox)
-                        .Visibility(EVisibility::Collapsed)
-                        + PauseMenuButton(NSLOCTEXT("MainMenu", "LoadButtonLabel", "Load"), &SPauseMenu::OnLoadLoad)
-                        + PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack)
-                        + PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnLoadDelete)
-                        .Padding(Padding, 200, Padding, Padding)
-                    ]
-                    + SVerticalBox::Slot()
-                    [
-                        SAssignNew(SaveVB, SVerticalBox)
-                        .Visibility(EVisibility::Collapsed)
-                        + PauseMenuButton(NSLOCTEXT("MainMenu", "SaveButtonLabel", "Save"), &SPauseMenu::OnSaveSave)
-                        + PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack)
-                        + PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnSaveDelete)
-                        .Padding(Padding, 200, Padding, Padding)
-                    ]
-                ]
-                // right part of the screen
-                + SHorizontalBox::Slot()
-			    .VAlign(VAlign_Fill)
-			    .HAlign(HAlign_Fill)
-                [
-                    SNew(SVerticalBox)
-                    + SVerticalBox::Slot()
-                    .VAlign(VAlign_Fill)
-                    .HAlign(HAlign_Fill)
-                    [
-                        SAssignNew(SavedGamesVB, SVerticalBox)
-                        .Visibility(EVisibility::Collapsed)
-                        // label
-                        + SVerticalBox::Slot()
-			            .VAlign(VAlign_Top)
-			            .HAlign(HAlign_Center)
-                        .Padding(Padding)
-                        .AutoHeight()
-                        [
-				            SNew(STextBlock)
-				            .ShadowColorAndOpacity(FLinearColor::Black)
-				            .ColorAndOpacity(FLinearColor::White)
-				            .ShadowOffset(FIntPoint(-1, 1))
-				            .Font(FSlateFontInfo(RobotoFont, 30))
-				            .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
-                        ]
-                        // List View
-                        + SVerticalBox::Slot()
-			            .VAlign(VAlign_Fill)
-			            .HAlign(HAlign_Fill)
-                        .Padding(Padding)
-                        [
-                            SAssignNew(SavedGamesListView, SSavedGamesListView)
-                            .OnSelectionChanged_Lambda([this](SSavedGamesListView::ListItem Item, ESelectInfo::Type Type)
-                        {
-                            if (!Item.IsValid())
-                                return;
-                            SaveNameTB->SetText(Item->Name);
-                        })
-                        ]
-                        // save name edit
-                        + SVerticalBox::Slot()
-			            .VAlign(VAlign_Top)
-			            .HAlign(HAlign_Fill)
-                        .Padding(Padding)
-                        [
-                            SAssignNew(SaveGameNameHB, SHorizontalBox)
-                            .Visibility(EVisibility::Collapsed)
-                            + SHorizontalBox::Slot()
-                            .HAlign(HAlign_Left)
-                            .AutoWidth()
-                            [
-                                SNew(STextBlock)
-                                .Text(LOCTEXT("SaveNameLabel", "Save Name: "))
-                                .Font(FSlateFontInfo(RobotoFont, 30))
-                            ]
-                            + SHorizontalBox::Slot()
-                            .HAlign(HAlign_Fill)
-                            [
-                                SAssignNew(SaveNameTB, SEditableTextBox)
-                                .RevertTextOnEscape(true)
-                                .Font(FSlateFontInfo(RobotoFont, 30))
-                            ]
-                        ]
-                    ]
-                    // Text line
-                    + SVerticalBox::Slot()
-			        .VAlign(VAlign_Bottom)
-			        .HAlign(HAlign_Center)
-                    .Padding(Padding)
-                    .AutoHeight()
-                    [
-                        MessageLine.ToSharedRef()
-                    ]
-                ]
-            ]
-		];
+    ChildSlot.VAlign(VAlign_Fill)
+        .HAlign(HAlign_Fill)
+            [SNew(SVerticalBox)
+             // Label
+             + SVerticalBox::Slot()
+                   .VAlign(VAlign_Top)
+                   .HAlign(HAlign_Center)
+                   .AutoHeight()[SNew(STextBlock)
+                                     .ShadowColorAndOpacity(FLinearColor::Black)
+                                     .ColorAndOpacity(FLinearColor::White)
+                                     .ShadowOffset(FIntPoint(-1, 1))
+                                     .Font(FSlateFontInfo(RobotoFont, 100))
+                                     .Text(FText::FromString("Polygon-4"))]
+             // Other
+             + SVerticalBox::Slot()
+                   .VAlign(VAlign_Fill)
+                   .HAlign(HAlign_Fill)
+                       [SNew(SHorizontalBox)
+                        // Left part of the screen (buttons)
+                        + SHorizontalBox::Slot()
+                              .VAlign(VAlign_Center)
+                              .HAlign(HAlign_Left)
+                              .AutoWidth()[SNew(SVerticalBox) +
+                                           SVerticalBox::Slot()[SAssignNew(MenuVB, SVerticalBox) +
+                                                                PauseMenuButton(LOCTEXT("ContinueGameButtonLabel", "Continue Game"), &SPauseMenu::OnContinue) +
+                                                                PauseMenuButton(LOCTEXT("SaveGameButtonLabel", "Save Game"), &SPauseMenu::OnSaveGame) +
+                                                                PauseMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SPauseMenu::OnLoadGame)
+                                                                //+ PauseMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SPauseMenu::OnNotImplemented)
+                                                                + PauseMenuButton(LOCTEXT("MainMenuButtonLabel", "Exit to Menu"), &SPauseMenu::OnExitToMenu) +
+                                                                PauseMenuButton(LOCTEXT("ExitGameButtonLabel", "Exit Game"), &SPauseMenu::OnExit)] +
+                                           SVerticalBox::Slot()[SAssignNew(LoadVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                PauseMenuButton(NSLOCTEXT("MainMenu", "LoadButtonLabel", "Load"), &SPauseMenu::OnLoadLoad) +
+                                                                PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack) +
+                                                                PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnLoadDelete)
+                                                                    .Padding(Padding, 200, Padding, Padding)] +
+                                           SVerticalBox::Slot()[SAssignNew(SaveVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                PauseMenuButton(NSLOCTEXT("MainMenu", "SaveButtonLabel", "Save"), &SPauseMenu::OnSaveSave) +
+                                                                PauseMenuButton(NSLOCTEXT("MainMenu", "BackButtonLabel", "Back"), &SPauseMenu::OnLoadBack) +
+                                                                PauseMenuButton(NSLOCTEXT("MainMenu", "DeleteButtonLabel", "Delete"), &SPauseMenu::OnSaveDelete)
+                                                                    .Padding(Padding, 200, Padding, Padding)]]
+                        // right part of the screen
+                        + SHorizontalBox::Slot()
+                              .VAlign(VAlign_Fill)
+                              .HAlign(HAlign_Fill)
+                                  [SNew(SVerticalBox) +
+                                   SVerticalBox::Slot()
+                                       .VAlign(VAlign_Fill)
+                                       .HAlign(HAlign_Fill)
+                                           [SAssignNew(SavedGamesVB, SVerticalBox).Visibility(EVisibility::Collapsed)
+                                            // label
+                                            + SVerticalBox::Slot()
+                                                  .VAlign(VAlign_Top)
+                                                  .HAlign(HAlign_Center)
+                                                  .Padding(Padding)
+                                                  .AutoHeight()[SNew(STextBlock)
+                                                                    .ShadowColorAndOpacity(FLinearColor::Black)
+                                                                    .ColorAndOpacity(FLinearColor::White)
+                                                                    .ShadowOffset(FIntPoint(-1, 1))
+                                                                    .Font(FSlateFontInfo(RobotoFont, 30))
+                                                                    .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))]
+                                            // List View
+                                            + SVerticalBox::Slot()
+                                                  .VAlign(VAlign_Fill)
+                                                  .HAlign(HAlign_Fill)
+                                                  .Padding(Padding)[SAssignNew(SavedGamesListView, SSavedGamesListView)
+                                                                        .OnSelectionChanged_Lambda([this](SSavedGamesListView::ListItem Item, ESelectInfo::Type Type) {
+                                                                            if (!Item.IsValid())
+                                                                                return;
+                                                                            SaveNameTB->SetText(Item->Name);
+                                                                        })]
+                                            // save name edit
+                                            + SVerticalBox::Slot()
+                                                  .VAlign(VAlign_Top)
+                                                  .HAlign(HAlign_Fill)
+                                                  .Padding(Padding)
+                                                      [SAssignNew(SaveGameNameHB, SHorizontalBox).Visibility(EVisibility::Collapsed) +
+                                                       SHorizontalBox::Slot()
+                                                           .HAlign(HAlign_Left)
+                                                           .AutoWidth()[SNew(STextBlock).Text(LOCTEXT("SaveNameLabel", "Save Name: ")).Font(FSlateFontInfo(RobotoFont, 30))] +
+                                                       SHorizontalBox::Slot().HAlign(
+                                                           HAlign_Fill)[SAssignNew(SaveNameTB, SEditableTextBox).RevertTextOnEscape(true).Font(FSlateFontInfo(RobotoFont, 30))]]]
+                                   // Text line
+                                   + SVerticalBox::Slot().VAlign(VAlign_Bottom).HAlign(HAlign_Center).Padding(Padding).AutoHeight()[MessageLine.ToSharedRef()]]]];
 }
 
-template <typename F>
-SVerticalBox::FSlot& SPauseMenu::PauseMenuButton(FText Text, F function) const
+template <typename F> SVerticalBox::FSlot& SPauseMenu::PauseMenuButton(FText Text, F function) const
 {
-    return
-        SVerticalBox::Slot()
-			.VAlign(VAlign_Top)
-			.HAlign(HAlign_Center)
-            .Padding(Padding)
-            [
-                SNew(SMenuButton)
-                .Text(Text)
-                .ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))
-            ]
-        ;
+    return SVerticalBox::Slot()
+        .VAlign(VAlign_Top)
+        .HAlign(HAlign_Center)
+        .Padding(Padding)[SNew(SMenuButton).Text(Text).ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))];
 }
 
 FReply SPauseMenu::OnContinue()

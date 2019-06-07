@@ -22,11 +22,13 @@
 
 #include "Menu.h"
 
-namespace polygon4 {
-    namespace detail {
-        class ModificationMapBuilding;
-    }
+namespace polygon4
+{
+namespace detail
+{
+class ModificationMapBuilding;
 }
+} // namespace polygon4
 
 class InfoTreeView;
 class SBar;
@@ -36,7 +38,9 @@ class SBuildingMenu : public SMenu, public polygon4::BuildingMenu
     using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
     using TextWidget = SRichTextBlock;
 
-	SLATE_BEGIN_ARGS(SBuildingMenu){}
+    SLATE_BEGIN_ARGS(SBuildingMenu)
+    {
+    }
     SLATE_END_ARGS()
 
 public:
@@ -90,15 +94,18 @@ private:
     FReply OnTrade();
     FReply OnBack();
     FReply OnExit();
-    FReply DoNothing() const { return FReply::Handled(); }
+    FReply DoNothing() const
+    {
+        return FReply::Handled();
+    }
 
     FReply OnSaveSave();
     FReply OnSaveBack();
     FReply OnSaveDelete();
 
-    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
-    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const;
+    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock>& Var) const;
+    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock>& Var, TSharedPtr<SBar>& Bar) const;
 
-    void OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &map);
+    void OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata& map);
     FSlateWidgetRun::FWidgetRunInfo EditWidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const;
 };

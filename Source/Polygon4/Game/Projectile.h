@@ -23,46 +23,52 @@
 
 namespace polygon4
 {
-    namespace detail
-    {
-        class Projectile;
-    }
+namespace detail
+{
+class Projectile;
 }
+} // namespace polygon4
 
 UCLASS(Abstract, Blueprintable)
 class POLYGON4_API AProjectile : public AActor
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	class USphereComponent* CollisionComp;
+    UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+    class USphereComponent* CollisionComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	class UProjectileMovementComponent* ProjectileMovement;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+    class UProjectileMovementComponent* ProjectileMovement;
 
-	UPROPERTY(EditAnywhere, Category = Power, meta = (AllowPrivateAccess = "true"))
-	float Impulse = 100.0f;
+    UPROPERTY(EditAnywhere, Category = Power, meta = (AllowPrivateAccess = "true"))
+    float Impulse = 100.0f;
 
 public:
     AProjectile(const FObjectInitializer& ObjectInitializer);
 
-    virtual void SetOwner(AActor *OtherOwner)
+    virtual void SetOwner(AActor* OtherOwner)
     {
         Owner = OtherOwner;
     }
 
-    void SetProjectile(polygon4::detail::Projectile *InProjectile)
+    void SetProjectile(polygon4::detail::Projectile* InProjectile)
     {
         Projectile = InProjectile;
     }
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    UFUNCTION()
+    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
-    FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+    FORCEINLINE class USphereComponent* GetCollisionComp() const
+    {
+        return CollisionComp;
+    }
+    FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const
+    {
+        return ProjectileMovement;
+    }
 
 private:
-    AActor *Owner = nullptr;
-    polygon4::detail::Projectile *Projectile = nullptr;
+    AActor* Owner = nullptr;
+    polygon4::detail::Projectile* Projectile = nullptr;
 };

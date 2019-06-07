@@ -18,16 +18,15 @@
 
 #include "P4Map.h"
 
-#include "P4GameInstance.h"
 #include "P4Engine.h"
+#include "P4GameInstance.h"
 
+#include "P4Glider.h"
 #include "P4MapBuilding.h"
 #include "P4MapObject.h"
 #include "P4Mechanoid.h"
-#include "P4Glider.h"
 
-P4Map::P4Map(const polygon4::detail::Map &rhs)
-    : Base(rhs)
+P4Map::P4Map(const polygon4::detail::Map &rhs) : Base(rhs)
 {
 }
 

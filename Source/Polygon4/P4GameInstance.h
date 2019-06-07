@@ -26,7 +26,7 @@ class P4Engine;
 UCLASS()
 class POLYGON4_API UP4GameInstance : public UGameInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
     virtual void Init() override;

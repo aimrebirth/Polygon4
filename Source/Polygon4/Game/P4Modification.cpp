@@ -18,14 +18,13 @@
 
 #include "P4Modification.h"
 
-#include "P4GameInstance.h"
 #include "P4Engine.h"
+#include "P4GameInstance.h"
 #include "P4Map.h"
 #include "P4Mechanoid.h"
 
 #include "UI/Menu/MainMenu.h"
 
-P4Modification::P4Modification(const polygon4::detail::Modification &rhs)
-    : Base(rhs)
+P4Modification::P4Modification(const polygon4::detail::Modification &rhs) : Base(rhs)
 {
 }

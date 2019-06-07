@@ -22,9 +22,9 @@
 #include <Polygon4/Mechanoid.h>
 
 #include "TextDecorators.h"
+#include "Widgets/InfoTreeView.h"
 #include "Widgets/MenuButton.h"
 #include "Widgets/SavedGamesListView.h"
-#include "Widgets/InfoTreeView.h"
 
 #include <Game/P4Engine.h>
 #include <UI/Colors.h>
@@ -32,7 +32,7 @@
 
 #define LOCTEXT_NAMESPACE "BuildingMenu"
 
-void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
+void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata& Map)
 {
     const FString* const IdString = Map.Find(TEXT("id"));
     const FString* const NameString = Map.Find(TEXT("name"));
@@ -56,15 +56,11 @@ void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
 
 FSlateWidgetRun::FWidgetRunInfo SBuildingMenu::EditWidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const
 {
-    TSharedRef<SWidget> Widget = SNew(SEditableTextBox)
-        .MinDesiredWidth(200)
-        .Font(FSlateFontInfo(RobotoFont, 14))
-        .OnTextCommitted_Lambda([this](const FText &NewText, ETextCommit::Type Type)
-    {
-        if (!mechanoid->setName(NewText))
-            mechanoid->setName(L"");
-    })
-        ;
+    TSharedRef<SWidget> Widget =
+        SNew(SEditableTextBox).MinDesiredWidth(200).Font(FSlateFontInfo(RobotoFont, 14)).OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type Type) {
+            if (!mechanoid->setName(NewText))
+                mechanoid->setName(L"");
+        });
     return FSlateWidgetRun::FWidgetRunInfo(Widget, 0);
 }
 
@@ -73,13 +69,13 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
         PlayerController->bShowMouseCursor = true;
 
-    FSlateBrush *BackgroundBrush;
-    //auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
+    FSlateBrush* BackgroundBrush;
+    // auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Texture2D'/Game/Mods/Common/Images/bg_base.bg_base'"));
     /*auto BackgroundTexture = LoadObject<UTexture2D>(0, TEXT("Blueprint'/Game/Blueprints/BLD_INTERIOR/BP_BLD_INTERIOR.BP_BLD_INTERIOR'"));
     if (BackgroundTexture)
         BackgroundBrush = new FSlateDynamicImageBrush(BackgroundTexture, FVector2D{ 100,100 }, FName("bg_base"));
     else*/
-        BackgroundBrush = new FSlateColorBrush(FColor::Black);
+    BackgroundBrush = new FSlateColorBrush(FColor::Black);
 
     LeftMenuButtons.resize(polygon4::bbMax);
 
@@ -90,482 +86,299 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
     FTextBlockStyle HyperlinkTextStyle;
     HyperlinkTextStyle.SetFont(FSlateFontInfo(RobotoFont, 14));
     HyperlinkTextStyle.SetColorAndOpacity(FLinearColor(P4_COLOR_BLUE));
-    //HyperlinkStyle.SetHighlightColor(FLinearColor::White);
+    // HyperlinkStyle.SetHighlightColor(FLinearColor::White);
 
     FTextBlockStyle HyperlinkTextStyle2;
     HyperlinkTextStyle2.SetFont(FSlateFontInfo(RobotoFont, 14));
     HyperlinkTextStyle2.SetColorAndOpacity(FLinearColor(P4_COLOR_RED));
 
     // set hyperlink styles
-    FSlateStyleSet &ss = (FSlateStyleSet&)FCoreStyle::Get();
+    FSlateStyleSet& ss = (FSlateStyleSet&)FCoreStyle::Get();
 
     ss.Set<FTextBlockStyle>("p4blue", HyperlinkTextStyle);
     ss.Set<FTextBlockStyle>("p4red", HyperlinkTextStyle2);
 
-    //ss.Set<FHyperlinkStyle>("p4blue_hl", HyperlinkStyle2);
-    //ss.Set<FHyperlinkStyle>("p4red_hl", HyperlinkStyle2);
-    //FHyperlinkStyle->UnderlineStyle.Normal = style_ptr->UnderlineStyle.Disabled;
-    //FHyperlinkStyle->UnderlineStyle.Hovered = style_ptr->UnderlineStyle.Disabled;
+    // ss.Set<FHyperlinkStyle>("p4blue_hl", HyperlinkStyle2);
+    // ss.Set<FHyperlinkStyle>("p4red_hl", HyperlinkStyle2);
+    // FHyperlinkStyle->UnderlineStyle.Normal = style_ptr->UnderlineStyle.Disabled;
+    // FHyperlinkStyle->UnderlineStyle.Hovered = style_ptr->UnderlineStyle.Disabled;
 
     // set decorators
-    TArray< TSharedRef< class ITextDecorator > > TextDecorators;
+    TArray<TSharedRef<class ITextDecorator>> TextDecorators;
     // text
     TextDecorators.Add(MakeShareable(new TextDecorator(FontStyle)));
 
     // hyperlinks
     TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("object", this, &SBuildingMenu::OnHyperlinkClick));
     TextDecorators.Add(SRichTextBlock::HyperlinkDecorator("script", this, &SBuildingMenu::OnHyperlinkClick));
-    //FSlateHyperlinkRun::FOnClick::CreateSP( InUserObjectPtr, NavigateFunc )
+    // FSlateHyperlinkRun::FOnClick::CreateSP( InUserObjectPtr, NavigateFunc )
 
     // widgets
     TextDecorators.Add(SRichTextBlock::WidgetDecorator("edit", this, &SBuildingMenu::EditWidgetDecorator));
 
     // viewport
-    //auto SVP = MakeShared<ISlateViewport>();
-    //auto SVP = MakeShareable<ISlateViewport>(new SViewport);
-    //auto FVP = MakeShared<FSceneViewport>(nullptr, SVP);
+    // auto SVP = MakeShared<ISlateViewport>();
+    // auto SVP = MakeShareable<ISlateViewport>(new SViewport);
+    // auto FVP = MakeShared<FSceneViewport>(nullptr, SVP);
 
-    SAssignNew(RatingBar, SBar)
-        .Max(100)
-        .Current(100)
-        .Text(FText::FromString("Rating"))
-        .Color(FLinearColor::Blue * 0.65f)
-        ;
-    SAssignNew(MassBar, SBar)
-        .Max(100)
-        .Current(100)
-        .Text(FText::FromString("Mass"))
-        .Color(FLinearColor::Green * 0.65f);
+    SAssignNew(RatingBar, SBar).Max(100).Current(100).Text(FText::FromString("Rating")).Color(FLinearColor::Blue * 0.65f);
+    SAssignNew(MassBar, SBar).Max(100).Current(100).Text(FText::FromString("Mass")).Color(FLinearColor::Green * 0.65f);
 
-    ChildSlot
-        .HAlign(HAlign_Fill)
+    ChildSlot.HAlign(HAlign_Fill)
         .VAlign(VAlign_Fill)
-        [
-            SNew(SBorder)
-            .HAlign(HAlign_Fill)
-            .VAlign(VAlign_Fill)
-            .Padding(10)
-            .BorderImage(BackgroundBrush)
-            [
-                SNew(SVerticalBox)
-                // building menu
-                + SVerticalBox::Slot()
-                [
-                    SAssignNew(BuildingMenuVB, SVerticalBox)
-                    // caption
-                    + SVerticalBox::Slot()
-                    .VAlign(VAlign_Top)
-                    .HAlign(HAlign_Fill)
-                    .AutoHeight()
-                    [
-                        SNew(SBorder)
-                        .Padding(10)
-                        [
-                            SNew(SVerticalBox)
-                            + SVerticalBox::Slot()
-                            .HAlign(HAlign_Center)
-                            [
-                                SAssignNew(Name, STextBlock)
-                                .Font(FSlateFontInfo(RobotoFont, 14))
-                                .Text(FText::FromString(L"Building Name"))
-                            ]
-                        ]
-                    ]
-                    // top layout
-                    + SVerticalBox::Slot()
-                    .HAlign(HAlign_Fill)
-                    .VAlign(VAlign_Fill)
-                    [
-                        SNew(SHorizontalBox)
-                        // left menu
-                        + SHorizontalBox::Slot()
-                        .FillWidth(0.25)
-                        [
-                            SNew(SVerticalBox)
-                            // part w/out back button
-                            + SVerticalBox::Slot()
-                            .HAlign(HAlign_Fill)
-                            .VAlign(VAlign_Fill)
-                            [
-                                SNew(SBorder)
-                                .Padding(10)
-                                [
-                                    SNew(SVerticalBox)
-                                    // buttons
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(ButtonsVB, SVerticalBox)
-                                        + VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave, &LeftMenuButtons[polygon4::bbSave])
-                                        .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::OnJournal, &LeftMenuButtons[polygon4::bbJournal])
-                                        .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnGlider, &LeftMenuButtons[polygon4::bbGlider])
-                                        .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::OnTrade, &LeftMenuButtons[polygon4::bbTrade])
-                                        .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbClans])
-                                        .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("TunnelButton", "Tunnel"), this, &SBuildingMenu::DoNothing, &LeftMenuButtons[polygon4::bbTunnel])
-                                        .VAlign(VAlign_Top)
-                                        + VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit, &LeftMenuButtons[polygon4::bbExit])
-                                        .VAlign(VAlign_Bottom)
-                                    ]
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(GliderVB, SVerticalBox)
-                                        .Visibility(EVisibility::Collapsed)
-                                        + SVerticalBox::Slot()
-                                        .HAlign(HAlign_Fill)
-                                        .VAlign(VAlign_Fill)
-                                        [
-                                            SAssignNew(GliderTV, InfoTreeView)
-                                            .RootItem(&glider)
-                                        ]
-                                    ]
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(HoldStoreVB, SVerticalBox)
-                                        .Visibility(EVisibility::Collapsed)
-                                        + SVerticalBox::Slot()
-                                        .HAlign(HAlign_Fill)
-                                        .VAlign(VAlign_Fill)
-                                        [
-                                            SAssignNew(HoldStoreTV, InfoTreeView)
-                                            .RootItem(&hold_store)
-                                        ]
-                                    ]
-                                ]
-                            ]
-                            // back button
-                            + SVerticalBox::Slot()
-                            .HAlign(HAlign_Center)
-                            .VAlign(VAlign_Bottom)
-                            .AutoHeight()
-                            [
-                                SAssignNew(BackLeftVB, SVerticalBox)
-                                .Visibility(EVisibility::Collapsed)
-                                + VerticalSlotMenuButton(LOCTEXT("BackButton", "Back"), this, &SBuildingMenu::OnBack)
-                            ]
-                        ]
-                        // middle
-                        + SHorizontalBox::Slot()
-                        .FillWidth(0.5)
-                        [
-                            SNew(SBorder)
-                            .Padding(10)
-                            [
-                                SNew(SVerticalBox)
-                                // text
-                                + SVerticalBox::Slot()
-                                .FillHeight(0.25)
-                                .VAlign(VAlign_Top)
-                                .HAlign(HAlign_Fill)
-                                [
-                                    SNew(SScrollBox)
-                                    + SScrollBox::Slot()
-                                    .VAlign(VAlign_Fill)
-                                    .HAlign(HAlign_Fill)
-                                    [
-                                        // for rich text: default text style, decorators
-                                        SAssignNew(Text, TextWidget)
-                                        .TextStyle(&FontStyle)
-                                        .Decorators(TextDecorators)
-                                        .Text(this, &SBuildingMenu::getFText)
-                                        .AutoWrapText(true)
-                                    ]
-                                ]
-                                // view port
-                                + SVerticalBox::Slot()
-                                .FillHeight(0.25)
-                                .VAlign(VAlign_Bottom)
-                                .HAlign(HAlign_Fill)
-                                [
-                                    SNew(SViewport)
-                                    .ViewportInterface(nullptr)
-                                    //.ViewportInterface(SVP)
-                                ]
-                            ]
-                        ]
-                        // right menu
-                        + SHorizontalBox::Slot()
-                        .FillWidth(0.25)
-                        [
-                            SNew(SVerticalBox)
-                            + SVerticalBox::Slot()
-                            .HAlign(HAlign_Fill)
-                            .VAlign(VAlign_Fill)
-                            [
-                                SNew(SBorder)
-                                .Padding(10)
-                                [
-                                    SNew(SVerticalBox)
-                                    // themes
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(ThemesVB, SVerticalBox)
-                                        + SVerticalBox::Slot()
-                                        [
-                                            SAssignNew(ThemesTV, InfoTreeView)
-                                            .RootItem(&themes)
-                                        ]
-                                    ]
-                                    // journal
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(JournalVB, SVerticalBox)
-                                        .Visibility(EVisibility::Collapsed)
-                                        + SVerticalBox::Slot()
-                                        [
-                                            SAssignNew(JournalTV, InfoTreeView)
-                                            .RootItem(&journal)
-                                        ]
-                                    ]
-                                    // glider
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(GliderStoreVB, SVerticalBox)
-                                        .Visibility(EVisibility::Collapsed)
-                                        + SVerticalBox::Slot()
-                                        [
-                                            SAssignNew(GliderStoreTV, InfoTreeView)
-                                            .RootItem(&glider_store)
-                                        ]
-                                    ]
-                                    // goods
-                                    + SVerticalBox::Slot()
-                                    .HAlign(HAlign_Fill)
-                                    .VAlign(VAlign_Fill)
-                                    [
-                                        SAssignNew(GoodsStoreVB, SVerticalBox)
-                                        .Visibility(EVisibility::Collapsed)
-                                        + SVerticalBox::Slot()
-                                        [
-                                            SAssignNew(GoodsStoreTV, InfoTreeView)
-                                            .RootItem(&goods_store)
-                                        ]
-                                    ]
-                                    // clans
-                                ]
-                            ]
-                            // back button
-                            + SVerticalBox::Slot()
-                            .HAlign(HAlign_Center)
-                            .VAlign(VAlign_Bottom)
-                            .AutoHeight()
-                            [
-                                SAssignNew(BackRightVB, SVerticalBox)
-                                .Visibility(EVisibility::Collapsed)
-                                + VerticalSlotMenuButton(LOCTEXT("BackButton", "Back"), this, &SBuildingMenu::OnBack)
-                            ]
-                        ]
-                    ]
-                    // bottom layout (money, rating etc.)
-                    + SVerticalBox::Slot()
-                    .HAlign(HAlign_Center)
-                    .VAlign(VAlign_Bottom)
-                    .AutoHeight()
-                    [
-                        SNew(SBorder)
-                        .Padding(10)
-                        [
-                            SNew(SVerticalBox)
-                            + BottomText(LOCTEXT("MoneyLabel", "Money: "), MoneyTB)
-                            + BottomText(LOCTEXT("RatingLabel", "Rating: "), RatingTB, RatingBar)
-                            + BottomText(LOCTEXT("MassLabel", "Mass: "), MassTB, MassBar)
-                        ]
-                    ]
-                ]
-                // load menu
-                + SVerticalBox::Slot()
-                [
-                    SAssignNew(SaveVB, SVerticalBox)
-                    .Visibility(EVisibility::Collapsed)
-                    // Label
-                    + SVerticalBox::Slot()
-                    .VAlign(VAlign_Top)
-                    .HAlign(HAlign_Center)
-                    .AutoHeight()
-                    [
-                        SNew(STextBlock)
-                        .ShadowColorAndOpacity(FLinearColor::Black)
-                        .ColorAndOpacity(FLinearColor::White)
-                        .ShadowOffset(FIntPoint(-1, 1))
-                        .Font(FSlateFontInfo(RobotoFont, 100))
-                        .Text(FText::FromString("Polygon-4"))
-                    ]
-                    // Other
-                    + SVerticalBox::Slot()
-                    .VAlign(VAlign_Fill)
-                    .HAlign(HAlign_Fill)
-                    [
-                        SNew(SHorizontalBox)
-                        // Left part of the screen (buttons)
-                        + SHorizontalBox::Slot()
-                        .VAlign(VAlign_Center)
-                        .HAlign(HAlign_Left)
-                        .AutoWidth()
-                        [
-                            SNew(SVerticalBox)
-                            + VerticalSlotMenuButton(LOCTEXT("SaveButtonLabel", "Save"), this, &SBuildingMenu::OnSaveSave)
-                            + VerticalSlotMenuButton(LOCTEXT("BackButtonLabel", "Back"), this, &SBuildingMenu::OnSaveBack)
-                            + VerticalSlotMenuButton(LOCTEXT("DeleteButtonLabel", "Delete"), this, &SBuildingMenu::OnSaveDelete)
-                        ]
-                        // right part of the screen
-                        + SHorizontalBox::Slot()
-                        .VAlign(VAlign_Fill)
-                        .HAlign(HAlign_Fill)
-                        [
-                            SNew(SVerticalBox)
-                            + SVerticalBox::Slot()
-                            [
-                                SNew(SVerticalBox)
-                                // label
-                                + SVerticalBox::Slot()
-                                .VAlign(VAlign_Top)
-                                .HAlign(HAlign_Center)
-                                .Padding(20)
-                                .AutoHeight()
-                                [
-                                    SNew(STextBlock)
-                                    .ShadowColorAndOpacity(FLinearColor::Black)
-                                    .ColorAndOpacity(FLinearColor::White)
-                                    .ShadowOffset(FIntPoint(-1, 1))
-                                    .Font(FSlateFontInfo(RobotoFont, 30))
-                                    .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))
-                                ]
-                                // List View
-                                + SVerticalBox::Slot()
-                                .VAlign(VAlign_Fill)
-                                .HAlign(HAlign_Fill)
-                                .Padding(20)
-                                [
-                                    SAssignNew(SavedGamesListView, SSavedGamesListView)
-                                    .OnSelectionChanged_Lambda([this](SSavedGamesListView::ListItem Item, ESelectInfo::Type Type)
-                                {
-                                    if (!Item.IsValid())
-                                        return;
-                                    SaveNameTB->SetText(Item->Name);
-                                })
-                                ]
-                                // save name edit
-                                + SVerticalBox::Slot()
-                                .VAlign(VAlign_Top)
-                                .HAlign(HAlign_Fill)
-                                .Padding(20)
-                                [
-                                    SNew(SHorizontalBox)
-                                    + SHorizontalBox::Slot()
+            [SNew(SBorder)
+                 .HAlign(HAlign_Fill)
+                 .VAlign(VAlign_Fill)
+                 .Padding(10)
+                 .BorderImage(BackgroundBrush)
+                     [SNew(SVerticalBox)
+                      // building menu
+                      + SVerticalBox::Slot()
+                            [SAssignNew(BuildingMenuVB, SVerticalBox)
+                             // caption
+                             + SVerticalBox::Slot()
+                                   .VAlign(VAlign_Top)
+                                   .HAlign(HAlign_Fill)
+                                   .AutoHeight()[SNew(SBorder).Padding(
+                                       10)[SNew(SVerticalBox) + SVerticalBox::Slot().HAlign(HAlign_Center)
+                                                                    [SAssignNew(Name, STextBlock).Font(FSlateFontInfo(RobotoFont, 14)).Text(FText::FromString(L"Building Name"))]]]
+                             // top layout
+                             + SVerticalBox::Slot()
+                                   .HAlign(HAlign_Fill)
+                                   .VAlign(VAlign_Fill)
+                                       [SNew(SHorizontalBox)
+                                        // left menu
+                                        + SHorizontalBox::Slot().FillWidth(0.25)
+                                              [SNew(SVerticalBox)
+                                               // part w/out back button
+                                               + SVerticalBox::Slot()
+                                                     .HAlign(HAlign_Fill)
+                                                     .VAlign(VAlign_Fill)[SNew(SBorder).Padding(
+                                                         10)[SNew(SVerticalBox)
+                                                             // buttons
+                                                             + SVerticalBox::Slot()
+                                                                   .HAlign(HAlign_Fill)
+                                                                   .VAlign(VAlign_Fill)[SAssignNew(ButtonsVB, SVerticalBox) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("SaveButton", "Save"), this, &SBuildingMenu::OnSave,
+                                                                                                               &LeftMenuButtons[polygon4::bbSave])
+                                                                                            .VAlign(VAlign_Top) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("JournalButton", "Journal"), this, &SBuildingMenu::OnJournal,
+                                                                                                               &LeftMenuButtons[polygon4::bbJournal])
+                                                                                            .VAlign(VAlign_Top) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("GliderButton", "Glider"), this, &SBuildingMenu::OnGlider,
+                                                                                                               &LeftMenuButtons[polygon4::bbGlider])
+                                                                                            .VAlign(VAlign_Top) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("TradeButton", "Trade"), this, &SBuildingMenu::OnTrade,
+                                                                                                               &LeftMenuButtons[polygon4::bbTrade])
+                                                                                            .VAlign(VAlign_Top) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("ClansButton", "Clans"), this, &SBuildingMenu::DoNothing,
+                                                                                                               &LeftMenuButtons[polygon4::bbClans])
+                                                                                            .VAlign(VAlign_Top) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("TunnelButton", "Tunnel"), this, &SBuildingMenu::DoNothing,
+                                                                                                               &LeftMenuButtons[polygon4::bbTunnel])
+                                                                                            .VAlign(VAlign_Top) +
+                                                                                        VerticalSlotMenuButton(LOCTEXT("ExitButton", "Exit"), this, &SBuildingMenu::OnExit,
+                                                                                                               &LeftMenuButtons[polygon4::bbExit])
+                                                                                            .VAlign(VAlign_Bottom)] +
+                                                             SVerticalBox::Slot()
+                                                                 .HAlign(HAlign_Fill)
+                                                                 .VAlign(VAlign_Fill)[SAssignNew(GliderVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                                      SVerticalBox::Slot()
+                                                                                          .HAlign(HAlign_Fill)
+                                                                                          .VAlign(VAlign_Fill)[SAssignNew(GliderTV, InfoTreeView).RootItem(&glider)]] +
+                                                             SVerticalBox::Slot()
+                                                                 .HAlign(HAlign_Fill)
+                                                                 .VAlign(VAlign_Fill)[SAssignNew(HoldStoreVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                                      SVerticalBox::Slot()
+                                                                                          .HAlign(HAlign_Fill)
+                                                                                          .VAlign(VAlign_Fill)[SAssignNew(HoldStoreTV, InfoTreeView).RootItem(&hold_store)]]]]
+                                               // back button
+                                               + SVerticalBox::Slot()
+                                                     .HAlign(HAlign_Center)
+                                                     .VAlign(VAlign_Bottom)
+                                                     .AutoHeight()[SAssignNew(BackLeftVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                   VerticalSlotMenuButton(LOCTEXT("BackButton", "Back"), this, &SBuildingMenu::OnBack)]]
+                                        // middle
+                                        + SHorizontalBox::Slot().FillWidth(0.5)[SNew(SBorder).Padding(
+                                              10)[SNew(SVerticalBox)
+                                                  // text
+                                                  + SVerticalBox::Slot()
+                                                        .FillHeight(0.25)
+                                                        .VAlign(VAlign_Top)
+                                                        .HAlign(HAlign_Fill)[SNew(SScrollBox) + SScrollBox::Slot()
+                                                                                                    .VAlign(VAlign_Fill)
+                                                                                                    .HAlign(HAlign_Fill)[
+                                                                                                        // for rich text: default text style, decorators
+                                                                                                        SAssignNew(Text, TextWidget)
+                                                                                                            .TextStyle(&FontStyle)
+                                                                                                            .Decorators(TextDecorators)
+                                                                                                            .Text(this, &SBuildingMenu::getFText)
+                                                                                                            .AutoWrapText(true)]]
+                                                  // view port
+                                                  + SVerticalBox::Slot()
+                                                        .FillHeight(0.25)
+                                                        .VAlign(VAlign_Bottom)
+                                                        .HAlign(HAlign_Fill)[SNew(SViewport).ViewportInterface(nullptr)
+                                                                             //.ViewportInterface(SVP)
+    ]]]
+                                        // right menu
+                                        + SHorizontalBox::Slot().FillWidth(
+                                              0.25)[SNew(SVerticalBox) +
+                                                    SVerticalBox::Slot()
+                                                        .HAlign(HAlign_Fill)
+                                                        .VAlign(VAlign_Fill)[SNew(SBorder).Padding(
+                                                            10)[SNew(SVerticalBox)
+                                                                // themes
+                                                                + SVerticalBox::Slot()
+                                                                      .HAlign(HAlign_Fill)
+                                                                      .VAlign(VAlign_Fill)[SAssignNew(ThemesVB, SVerticalBox) +
+                                                                                           SVerticalBox::Slot()[SAssignNew(ThemesTV, InfoTreeView).RootItem(&themes)]]
+                                                                // journal
+                                                                + SVerticalBox::Slot()
+                                                                      .HAlign(HAlign_Fill)
+                                                                      .VAlign(VAlign_Fill)[SAssignNew(JournalVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                                           SVerticalBox::Slot()[SAssignNew(JournalTV, InfoTreeView).RootItem(&journal)]]
+                                                                // glider
+                                                                + SVerticalBox::Slot()
+                                                                      .HAlign(HAlign_Fill)
+                                                                      .VAlign(VAlign_Fill)[SAssignNew(GliderStoreVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                                           SVerticalBox::Slot()[SAssignNew(GliderStoreTV, InfoTreeView).RootItem(&glider_store)]]
+                                                                // goods
+                                                                + SVerticalBox::Slot()
+                                                                      .HAlign(HAlign_Fill)
+                                                                      .VAlign(VAlign_Fill)[SAssignNew(GoodsStoreVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                                           SVerticalBox::Slot()[SAssignNew(GoodsStoreTV, InfoTreeView).RootItem(&goods_store)]]
+                                                                // clans
+    ]]
+                                                    // back button
+                                                    + SVerticalBox::Slot()
+                                                          .HAlign(HAlign_Center)
+                                                          .VAlign(VAlign_Bottom)
+                                                          .AutoHeight()[SAssignNew(BackRightVB, SVerticalBox).Visibility(EVisibility::Collapsed) +
+                                                                        VerticalSlotMenuButton(LOCTEXT("BackButton", "Back"), this, &SBuildingMenu::OnBack)]]]
+                             // bottom layout (money, rating etc.)
+                             + SVerticalBox::Slot()
+                                   .HAlign(HAlign_Center)
+                                   .VAlign(VAlign_Bottom)
+                                   .AutoHeight()[SNew(SBorder).Padding(
+                                       10)[SNew(SVerticalBox) + BottomText(LOCTEXT("MoneyLabel", "Money: "), MoneyTB) +
+                                           BottomText(LOCTEXT("RatingLabel", "Rating: "), RatingTB, RatingBar) + BottomText(LOCTEXT("MassLabel", "Mass: "), MassTB, MassBar)]]]
+                      // load menu
+                      + SVerticalBox::Slot()
+                            [SAssignNew(SaveVB, SVerticalBox).Visibility(EVisibility::Collapsed)
+                             // Label
+                             + SVerticalBox::Slot()
+                                   .VAlign(VAlign_Top)
+                                   .HAlign(HAlign_Center)
+                                   .AutoHeight()[SNew(STextBlock)
+                                                     .ShadowColorAndOpacity(FLinearColor::Black)
+                                                     .ColorAndOpacity(FLinearColor::White)
+                                                     .ShadowOffset(FIntPoint(-1, 1))
+                                                     .Font(FSlateFontInfo(RobotoFont, 100))
+                                                     .Text(FText::FromString("Polygon-4"))]
+                             // Other
+                             + SVerticalBox::Slot()
+                                   .VAlign(VAlign_Fill)
+                                   .HAlign(HAlign_Fill)
+                                       [SNew(SHorizontalBox)
+                                        // Left part of the screen (buttons)
+                                        + SHorizontalBox::Slot()
+                                              .VAlign(VAlign_Center)
+                                              .HAlign(HAlign_Left)
+                                              .AutoWidth()[SNew(SVerticalBox) + VerticalSlotMenuButton(LOCTEXT("SaveButtonLabel", "Save"), this, &SBuildingMenu::OnSaveSave) +
+                                                           VerticalSlotMenuButton(LOCTEXT("BackButtonLabel", "Back"), this, &SBuildingMenu::OnSaveBack) +
+                                                           VerticalSlotMenuButton(LOCTEXT("DeleteButtonLabel", "Delete"), this, &SBuildingMenu::OnSaveDelete)]
+                                        // right part of the screen
+                                        + SHorizontalBox::Slot()
+                                              .VAlign(VAlign_Fill)
+                                              .HAlign(HAlign_Fill)
+                                                  [SNew(SVerticalBox) +
+                                                   SVerticalBox::Slot()
+                                                       [SNew(SVerticalBox)
+                                                        // label
+                                                        + SVerticalBox::Slot()
+                                                              .VAlign(VAlign_Top)
+                                                              .HAlign(HAlign_Center)
+                                                              .Padding(20)
+                                                              .AutoHeight()[SNew(STextBlock)
+                                                                                .ShadowColorAndOpacity(FLinearColor::Black)
+                                                                                .ColorAndOpacity(FLinearColor::White)
+                                                                                .ShadowOffset(FIntPoint(-1, 1))
+                                                                                .Font(FSlateFontInfo(RobotoFont, 30))
+                                                                                .Text(LOCTEXT("SavedGamesLabel", "Saved Games"))]
+                                                        // List View
+                                                        + SVerticalBox::Slot()
+                                                              .VAlign(VAlign_Fill)
+                                                              .HAlign(HAlign_Fill)
+                                                              .Padding(20)[SAssignNew(SavedGamesListView, SSavedGamesListView)
+                                                                               .OnSelectionChanged_Lambda([this](SSavedGamesListView::ListItem Item, ESelectInfo::Type Type) {
+                                                                                   if (!Item.IsValid())
+                                                                                       return;
+                                                                                   SaveNameTB->SetText(Item->Name);
+                                                                               })]
+                                                        // save name edit
+                                                        + SVerticalBox::Slot()
+                                                              .VAlign(VAlign_Top)
+                                                              .HAlign(HAlign_Fill)
+                                                              .Padding(20)[SNew(SHorizontalBox) +
+                                                                           SHorizontalBox::Slot()
+                                                                               .HAlign(HAlign_Left)
+                                                                               .AutoWidth()[SNew(STextBlock)
+                                                                                                .Text(LOCTEXT("SaveNameLabel", "Save Name: "))
+                                                                                                .Font(FSlateFontInfo(RobotoFont, 30))] +
+                                                                           SHorizontalBox::Slot().HAlign(HAlign_Fill)[SAssignNew(SaveNameTB, SEditableTextBox)
+                                                                                                                          .RevertTextOnEscape(true)
+                                                                                                                          .Font(FSlateFontInfo(RobotoFont, 30))]]]]]]]];
+}
+
+SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock>& Var) const
+{
+    return SVerticalBox::Slot()[SNew(SHorizontalBox) +
+                                SHorizontalBox::Slot()
                                     .HAlign(HAlign_Left)
-                                    .AutoWidth()
-                                    [
-                                        SNew(STextBlock)
-                                        .Text(LOCTEXT("SaveNameLabel", "Save Name: "))
-                                        .Font(FSlateFontInfo(RobotoFont, 30))
-                                    ]
-                                    + SHorizontalBox::Slot()
+                                    .VAlign(VAlign_Center)
+                                    .AutoWidth()[SNew(STextBlock)
+                                                     .ShadowColorAndOpacity(FLinearColor::Black)
+                                                     .ColorAndOpacity(FLinearColor::White)
+                                                     .ShadowOffset(FIntPoint(-1, 1))
+                                                     .Font(FSlateFontInfo(RobotoFont, 18))
+                                                     .Text(NameIn)] +
+                                SHorizontalBox::Slot()
                                     .HAlign(HAlign_Fill)
-                                    [
-                                        SAssignNew(SaveNameTB, SEditableTextBox)
-                                        .RevertTextOnEscape(true)
-                                        .Font(FSlateFontInfo(RobotoFont, 30))
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-    ;
+                                    .VAlign(VAlign_Center)
+                                    .AutoWidth()[SAssignNew(Var, STextBlock)
+                                                     .ShadowColorAndOpacity(FLinearColor::Black)
+                                                     .ColorAndOpacity(FLinearColor::White)
+                                                     .ShadowOffset(FIntPoint(-1, 1))
+                                                     .Font(FSlateFontInfo(RobotoFont, 18))]];
 }
 
-SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var) const
+SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock>& Var, TSharedPtr<SBar>& Bar) const
 {
-    return
-        SVerticalBox::Slot()
-        [
-            SNew(SHorizontalBox)
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SNew(STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-                .Text(NameIn)
-            ]
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Fill)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SAssignNew(Var, STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-            ]
-        ];
-}
-
-SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const
-{
-    return
-        SVerticalBox::Slot()
-        [
-            SNew(SHorizontalBox)
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SNew(STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-                .Text(NameIn)
-            ]
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SAssignNew(Var, STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-            ]
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Right)
-            .VAlign(VAlign_Center)
-            .Padding(10, 0, 0, 0)
-            //.AutoWidth()
-            [
-                SNew(SBox)
-                .WidthOverride(500)
-                .HeightOverride(25)
-                [
-                    Bar.ToSharedRef()
-                ]
-            ]
-        ];
+    return SVerticalBox::Slot()[SNew(SHorizontalBox) +
+                                SHorizontalBox::Slot()
+                                    .HAlign(HAlign_Left)
+                                    .VAlign(VAlign_Center)
+                                    .AutoWidth()[SNew(STextBlock)
+                                                     .ShadowColorAndOpacity(FLinearColor::Black)
+                                                     .ColorAndOpacity(FLinearColor::White)
+                                                     .ShadowOffset(FIntPoint(-1, 1))
+                                                     .Font(FSlateFontInfo(RobotoFont, 18))
+                                                     .Text(NameIn)] +
+                                SHorizontalBox::Slot()
+                                    .HAlign(HAlign_Left)
+                                    .VAlign(VAlign_Center)
+                                    .AutoWidth()[SAssignNew(Var, STextBlock)
+                                                     .ShadowColorAndOpacity(FLinearColor::Black)
+                                                     .ColorAndOpacity(FLinearColor::White)
+                                                     .ShadowOffset(FIntPoint(-1, 1))
+                                                     .Font(FSlateFontInfo(RobotoFont, 18))] +
+                                SHorizontalBox::Slot()
+                                    .HAlign(HAlign_Right)
+                                    .VAlign(VAlign_Center)
+                                    .Padding(10, 0, 0, 0)
+                                        //.AutoWidth()
+                                        [SNew(SBox).WidthOverride(500).HeightOverride(25)[Bar.ToSharedRef()]]];
 }
 
 void SBuildingMenu::refresh()

@@ -24,12 +24,12 @@
 
 #include "P4Engine.generated.h"
 
-#define DECLARE_MENU(name) \
-public: \
-    TSharedPtr<S ## name ## Menu> Get ## name ## Menu(); \
-    virtual void Show ## name ## Menu() override; \
-    virtual void Hide ## name ## Menu() override; \
-    virtual void Set ## name ## MenuVisibility(bool Visibility) override
+#define DECLARE_MENU(name)                                                                                                                                                         \
+public:                                                                                                                                                                            \
+    TSharedPtr<S##name##Menu> Get##name##Menu();                                                                                                                                   \
+    virtual void Show##name##Menu() override;                                                                                                                                      \
+    virtual void Hide##name##Menu() override;                                                                                                                                      \
+    virtual void Set##name##MenuVisibility(bool Visibility) override
 
 class UP4GameInstance;
 
@@ -67,15 +67,30 @@ public:
 
     TArray<TSharedPtr<struct ModificationDesc>> GetModificationDescriptors() const;
 
-    void StartEngine() { P4EngineState = EP4EngineState::Started; }
-    bool IsStarted() const { return P4EngineState == EP4EngineState::Started; }
+    void StartEngine()
+    {
+        P4EngineState = EP4EngineState::Started;
+    }
+    bool IsStarted() const
+    {
+        return P4EngineState == EP4EngineState::Started;
+    }
     void Exit();
 
-    UP4GameInstance* GetP4GameInstance() const { return P4GameInstance; }
-    UWorld* GetWorld() const;
+    UP4GameInstance *GetP4GameInstance() const
+    {
+        return P4GameInstance;
+    }
+    UWorld *GetWorld() const;
 
-    FVector GetWorldScale() const { return WorldScale; }
-    void SetWorldScale(const FVector &Scale) { WorldScale = Scale; }
+    FVector GetWorldScale() const
+    {
+        return WorldScale;
+    }
+    void SetWorldScale(const FVector &Scale)
+    {
+        WorldScale = Scale;
+    }
 
     virtual void OnLevelLoaded() override;
 
@@ -133,5 +148,4 @@ POLYGON4_API
 #ifdef _MSC_VER
 __declspec(noinline)
 #endif
-P4Engine *GP4Engine(P4Engine *Engine = nullptr);
-
+    P4Engine *GP4Engine(P4Engine *Engine = nullptr);

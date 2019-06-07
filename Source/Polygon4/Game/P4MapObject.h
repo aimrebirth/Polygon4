@@ -30,7 +30,7 @@ class POLYGON4_API AP4Object : public AActor
     GENERATED_BODY()
 
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* VisibleComponent;
+    UStaticMeshComponent *VisibleComponent;
 
 public:
     AP4Object();
@@ -38,7 +38,7 @@ public:
     virtual void BeginPlay() override;
 
     void SetStaticMesh(UStaticMesh *mesh);
-    void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    void OnHit(UPrimitiveComponent *HitComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, FVector NormalImpulse, const FHitResult &Hit);
 
 private:
     P4MapObject *MapObject;

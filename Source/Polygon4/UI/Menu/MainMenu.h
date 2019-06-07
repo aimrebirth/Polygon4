@@ -24,8 +24,8 @@
 
 struct LanguageComboBoxItem
 {
-	FText Text;
-	polygon4::LocalizationType id;
+    FText Text;
+    polygon4::LocalizationType id;
 };
 
 using cb_item_type = TSharedPtr<LanguageComboBoxItem>;
@@ -39,8 +39,10 @@ public:
     using SModsListView = TSharedPtr<class SModListView>;
     using SSGamesListView = TSharedPtr<class SSavedGamesListView>;
 
-	SLATE_BEGIN_ARGS(SMainMenu){}
-	SLATE_END_ARGS()
+    SLATE_BEGIN_ARGS(SMainMenu)
+    {
+    }
+    SLATE_END_ARGS()
 
 private:
     SModsListView ModsListView;
@@ -57,17 +59,18 @@ public:
     void Construct(const FArguments& InArgs);
 
     virtual void OnShow() override;
-    virtual void OnHide() override {}
+    virtual void OnHide() override
+    {
+    }
 
     void ReloadMods();
 
 private:
-	TSharedPtr<cb_type> LangWidget;
-	cb_item_array_ptr LanguageItems;
+    TSharedPtr<cb_type> LangWidget;
+    cb_item_array_ptr LanguageItems;
     TSharedPtr<STextBlock> CurrentLangItem;
 
-    template <typename F>
-    SVerticalBox::FSlot& MainMenuButton(FText Text, F function) const;
+    template <typename F> SVerticalBox::FSlot& MainMenuButton(FText Text, F function) const;
 
     FReply OnNewGame();
     FReply OnLoadGame();

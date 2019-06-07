@@ -48,7 +48,7 @@ void AP4Object::BeginPlay()
     Super::BeginPlay();
 }
 
-void AP4Object::SetStaticMesh(UStaticMesh *mesh)
+void AP4Object::SetStaticMesh(UStaticMesh* mesh)
 {
     if (mesh)
     {
@@ -63,8 +63,7 @@ void AP4Object::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
     }
 }
 
-P4MapObject::P4MapObject(const polygon4::detail::MapObject &rhs)
-    : Base(rhs)
+P4MapObject::P4MapObject(const polygon4::detail::MapObject& rhs) : Base(rhs)
 {
 }
 
@@ -76,7 +75,7 @@ bool P4MapObject::spawn()
     return !!Object;
 }
 
-AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
+AP4Object* spawn(polygon4::detail::MapObject* O, UWorld* W)
 {
     auto World = W;
     TActorIterator<ALandscape> landscapeIterator(World);
@@ -92,7 +91,7 @@ AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
         if (o)
         {
             auto Object = World->SpawnActorDeferred<AP4Object>(AP4Object::StaticClass(), {});
-            UGameplayStatics::FinishSpawningActor(Object, { rot, pos });
+            UGameplayStatics::FinishSpawningActor(Object, {rot, pos});
 
             Object->SetStaticMesh(o);
             FVector new_scale(O->object->scale, O->object->scale, O->object->scale);

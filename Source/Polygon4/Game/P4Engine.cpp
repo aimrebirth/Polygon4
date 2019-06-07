@@ -22,12 +22,12 @@
 #include <P4GameInstance.h>
 
 #include "P4Map.h"
-#include "P4Mechanoid.h"
-#include "P4MapObject.h"
 #include "P4MapBuilding.h"
+#include "P4MapObject.h"
+#include "P4Mechanoid.h"
 
-#include <UI/Menu/MainMenu.h>
 #include <UI/Menu/BuildingMenu.h>
+#include <UI/Menu/MainMenu.h>
 #include <UI/Menu/PauseMenu.h>
 
 #include <Polygon4/Configuration.h>
@@ -36,29 +36,29 @@
 
 #include <Game/GliderHUD.h>
 
-#include "Landscape.h"
-#include "EngineUtils.h"
 #include "Engine/Engine.h"
+#include "EngineUtils.h"
+#include "Landscape.h"
 
-#define DEFINE_MENU(name)                                                           \
-    TSharedPtr<S##name##Menu> P4Engine::Get##name##Menu()                           \
-    {                                                                               \
-        return StaticCastSharedPtr<S##name##Menu>(GetMenu(MenuType::##name##Menu)); \
-    }                                                                               \
-                                                                                    \
-    void P4Engine::Show##name##Menu()                                               \
-    {                                                                               \
-        ShowMenu(MenuType::##name##Menu);                                           \
-    }                                                                               \
-                                                                                    \
-    void P4Engine::Hide##name##Menu()                                               \
-    {                                                                               \
-        HideMenu(MenuType::##name##Menu);                                           \
-    }                                                                               \
-                                                                                    \
-    void P4Engine::Set##name##MenuVisibility(bool Visibility)                       \
-    {                                                                               \
-        SetMenuVisibility(MenuType::##name##Menu, Visibility);                      \
+#define DEFINE_MENU(name)                                                                                                                                                          \
+    TSharedPtr<S##name##Menu> P4Engine::Get##name##Menu()                                                                                                                          \
+    {                                                                                                                                                                              \
+        return StaticCastSharedPtr<S##name##Menu>(GetMenu(MenuType::##name##Menu));                                                                                                \
+    }                                                                                                                                                                              \
+                                                                                                                                                                                   \
+    void P4Engine::Show##name##Menu()                                                                                                                                              \
+    {                                                                                                                                                                              \
+        ShowMenu(MenuType::##name##Menu);                                                                                                                                          \
+    }                                                                                                                                                                              \
+                                                                                                                                                                                   \
+    void P4Engine::Hide##name##Menu()                                                                                                                                              \
+    {                                                                                                                                                                              \
+        HideMenu(MenuType::##name##Menu);                                                                                                                                          \
+    }                                                                                                                                                                              \
+                                                                                                                                                                                   \
+    void P4Engine::Set##name##MenuVisibility(bool Visibility)                                                                                                                      \
+    {                                                                                                                                                                              \
+        SetMenuVisibility(MenuType::##name##Menu, Visibility);                                                                                                                     \
     }
 
 P4Engine *GP4Engine(P4Engine *Engine)
@@ -69,15 +69,14 @@ P4Engine *GP4Engine(P4Engine *Engine)
     return P4Engine;
 }
 
-P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4GameInstance)
-    : Base(modificationsDirectory.GetCharArray().GetData()), P4GameInstance(P4GameInstance)
+P4Engine::P4Engine(const FString &modificationsDirectory, UP4GameInstance *P4GameInstance) : Base(modificationsDirectory.GetCharArray().GetData()), P4GameInstance(P4GameInstance)
 {
     // set engine pointers
     polygon4::getEngine(this);
     GP4Engine(this);
 
     Menus.AddDefaulted(static_cast<int>(MenuType::Max));
-    DummyObject = (UDummyObject*)calloc(1, sizeof(UDummyObject));
+    DummyObject = (UDummyObject *)calloc(1, sizeof(UDummyObject));
 }
 
 P4Engine::~P4Engine()
@@ -90,9 +89,9 @@ void P4Engine::initChildren()
     if (!storage)
         return;
 
-#define REPLACE(a, t) \
-    for (auto &v : storage->a) \
-        v.second->replace<t>(v.second)
+#define REPLACE(a, t)                                                                                                                                                              \
+    for (auto &v : storage->a)                                                                                                                                                     \
+    v.second->replace<t>(v.second)
 
     REPLACE(modifications, P4Modification);
     REPLACE(maps, P4Map);
@@ -219,12 +218,12 @@ void P4Engine::OnLevelLoaded()
     SetPauseMenuBindings();
 
     TActorIterator<ALandscape> landscapeIterator(GetWorld());
-    ALandscape* landscape = *landscapeIterator;
+    ALandscape *landscape = *landscapeIterator;
     SetWorldScale(landscape->GetActorScale() / 100.0f);
     LoadLevelObjects();
 }
 
-UWorld* P4Engine::GetWorld() const
+UWorld *P4Engine::GetWorld() const
 {
     return P4GameInstance->GetWorld();
 }

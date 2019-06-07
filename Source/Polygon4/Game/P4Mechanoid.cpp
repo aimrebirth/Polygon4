@@ -18,15 +18,14 @@
 
 #include "P4Mechanoid.h"
 
-#include "P4GameInstance.h"
 #include "P4Engine.h"
+#include "P4GameInstance.h"
 
 #include "P4Glider.h"
 
 #include <string>
 
-P4Mechanoid::P4Mechanoid(const polygon4::detail::Mechanoid &rhs)
-    : Base(rhs)
+P4Mechanoid::P4Mechanoid(const polygon4::detail::Mechanoid &rhs) : Base(rhs)
 {
 }
 
@@ -54,12 +53,9 @@ bool P4Mechanoid::spawn()
     return true;
 }
 
-AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
+AP4Glider *spawn(polygon4::detail::Mechanoid *M, UWorld *W)
 {
-    FTransform tr{
-        { M->pitch, M->yaw, M->roll },
-        { M->x, M->y, M->z }
-    };
+    FTransform tr{{M->pitch, M->yaw, M->roll}, {M->x, M->y, M->z}};
 
     auto conf = M->getConfiguration();
     auto glider = conf->glider;
@@ -106,7 +102,7 @@ AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
     int heavy_id = 0;
     for (auto &nw : conf->getWeapons())
     {
-        auto w = (polygon4::detail::Weapon*)nw.second;
+        auto w = (polygon4::detail::Weapon *)nw.second;
         if (!w->resource.empty())
         {
             auto r = LoadObject<UStaticMesh>(0, w->resource);
@@ -142,7 +138,7 @@ AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
                     r1->SetStaticMesh(r);
                     r1->SetSimulatePhysics(false);
                     r1->SetVisibility(true);
-                    r1->SetRelativeScale3D({ 1,-1,-1 });
+                    r1->SetRelativeScale3D({1, -1, -1});
                     w1->SetRootComponent(r1);
                     w1->AttachToActor(g, rules, ("WeaponLight_" + std::to_string(light_id++)).c_str());
                     w1->FinishSpawning({});

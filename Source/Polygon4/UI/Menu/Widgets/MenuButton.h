@@ -27,45 +27,32 @@ public:
     typedef ParentType::FArguments FParentArguments;
 
 private:
-	SLATE_BEGIN_ARGS(SMenuButton){}
-        SLATE_ARGUMENT(FText, Text)
-        SLATE_ARGUMENT(FParentArguments, ParentArguments)
-	SLATE_END_ARGS()
+    SLATE_BEGIN_ARGS(SMenuButton)
+    {
+    }
+    SLATE_ARGUMENT(FText, Text)
+    SLATE_ARGUMENT(FParentArguments, ParentArguments)
+    SLATE_END_ARGS()
 
 public:
-	void Construct(const FArguments& InArgs);
+    void Construct(const FArguments& InArgs);
 
 private:
     FText Text;
 };
 
-template <typename C, typename F>
-SVerticalBox::FSlot& VerticalSlotMenuButton(FText Text, C *object, F function, TSharedPtr<SMenuButton> *Button = nullptr)
+template <typename C, typename F> SVerticalBox::FSlot& VerticalSlotMenuButton(FText Text, C* object, F function, TSharedPtr<SMenuButton>* Button = nullptr)
 {
     if (Button)
-        return
-            SVerticalBox::Slot()
+        return SVerticalBox::Slot()
             .VAlign(VAlign_Top)
             .HAlign(HAlign_Center)
             //.AutoHeight()
-            .Padding(20)
-            [
-                SAssignNew(*Button, SMenuButton)
-                .Text(Text)
-                .ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))
-            ]
-    ;
+            .Padding(20)[SAssignNew(*Button, SMenuButton).Text(Text).ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))];
     else
-        return
-            SVerticalBox::Slot()
+        return SVerticalBox::Slot()
             .VAlign(VAlign_Top)
             .HAlign(HAlign_Center)
             //.AutoHeight()
-            .Padding(20)
-            [
-                SNew(SMenuButton)
-                .Text(Text)
-                .ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))
-            ]
-        ;
+            .Padding(20)[SNew(SMenuButton).Text(Text).ParentArguments(SMenuButton::FParentArguments().OnClicked(object, function))];
 }

@@ -37,5 +37,5 @@ class P4Modification : public polygon4::Modification
     using Base = polygon4::Modification;
 
 public:
-    P4Modification(const polygon4::detail::Modification &rhs);
+    P4Modification(const polygon4::detail::Modification& rhs);
 };

@@ -35,9 +35,9 @@ public:
     using FOnSelectionChanged = Base::FOnSelectionChanged;
 
 public:
-    SLATE_BEGIN_ARGS(SSavedGamesListView)
-        : _OnSelectionChanged()
-    {}
+    SLATE_BEGIN_ARGS(SSavedGamesListView) : _OnSelectionChanged()
+    {
+    }
     SLATE_EVENT(FOnSelectionChanged, OnSelectionChanged)
     SLATE_END_ARGS()
 
@@ -45,7 +45,7 @@ public:
     int Padding = 20;
 
 public:
-	void Construct(const FArguments& InArgs);
+    void Construct(const FArguments& InArgs);
     void ReloadSaves(bool save = false);
 
     TSharedRef<ITableRow> OnGenerateWidgetForList(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);

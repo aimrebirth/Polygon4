@@ -21,8 +21,8 @@
 #include <queue>
 
 #include "GameFramework/Pawn.h"
-#include <Polygon4/DataManager/Types.h>
 #include "GliderMovement.h"
+#include <Polygon4/DataManager/Types.h>
 #include "P4Glider.generated.h"
 
 USTRUCT()
@@ -33,8 +33,8 @@ struct FGliderData
     UPROPERTY(EditAnywhere)
     FString TextID;
 
-    //UPROPERTY(EditAnywhere)
-    //TArray<FString> Clan;
+    // UPROPERTY(EditAnywhere)
+    // TArray<FString> Clan;
 };
 
 struct ArmedTimedValue
@@ -166,15 +166,13 @@ struct PreparedTimedValue
     }
 };
 
-template <typename T>
-struct FadedValue
+template <typename T> struct FadedValue
 {
     T time;
     T fade_time;
     bool started;
 
-    FadedValue(T s = 2)
-        : fade_time(s)
+    FadedValue(T s = 2) : fade_time(s)
     {
         reset();
     }
@@ -223,12 +221,10 @@ struct FadedValue
     }
 };
 
-template <typename T>
-class DampingValue
+template <typename T> class DampingValue
 {
 public:
-    DampingValue(size_t n = 5)
-        : n(n)
+    DampingValue(size_t n = 5) : n(n)
     {
     }
 
@@ -258,7 +254,7 @@ public:
         if (values.empty())
             return T();
         T sum = T();
-        for (auto &v : values)
+        for (auto& v : values)
             sum = sum + v;
         return sum / n;
     }
@@ -317,7 +313,7 @@ class POLYGON4_API AP4Glider : public APawn
     enum EGliderView
     {
         FPS,
-        //FPSWeapons,
+        // FPSWeapons,
         TPS,
 
         Max
@@ -343,7 +339,7 @@ class POLYGON4_API AP4Glider : public APawn
     UPROPERTY(VisibleAnywhere, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     class UStaticMeshComponent* EnergyShield;
 
-    UGliderMovement *GliderMovement;
+    UGliderMovement* GliderMovement;
 
     // spot light
 
@@ -361,19 +357,37 @@ public:
     virtual void Tick(float DeltaSeconds) override;
     virtual void SetupPlayerInputComponent(class UInputComponent* InInputComponent) override;
 
-    void BoostOn() { boost = true; }
-    void BoostOff() { boost = false; }
-    void FireLightOn() { FireLight = true; }
-    void FireLightOff() { FireLight = false; }
-    void FireHeavyOn() { FireHeavy = true; }
-    void FireHeavyOff() { FireHeavy = false; }
+    void BoostOn()
+    {
+        boost = true;
+    }
+    void BoostOff()
+    {
+        boost = false;
+    }
+    void FireLightOn()
+    {
+        FireLight = true;
+    }
+    void FireLightOff()
+    {
+        FireLight = false;
+    }
+    void FireHeavyOn()
+    {
+        FireHeavy = true;
+    }
+    void FireHeavyOff()
+    {
+        FireHeavy = false;
+    }
 
-    virtual UGliderMovement *GetMovementComponent() const override;
+    virtual UGliderMovement* GetMovementComponent() const override;
 
 private:
     bool LeftGun = true;
-    UClass *projectileLight;
-    UClass *projectileHeavy;
+    UClass* projectileLight;
+    UClass* projectileHeavy;
 
     FVector GunOffsetLeft;
     FVector GunOffsetRight;
@@ -381,13 +395,13 @@ private:
     FVector GunOffsetTopLeft;
     FVector GunOffsetTopRight;
 
-	class UPrimitiveComponent* Body;
-	class USoundWave* JumpSound = nullptr;
-	class USoundWave* EngineSound = nullptr;
-	class USoundWave* LightSound = nullptr;
-	class USoundWave* HeavySound = nullptr;
-	class UAudioComponent* EngineAudioComponent;
-	class UAudioComponent* WeaponAudioComponent;
+    class UPrimitiveComponent* Body;
+    class USoundWave* JumpSound = nullptr;
+    class USoundWave* EngineSound = nullptr;
+    class USoundWave* LightSound = nullptr;
+    class USoundWave* HeavySound = nullptr;
+    class UAudioComponent* EngineAudioComponent;
+    class UAudioComponent* WeaponAudioComponent;
 
     FloatFadedValue EnergyShieldTimer;
 
@@ -436,21 +450,32 @@ private:
 
 public:
     void SetMechanoid(polygon4::detail::Mechanoid* Mechanoid);
-    polygon4::detail::Mechanoid* GetMechanoid() const { return Mechanoid; }
+    polygon4::detail::Mechanoid* GetMechanoid() const
+    {
+        return Mechanoid;
+    }
 
-    float GetLifetime() const { return Lifetime; }
-    bool CanEnterBuilding() const { return GetLifetime() > 3.0f; }
+    float GetLifetime() const
+    {
+        return Lifetime;
+    }
+    bool CanEnterBuilding() const
+    {
+        return GetLifetime() > 3.0f;
+    }
 
-    void SetStaticMesh(UStaticMesh *mesh);
+    void SetStaticMesh(UStaticMesh* mesh);
 
 public:
     UFUNCTION()
     void OnBodyHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
     UFUNCTION()
-    void OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    void OnBodyBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                            const FHitResult& SweepResult);
 
     UFUNCTION()
-    void OnEnergyShieldBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    void OnEnergyShieldBeginOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                    const FHitResult& SweepResult);
     UFUNCTION()
     void OnEnergyShieldEndOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

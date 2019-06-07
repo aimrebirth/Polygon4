@@ -18,19 +18,15 @@
 
 #include "MenuButton.h"
 
-
 void SMenuButton::Construct(const FArguments& InArgs)
 {
     Text = InArgs._Text;
     ParentType::Construct(InArgs._ParentArguments);
-    
-    ChildSlot
-        [
-            SNew(STextBlock)
-            .ShadowColorAndOpacity(FLinearColor::Black)
-            .ColorAndOpacity(FLinearColor::White)
-            .ShadowOffset(FIntPoint(-1, 1))
-            .Font(FSlateFontInfo(RobotoFont, 40))
-            .Text(Text)
-        ];
+
+    ChildSlot[SNew(STextBlock)
+                  .ShadowColorAndOpacity(FLinearColor::Black)
+                  .ColorAndOpacity(FLinearColor::White)
+                  .ShadowOffset(FIntPoint(-1, 1))
+                  .Font(FSlateFontInfo(RobotoFont, 40))
+                  .Text(Text)];
 }

@@ -20,11 +20,10 @@
 
 #include "Game/P4Engine.h"
 
-#include "Game/P4Glider.h"
 #include "Game/GliderHUD.h"
+#include "Game/P4Glider.h"
 
-AP4GameMode::AP4GameMode(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+AP4GameMode::AP4GameMode(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
     DefaultPawnClass = AP4Glider::StaticClass();
     HUDClass = AGliderHUD::StaticClass();
