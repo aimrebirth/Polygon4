@@ -17,10 +17,14 @@
  */
 
 #include "GliderHUD.h"
+#include "Polygon4.h"
 
 #include <UI/Game/SBar.h>
 
 #include "P4Glider.h"
+
+#include "Engine/Canvas.h"
+#include "GameFramework/PlayerController.h"
 
 AGliderHUD::AGliderHUD(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)

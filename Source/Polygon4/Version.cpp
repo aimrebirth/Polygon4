@@ -18,6 +18,8 @@
 
 #include "Version.h"
 
+#include "Polygon4.h"
+
 const FString GitVersion =
 #include "Generated/Version.h"
 ;

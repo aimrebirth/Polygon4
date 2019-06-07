@@ -20,7 +20,10 @@
 
 #include <memory>
 
-#include "Engine.h"
+#include "CoreMinimal.h"
+#include "Engine/EngineTypes.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Font.h"
 
 #define DUMMY_OBJECT TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'")
 #define DUMMY_BUILDING DUMMY_OBJECT

@@ -18,11 +18,13 @@
 
 #include "MenuButton.h"
 
+#include "Polygon4.h"
+
 void SMenuButton::Construct(const FArguments& InArgs)
 {
     Text = InArgs._Text;
     ParentType::Construct(InArgs._ParentArguments);
-
+    
     ChildSlot
         [
             SNew(STextBlock)

@@ -17,6 +17,7 @@
  */
 
 #include "GliderMovement.h"
+#include "Polygon4.h"
 
 void UGliderMovement::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {

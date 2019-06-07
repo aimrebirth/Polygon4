@@ -17,11 +17,15 @@
  */
 
 #include "P4MapBuilding.h"
+#include "Polygon4.h"
 
 #include "Landscape.h"
 
 #include "P4Engine.h"
 #include "P4Glider.h"
+
+#include "EngineUtils.h"
+#include "Landscape.h"
 
 AP4Building::AP4Building()
 {

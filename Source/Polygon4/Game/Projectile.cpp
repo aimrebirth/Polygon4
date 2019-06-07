@@ -17,7 +17,10 @@
  */
 
 #include "Projectile.h"
-
+#include "Polygon4.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "P4Glider.h"
 
 AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)

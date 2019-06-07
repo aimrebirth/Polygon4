@@ -17,6 +17,7 @@
 */
 
 #include "TextDecorators.h"
+#include "Polygon4.h"
 
 #include <UI/Colors.h>
 

@@ -18,6 +18,8 @@
 
 #include "ModListView.h"
 
+#include "Polygon4.h"
+
 #include "Paths.h"
 #include "FileManagerGeneric.h"
 

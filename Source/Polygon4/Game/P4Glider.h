@@ -23,9 +23,10 @@
 #include "GameFramework/Pawn.h"
 #include <Polygon4/DataManager/Types.h>
 #include "GliderMovement.h"
+#include "Components/PrimitiveComponent.h"
+#include "Sound/SoundWave.h"
+#include "Components/AudioComponent.h"
 #include "P4Glider.generated.h"
-
-class USoundWave;
 
 USTRUCT()
 struct FGliderData

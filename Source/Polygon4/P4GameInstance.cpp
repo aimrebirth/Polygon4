@@ -17,6 +17,7 @@
  */
 
 #include "P4GameInstance.h"
+#include "Polygon4.h"
 
 #include <Polygon4/Hotpatch.h>
 

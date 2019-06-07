@@ -35,6 +35,8 @@ public class Polygon4 : ModuleRules
         : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+        bFasterWithoutUnity = true;
         PrivatePCHHeaderFile = "Polygon4.h";
         CppStandard = CppStandardVersion.Cpp17;
         bEnforceIWYU = true;

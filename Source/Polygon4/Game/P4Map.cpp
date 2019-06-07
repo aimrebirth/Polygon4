@@ -17,6 +17,7 @@
  */
 
 #include "P4Map.h"
+#include "Polygon4.h"
 
 #include "P4GameInstance.h"
 #include "P4Engine.h"

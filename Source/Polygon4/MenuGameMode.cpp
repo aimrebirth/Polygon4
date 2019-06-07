@@ -17,6 +17,7 @@
  */
 
 #include "MenuGameMode.h"
+#include "Polygon4.h"
 
 #include <Game/P4Engine.h>
 
