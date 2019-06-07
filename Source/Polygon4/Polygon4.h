@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include "Engine.h"
+
+#include <memory>
 
 #define DUMMY_OBJECT TEXT("Class'/Game/Mods/Common/Objects/Dummy/Dummy.Dummy_C'")
 #define DUMMY_BUILDING DUMMY_OBJECT
