@@ -381,13 +381,13 @@ private:
     FVector GunOffsetTopLeft;
     FVector GunOffsetTopRight;
 
-	class UPrimitiveComponent* Body;
-	class USoundWave* JumpSound = nullptr;
-	class USoundWave* EngineSound = nullptr;
-	class USoundWave* LightSound = nullptr;
-	class USoundWave* HeavySound = nullptr;
-	class UAudioComponent* EngineAudioComponent;
-	class UAudioComponent* WeaponAudioComponent;
+    class UPrimitiveComponent* Body;
+    class USoundWave* JumpSound = nullptr;
+    class USoundWave* EngineSound = nullptr;
+    class USoundWave* LightSound = nullptr;
+    class USoundWave* HeavySound = nullptr;
+    class UAudioComponent* EngineAudioComponent;
+    class UAudioComponent* WeaponAudioComponent;
 
     FloatFadedValue EnergyShieldTimer;
 

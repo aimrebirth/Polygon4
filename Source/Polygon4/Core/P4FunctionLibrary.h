@@ -26,7 +26,6 @@ class POLYGON4_API UP4FunctionLibrary : public UBlueprintFunctionLibrary
     GENERATED_UCLASS_BODY()
 
 public:
-
     UFUNCTION(BlueprintCallable, meta = (DisplayName = " CalculateAirDragForce "), Category = " Utility")
     static FVector CalculateAirDragForce(UPrimitiveComponent* Target, const FVector AirDragCoef, const float AreaOfDrag, const float AirDensity);
 
@@ -36,5 +35,4 @@ public:
     UFUNCTION(BlueprintCallable, meta = (DisplayName = " Stabilizer "), Category = " Utility")
     static float Stabilizer(const float DT, const float CurrentValue, const float MinValue, const float MaxValue, const float MinForce, const float ForceMultiplier,
                             const float Damping, const float OldValue);
-
 };
