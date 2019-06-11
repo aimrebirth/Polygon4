@@ -18,8 +18,6 @@
 
 #include "P4Engine.h"
 
-#include "Landscape.h"
-
 #include "P4Modification.h"
 #include <P4GameInstance.h>
 
@@ -37,6 +35,10 @@
 #include <Polygon4/Glider.h>
 
 #include <Game/GliderHUD.h>
+
+#include "Landscape.h"
+#include "EngineUtils.h"
+#include "Engine/Engine.h"
 
 #define DEFINE_MENU(name)                                                           \
     TSharedPtr<S##name##Menu> P4Engine::Get##name##Menu()                           \

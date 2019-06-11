@@ -22,6 +22,9 @@
 
 #include "P4Engine.h"
 
+#include "EngineUtils.h"
+#include "Landscape.h"
+
 AP4Object::AP4Object()
 {
     PrimaryActorTick.bCanEverTick = false;

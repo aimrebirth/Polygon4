@@ -23,6 +23,9 @@
 #include "P4Engine.h"
 #include "P4Glider.h"
 
+#include "EngineUtils.h"
+#include "Landscape.h"
+
 AP4Building::AP4Building()
 {
     PrimaryActorTick.bCanEverTick = false;

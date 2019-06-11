@@ -29,6 +29,18 @@
 #include "P4Mechanoid.h"
 #include "P4MapBuilding.h"
 
+#include "Kismet/GameplayStatics.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "ConstructorHelpers.h"
+#include "Components/MeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/AudioComponent.h"
+#include "Materials/Material.h"
+#include "Engine/StaticMesh.h"
+
 const float k_mouse_x = 0.6;
 const float k_mouse_y = 0.8;
 

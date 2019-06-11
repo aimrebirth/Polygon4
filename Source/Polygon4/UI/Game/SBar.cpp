@@ -18,6 +18,7 @@
 
 #include "SBar.h"
 
+
 void SBar::Construct(const FArguments& InArgs)
 {
     Max = InArgs._Max;

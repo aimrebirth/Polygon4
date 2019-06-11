@@ -18,6 +18,6 @@
 
 #pragma once
 
-#include "Engine.h"
+#include "CoreMinimal.h"
 
 FString GetPolygon4Version();

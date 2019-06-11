@@ -18,7 +18,10 @@
 
 #pragma once
 
-#include "Engine.h"
+#include "CoreMinimal.h"
+#include "Engine/EngineTypes.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Font.h"
 
 #include <memory>
 
