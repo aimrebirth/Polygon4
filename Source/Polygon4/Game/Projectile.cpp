@@ -20,6 +20,10 @@
 
 #include "P4Glider.h"
 
+#include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/PrimitiveComponent.h"
+
 AProjectile::AProjectile(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {

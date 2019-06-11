@@ -23,6 +23,10 @@
 
 #include <fstream>
 
+#include "Modules/ModuleManager.h"
+#include "Misc/Paths.h"
+#include "GameFramework/Actor.h"
+
 UFont *RobotoFont;
 
 class FPolygon4ModuleImpl : public FDefaultGameModuleImpl

@@ -17,7 +17,6 @@
  */
 
 #include "BuildingMenu.h"
-
 #include "SceneViewport.h"
 
 #include <Polygon4/Mechanoid.h>

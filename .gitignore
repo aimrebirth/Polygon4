@@ -27,3 +27,5 @@ ThirdParty
 *.lnk
 *.bat
 *.sh
+
+Config/DefaultEditor\.ini
