@@ -32,7 +32,7 @@ UP4GliderMovementComponent::UP4GliderMovementComponent(const FObjectInitializer&
     bWantsInitializeComponent = true;
     PrimaryComponentTick.bCanEverTick = true;
     PrimaryComponentTick.TickGroup = TG_PrePhysics;
-    bReplicates = true;
+    SetIsReplicatedByDefault(true);
 
     UpdatedMesh = nullptr;
 

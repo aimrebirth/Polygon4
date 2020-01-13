@@ -177,7 +177,7 @@ void P4Engine::ShowMenu(MenuType Type)
     m->OnShow();
     if (auto PlayerController = GetWorld()->GetFirstPlayerController())
         PlayerController->bShowMouseCursor = true;
-    FSlateApplication::Get().ReleaseMouseCapture();
+    FSlateApplication::Get().ReleaseAllPointerCapture();
 }
 
 void P4Engine::HideMenu(MenuType Type)

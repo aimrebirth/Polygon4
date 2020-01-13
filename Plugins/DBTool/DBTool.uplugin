@@ -11,11 +11,11 @@
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"Modules": [
-		{
-			"Name": "DBTool",
-			"Type": "Developer",
-			"LoadingPhase": "Default"
-		}
+        {
+            "Name": "DBTool",
+            "Type": "DeveloperTool",
+            "LoadingPhase": "Default"
+        }
 	],
 	"EnabledByDefault": false,
 	"CanContainContent": false,

@@ -34,7 +34,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "ConstructorHelpers.h"
+#include "CoreUObject.h"
 #include "Components/MeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/AudioComponent.h"
@@ -116,7 +116,7 @@ AP4Glider::AP4Glider()
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraSpringArm"));
     SpringArm->bUsePawnControlRotation = false;
     SpringArm->SetupAttachment(VisibleComponent);
-    SpringArm->RelativeRotation = FRotator(-15.f, 0.f, 0.f);
+    SpringArm->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
     SpringArm->TargetArmLength = 500.0f;
     SpringArm->bEnableCameraLag = true;
     SpringArm->CameraLagSpeed = 8.0f;
@@ -135,7 +135,7 @@ AP4Glider::AP4Glider()
         EnergyShield->SetSimulatePhysics(false);
         EnergyShield->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         EnergyShield->SetOwnerNoSee(true);
-        EnergyShield->RelativeLocation = { 0,0,0 };
+        EnergyShield->SetRelativeRotation({ 0,0,0 });
 
         static ConstructorHelpers::FObjectFinder<UMaterial> EnergyShieldMat(TEXT("Material'/Game/Mods/Common/Materials/EnergyShield.EnergyShield'"));
         if (EnergyShieldMat.Succeeded())

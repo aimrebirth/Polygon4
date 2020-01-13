@@ -17,7 +17,6 @@
  */
 
 #include "BuildingMenu.h"
-#include "SceneViewport.h"
 
 #include <Polygon4/Mechanoid.h>
 
@@ -580,14 +579,14 @@ void SBuildingMenu::refresh()
     }
     if (mechanoid)
     {
-        MoneyTB->SetText(FString(std::to_string((int)mechanoid->money).c_str()));
+        MoneyTB->SetText(FText::FromString(std::to_string((int)mechanoid->money).c_str()));
 
         auto rat = std::to_string((int)mechanoid->rating);
         int level = mechanoid->getRatingLevel();
         auto cap = polygon4::getRatingLevelCap(level);
         auto caps = std::to_string((int)cap);
         rat = rat + "/" + caps + " (Level: " + std::to_string(level) + ")";
-        RatingTB->SetText(FString(rat.c_str()));
+        RatingTB->SetText(FText::FromString(rat.c_str()));
 
         RatingBar->SetMaxValue(cap);
         RatingBar->SetCurrentValue((int)mechanoid->rating);
@@ -596,7 +595,7 @@ void SBuildingMenu::refresh()
         auto m = std::to_string((int)conf->getMass());
         auto c = std::to_string((int)conf->getCapacity());
         m = m + "/" + c;
-        MassTB->SetText(FString(m.c_str()));
+        MassTB->SetText(FText::FromString(m.c_str()));
 
         MassBar->SetMaxValue((int)conf->getCapacity());
         MassBar->SetCurrentValue((int)conf->getMass());

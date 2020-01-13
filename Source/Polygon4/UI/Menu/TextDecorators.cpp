@@ -108,10 +108,10 @@ void TextDecorator::ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& Ou
         }
 #define CHANGE_COLOR(c, cc) else if (FontColorStringRef == L ## #c) { OutFontColor = cc; }
         CHANGE_COLOR(green, P4_COLOR_GREEN)
-            CHANGE_COLOR(blue, P4_COLOR_BLUE)
-            CHANGE_COLOR(red, P4_COLOR_RED)
-            CHANGE_COLOR(yellow, P4_COLOR_YELLOW)
-            // add more text colors here
+        CHANGE_COLOR(blue, P4_COLOR_BLUE)
+        CHANGE_COLOR(red, P4_COLOR_RED)
+        CHANGE_COLOR(yellow, P4_COLOR_YELLOW)
+        // add more text colors here
     }
     else
     {

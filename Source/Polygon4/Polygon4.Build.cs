@@ -1,6 +1,6 @@
 /*
  * Polygon-4
- * Copyright (C) 2015 lzwdgc
+ * Copyright (C) 2015-2020 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -29,22 +29,19 @@ public class Polygon4 : ModuleRules
         get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../ThirdParty/")); }
     }
 
-    //private static int NumberOfCalls = 0;
-
     public Polygon4(ReadOnlyTargetRules Target)
         : base(Target)
     {
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        MinFilesUsingPrecompiledHeaderOverride = 1;
-        bFasterWithoutUnity = true;
         PrivatePCHHeaderFile = "Polygon4.h";
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+        bUseUnity = false;
         CppStandard = CppStandardVersion.Cpp17;
 
         PublicDependencyModuleNames .AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         GenerateVersion();
-        LoadCoreModule(Target, "Engine");
+        LoadEngine(Target);
     }
 
     void GenerateVersion()
@@ -102,150 +99,63 @@ public class Polygon4 : ModuleRules
             File.WriteAllText(p, version);
     }
 
-    bool RemoveLibrary(string dst)
+    public void LoadEngine(ReadOnlyTargetRules Target)
     {
-        bool removed = true;
-        string dll = dst + ".dll";
-        string pdb = dst + ".pdb";
-        if (File.Exists(dll))
+        var BuildName = "rwdi";
+
+        var EnginePath = Path.Combine(ThirdPartyPath, "Engine");
+        var DotSwPath = Path.Combine(EnginePath, ".sw");
+        var JsonProgPath = Path.Combine(DotSwPath, "out", BuildName, "");
+        var JsonPath = Path.Combine(DotSwPath, "g", "swbdesc", BuildName + ".json");
+
+        var DefsFile = Path.Combine(DotSwPath, "defs.txt");
+        var IdirsFile = Path.Combine(DotSwPath, "idirs.txt");
+        var LibsFile = Path.Combine(DotSwPath, "libs.txt");
+
+        if (!File.Exists(DefsFile) ||
+            !File.Exists(IdirsFile) ||
+            !File.Exists(LibsFile))
         {
-            try
-            {
-                string msg = "Deleting old hot reload file: \"{0}\".";
-                File.Delete(dll);
-                System.Console.WriteLine(msg, dll);
-                File.Delete(pdb);
-                System.Console.WriteLine(msg, pdb);
-            }
-            catch (System.Exception)
-            {
-                removed = false;
-            }
+            bool r =
+                RunSwCommand("sw", "-static -config rwdi build", EnginePath) &&
+                RunSwCommand("sw", "-static -config rwdi -build-name " + BuildName + " generate -g swbdesc", EnginePath) &&
+                RunSwCommand("sw", "run Polygon4.Engine.tools.prepare_sw_info-0.0.1 \"" + DotSwPath + "\" \"" + JsonPath + "\" Polygon4.Engine-master", EnginePath)
+            ;
+            if (!r)
+                throw new Exception("Engine build failed");
         }
-        return removed;
+
+        PublicIncludePaths.Add(ModuleDirectory);
+
+        // read & set defs, idirs, libs
+        foreach (var s in File.ReadLines(DefsFile))
+            PublicDefinitions.Add(s);
+
+        foreach (var s in File.ReadLines(IdirsFile))
+            PublicIncludePaths.Add(s);
+
+        foreach (var s in File.ReadLines(LibsFile))
+            PublicSystemLibraries.Add(s);
     }
 
-    bool RemoveLogs(string dst)
+    bool RunSwCommand(string Program, string Args, string Wdir)
     {
-        bool removed = true;
+        Console.WriteLine("Executing: " + Program + " " + Args);
 
-        string log_info = dst + ".log.info";
-        try
-        {
-            File.Delete(log_info);
-        }
-        catch (System.Exception)
-        {
-            removed = false;
-        }
-
-        string log_debug = dst + ".log.debug";
-        try
-        {
-            File.Delete(log_debug);
-        }
-        catch (System.Exception)
-        {
-            removed = false;
-        }
-
-        string log_trace = dst + ".log.trace";
-        try
-        {
-            File.Delete(log_trace);
-        }
-        catch (System.Exception)
-        {
-            removed = false;
-        }
-
-        return removed;
-    }
-
-    public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
-    {
-        //System.Console.WriteLine("Enter LoadCoreModule");
-
-        if (Target.Platform != UnrealTargetPlatform.Win64 && Target.Platform != UnrealTargetPlatform.Win32)
-            return;
-
-        //PublicDefinitions.Add("SCHEMA_API=");
-        //PublicDefinitions.Add("DATA_MANAGER_API=");
-        //PublicDefinitions.Add("SCHEMA_API=__declspec(dllimport)");
-        //PublicDefinitions.Add("DATA_MANAGER_API=__declspec(dllimport)");
-        PublicDefinitions.Add("P4_ENGINE_API=__declspec(dllimport)");
-
-        // idirs, libs
-        {
-            var defs = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "definitions_ReleaseWithDebugInformation.txt"));
-            foreach (var s in defs)
-                if (!s.StartsWith("P4_ENGINE_API="))
-                    PublicDefinitions.Add(s);
-
-            var includes = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "includes_ReleaseWithDebugInformation.txt"));
-            foreach (var s in includes)
-                PublicIncludePaths.Add(s);
-
-            //foreach (var s in PublicIncludePaths)
-            //    Console.WriteLine(s);
-
-            /*var data_manager = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "data_manager_ReleaseWithDebugInformation.txt"));
-            var schema = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "schema_ReleaseWithDebugInformation.txt"));
-            PublicAdditionalLibraries.Add(data_manager);
-            PublicAdditionalLibraries.Add(schema);*/
-
-            var ll = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "link_libraries_ReleaseWithDebugInformation.txt"));
-            foreach (var s in ll)
-                PublicAdditionalLibraries.Add(s);
-
-            //foreach (var s in PublicDelayLoadDLLs)
-            //    Console.WriteLine(s);
-        }
-
-        var ell = File.ReadLines(Path.Combine(ThirdPartyPath, Name, ".sw", "engine_ReleaseWithDebugInformation.txt"));
-
-        //string base_name = "Polygon4.Engine-master";
-        //int base_name_id = 0;
-
-        foreach (var s in ell)
-            PublicAdditionalLibraries.Add(s);
-        //PublicDelayLoadDLLs.Add(base_name + ".dll");
-
-        /*string dst_base_name = Path.Combine(ModuleDirectory, "../../Binaries/", Target.Platform.ToString()) + "/" + base_name;
-        dst_base_name = Path.GetFullPath(dst_base_name);
-
-        string src = Path.Combine(BaseDir, base_name);
-        string dst = dst_base_name;
-
-        //if (Target.Type != TargetRules.TargetType.Editor)
-        //    return;
-
-        if (NumberOfCalls++ > 0)
-            return;
-
-        // try to remove previous dll, pdb
-        base_name_id = 1;
-        while (true)
-        {
-            dst = dst_base_name;
-            if (base_name_id > 0)
-                dst = dst_base_name + "." + base_name_id.ToString();
-            if (!RemoveLibrary(dst))
-                break;
-            if (base_name_id++ > 1000)
-                break;
-        }
-        // try to remove previous logs
-        base_name_id = 0;
-        while (true)
-        {
-            dst = dst_base_name;
-            if (base_name_id > 0)
-                dst = dst_base_name + "." + base_name_id.ToString();
-            if (!RemoveLogs(dst))
-                break;
-            if (base_name_id++ > 1000)
-                break;
-        }*/
+        Process process = new Process();
+        process.StartInfo.FileName = Program;
+        process.StartInfo.Arguments = Args;
+        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        process.StartInfo.WorkingDirectory = Wdir;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        process.OutputDataReceived += (sender, args) => Console.WriteLine("sw: {0}", args.Data);
+        process.ErrorDataReceived += (sender, args) => Console.WriteLine("sw: {0}", args.Data);
+        process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        process.WaitForExit();
+        return process.ExitCode == 0;
     }
 }

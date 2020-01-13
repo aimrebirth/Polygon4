@@ -9,5 +9,7 @@ public class Polygon4EditorTarget : TargetRules
         Type = TargetType.Editor;
 
         ExtraModuleNames.Add("Polygon4");
+
+        DefaultBuildSettings = BuildSettingsVersion.V2;
     }
 }

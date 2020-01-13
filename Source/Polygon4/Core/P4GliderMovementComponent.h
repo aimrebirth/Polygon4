@@ -20,8 +20,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 
 #include "PhysicsEngine/BodyInstance.h"
-#include "Public/CollisionQueryParams.h"
-#include "Public/WorldCollision.h"
+#include "CollisionQueryParams.h"
+#include "WorldCollision.h"
 
 #include "P4GliderMovementComponent.generated.h"
 

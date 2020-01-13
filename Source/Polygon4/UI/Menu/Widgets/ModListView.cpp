@@ -18,9 +18,6 @@
 
 #include "ModListView.h"
 
-#include "Paths.h"
-#include "FileManagerGeneric.h"
-
 #include <Game/P4Modification.h>
 #include <Game/P4Engine.h>
 

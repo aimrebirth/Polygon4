@@ -1,8 +1,8 @@
 
 #include "DBToolStyle.h"
 
-#include "SlateGameResources.h"
-#include "IPluginManager.h"
+#include "Projects.h"
+#include "SlateBasics.h"
 
 TSharedPtr< FSlateStyleSet > FDBToolStyle::StyleInstance = NULL;
 

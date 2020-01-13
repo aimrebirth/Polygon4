@@ -4,8 +4,6 @@
 
 #include <memory>
 
-#include "ModuleManager.h"
-
 class FToolBarBuilder;
 class FMenuBuilder;
 

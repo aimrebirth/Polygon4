@@ -10,7 +10,7 @@
 #include "DBToolStyle.h"
 #include "DBToolCommands.h"
 
-#include "IPluginManager.h"
+#include "Projects.h"
 #include "LevelEditor.h"
 #include "EngineUtils.h"
 
