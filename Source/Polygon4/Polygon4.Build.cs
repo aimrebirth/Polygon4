@@ -140,6 +140,18 @@ public class Polygon4 : ModuleRules
 
     bool RunSwCommand(string Program, string Args, string Wdir)
     {
+        try
+        {
+            return RunSwCommand1(Program, Args, Wdir);
+        }
+        catch (System.Exception)
+        {
+            return RunSwCommand1(Path.Combine(ModuleDirectory, "../../../BootstrapPrograms", Program), Args, Wdir);
+        }
+    }
+
+    bool RunSwCommand1(string Program, string Args, string Wdir)
+    {
         Console.WriteLine("Executing: " + Program + " " + Args);
 
         Process process = new Process();
