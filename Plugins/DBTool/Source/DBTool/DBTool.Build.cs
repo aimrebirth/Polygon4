@@ -44,8 +44,7 @@ public class DBTool : ModuleRules
                 "Core",
                 // ... add other public dependencies that you statically link with here ...
             }
-            );
-
+        );
 
         PrivateDependencyModuleNames.AddRange(
             new string[]
@@ -64,22 +63,13 @@ public class DBTool : ModuleRules
                 //
                 "Polygon4",
             }
-            );
-
+        );
 
         DynamicallyLoadedModuleNames.AddRange(
             new string[]
             {
                 // ... add any modules that your module loads dynamically here ...
             }
-            );
-
-        LoadCoreModule(Target, "Engine");
-    }
-
-    public void LoadCoreModule(ReadOnlyTargetRules Target, string Name)
-    {
-        //var sqlite3 = File.ReadAllText(Path.Combine(ThirdPartyPath, Name, ".sw", "sqlite3_ReleaseWithDebugInformation.txt"));
-        //PublicAdditionalLibraries.Add(sqlite3);
+        );
     }
 }

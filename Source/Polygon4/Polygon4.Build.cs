@@ -136,10 +136,6 @@ public class Polygon4 : ModuleRules
 
         foreach (var s in File.ReadLines(LibsFile))
             PublicSystemLibraries.Add(s);
-
-        // TODO: remove
-        PublicSystemLibraries.Add("psapi.lib");
-        PublicSystemLibraries.Add("userenv.lib");
     }
 
     bool RunSwCommand(string Program, string Args, string Wdir)
