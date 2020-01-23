@@ -119,14 +119,20 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
         case EObjectType::ConfigurationProjectile:
         {
             auto p = (ConfigurationProjectile *)o;
-            T += L" (" + std::to_wstring(p->quantity) + L")";
+            T += u" (";
+            T += std::to_string(p->quantity);
+            T += u")"s;
             break;
         }
         case EObjectType::MapBuildingGood:
         {
             auto p = (MapBuildingGood *)o;
             if (p->quantity != -1)
-                T += L" (" + std::to_wstring(p->quantity) + L")";
+            {
+                T += u" (";
+                T += std::to_string(p->quantity);
+                T += u")"s;
+            }
             break;
         }
         default:
