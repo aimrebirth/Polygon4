@@ -197,21 +197,21 @@ SVerticalBox::FSlot& SPauseMenu::PauseMenuButton(FText Text, F function) const
         ;
 }
 
-FReply SPauseMenu::OnContinue()
+FReply SPauseMenu::OnContinue() const
 {
     ClearError();
     GP4Engine()->ShowPauseMenuFromBinding();
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnExitToMenu()
+FReply SPauseMenu::OnExitToMenu() const
 {
     ClearError();
     GP4Engine()->ReturnToMainMenu();
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnLoadGame()
+FReply SPauseMenu::OnLoadGame() const
 {
     ClearError();
     SavedGamesListView->ReloadSaves();
@@ -221,7 +221,7 @@ FReply SPauseMenu::OnLoadGame()
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnSaveGame()
+FReply SPauseMenu::OnSaveGame() const
 {
     ClearError();
     SavedGamesListView->ReloadSaves(true);
@@ -233,7 +233,7 @@ FReply SPauseMenu::OnSaveGame()
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnExit()
+FReply SPauseMenu::OnExit() const
 {
     ClearError();
     if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
@@ -241,29 +241,29 @@ FReply SPauseMenu::OnExit()
     return FReply::Handled();
 }
 
-FReply SPauseMenu::PrintError(const FText& Text)
+FReply SPauseMenu::PrintError(const FText& Text) const
 {
     MessageLine->SetText(Text);
     return FReply::Unhandled();
 }
 
-void SPauseMenu::ClearError()
+void SPauseMenu::ClearError() const
 {
     MessageLine->SetText(FText::FromString(FString()));
 }
 
-FReply SPauseMenu::OnOptions()
+FReply SPauseMenu::OnOptions() const
 {
     ClearError();
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnNotImplemented()
+FReply SPauseMenu::OnNotImplemented() const
 {
     return PrintError(LOCTEXT("NotImplemented", "Not Implemented"));
 }
 
-FReply SPauseMenu::OnLoadBack()
+FReply SPauseMenu::OnLoadBack() const
 {
     ClearError();
     LoadVB->SetVisibility(EVisibility::Collapsed);
@@ -274,7 +274,7 @@ FReply SPauseMenu::OnLoadBack()
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnLoadDelete()
+FReply SPauseMenu::OnLoadDelete() const
 {
     ClearError();
     auto selected = SavedGamesListView->GetSelectedItems();
@@ -288,14 +288,14 @@ FReply SPauseMenu::OnLoadDelete()
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnSaveDelete()
+FReply SPauseMenu::OnSaveDelete() const
 {
     auto r = OnLoadDelete();
     SavedGamesListView->ReloadSaves(true);
     return r;
 }
 
-FReply SPauseMenu::OnLoadLoad()
+FReply SPauseMenu::OnLoadLoad() const
 {
     ClearError();
     auto selected = SavedGamesListView->GetSelectedItems();
@@ -310,7 +310,7 @@ FReply SPauseMenu::OnLoadLoad()
     return FReply::Handled();
 }
 
-FReply SPauseMenu::OnSaveSave()
+FReply SPauseMenu::OnSaveSave() const
 {
     ClearError();
     auto n = SaveNameTB->GetText().ToString();

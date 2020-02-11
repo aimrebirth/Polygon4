@@ -48,20 +48,20 @@ private:
     template <typename F>
     SVerticalBox::FSlot& PauseMenuButton(FText Text, F function) const;
 
-    FReply OnContinue();
-    FReply OnExitToMenu();
-    FReply OnLoadGame();
-    FReply OnSaveGame();
-    FReply OnOptions();
-    FReply OnExit();
-    FReply OnNotImplemented();
+    FReply OnContinue() const;
+    FReply OnExitToMenu() const;
+    FReply OnLoadGame() const;
+    FReply OnSaveGame() const;
+    FReply OnOptions() const;
+    FReply OnExit() const;
+    FReply OnNotImplemented() const;
 
-    FReply OnLoadBack();
-    FReply OnLoadDelete();
-    FReply OnLoadLoad();
-    FReply OnSaveSave();
-    FReply OnSaveDelete();
+    FReply OnLoadBack() const;
+    FReply OnLoadDelete() const;
+    FReply OnLoadLoad() const;
+    FReply OnSaveSave() const;
+    FReply OnSaveDelete() const;
 
-    FReply PrintError(const FText& Text);
-    void ClearError();
+    FReply PrintError(const FText& Text) const;
+    void ClearError() const;
 };

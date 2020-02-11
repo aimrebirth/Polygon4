@@ -298,7 +298,7 @@ void SMainMenu::ReloadMods()
         ModsListView->ReloadMods();
 }
 
-FReply SMainMenu::OnNewGame()
+FReply SMainMenu::OnNewGame() const
 {
     auto selected = ModsListView->GetSelectedItems();
     if (!selected.Num())
@@ -309,7 +309,7 @@ FReply SMainMenu::OnNewGame()
     return FReply::Handled();
 }
 
-FReply SMainMenu::OnLoadGame()
+FReply SMainMenu::OnLoadGame() const
 {
     SavedGamesListView->ReloadSaves();
     MenuVB->SetVisibility(EVisibility::Collapsed);
@@ -326,19 +326,19 @@ FReply SMainMenu::OnReloadMods()
     return FReply::Handled();
 }
 
-FReply SMainMenu::OnExit()
+FReply SMainMenu::OnExit() const
 {
     GP4Engine()->Exit();
     return FReply::Handled();
 }
 
-FReply SMainMenu::PrintError(const FText& Text)
+FReply SMainMenu::PrintError(const FText& Text) const
 {
     MessageLine->SetText(Text);
     return FReply::Unhandled();
 }
 
-void SMainMenu::ClearError()
+void SMainMenu::ClearError() const
 {
     MessageLine->SetText(FText::FromString(FString()));
 }
@@ -358,7 +358,7 @@ FReply SMainMenu::OnNotImplemented()
     return PrintError(LOCTEXT("NotImplemented", "Not Implemented"));
 }
 
-FReply SMainMenu::OnLoadBack()
+FReply SMainMenu::OnLoadBack() const
 {
     LoadVB->SetVisibility(EVisibility::Collapsed);
     SavedGamesVB->SetVisibility(EVisibility::Collapsed);
@@ -367,7 +367,7 @@ FReply SMainMenu::OnLoadBack()
     return FReply::Handled();
 }
 
-FReply SMainMenu::OnLoadDelete()
+FReply SMainMenu::OnLoadDelete() const
 {
     ClearError();
     auto selected = SavedGamesListView->GetSelectedItems();
@@ -381,7 +381,7 @@ FReply SMainMenu::OnLoadDelete()
     return FReply::Handled();
 }
 
-FReply SMainMenu::OnLoadLoad()
+FReply SMainMenu::OnLoadLoad() const
 {
     ClearError();
     auto selected = SavedGamesListView->GetSelectedItems();

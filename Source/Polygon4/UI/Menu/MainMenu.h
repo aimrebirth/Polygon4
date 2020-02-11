@@ -69,19 +69,19 @@ private:
     template <typename F>
     SVerticalBox::FSlot& MainMenuButton(FText Text, F function) const;
 
-    FReply OnNewGame();
-    FReply OnLoadGame();
+    FReply OnNewGame() const;
+    FReply OnLoadGame() const;
     FReply OnReloadMods();
     FReply OnOptions();
     FReply OnAuthors();
-    FReply OnExit();
+    FReply OnExit() const;
 
-    FReply OnLoadBack();
-    FReply OnLoadDelete();
-    FReply OnLoadLoad();
+    FReply OnLoadBack() const;
+    FReply OnLoadDelete() const;
+    FReply OnLoadLoad() const;
 
     FReply OnNotImplemented();
 
-    FReply PrintError(const FText& Text);
-    void ClearError();
+    FReply PrintError(const FText& Text) const;
+    void ClearError() const;
 };
