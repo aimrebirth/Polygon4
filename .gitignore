@@ -27,3 +27,5 @@ ThirdParty
 *.lnk
 *.bat
 *.sh
+
+sw.lock
