@@ -39,6 +39,13 @@ AP4Building::AP4Building()
 #else
     RootComponent->SetMobility(EComponentMobility::Stationary);
 #endif
+
+    static ConstructorHelpers::FObjectFinder<USoundWave> SoundAsset(TEXT("SoundWave'/Game/Mods/Common/Sounds/Glider/jump.jump'"));
+    if (SoundAsset.Succeeded())
+    {
+        Sound = SoundAsset.Object;
+        Sound->AttenuationSettings = CreateDefaultSubobject<USoundAttenuation>(TEXT("SoundAttenuationBuilding"));
+    }
 }
 
 void AP4Building::BeginPlay()
@@ -88,6 +95,8 @@ void AP4Building::OnHit(AActor* OtherActor, UPrimitiveComponent* OtherComp)
         return;
     Glider->Destroy();
     M->enterBuilding(MapBuilding);
+    if (Sound)
+        UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
 }
 
 P4MapBuilding::P4MapBuilding(const polygon4::detail::MapBuilding &rhs)

@@ -52,6 +52,8 @@ public:
 private:
     P4MapBuilding *MapBuilding = nullptr;
 
+    class USoundWave* Sound = nullptr;
+
     friend class P4MapBuilding;
 };
 
