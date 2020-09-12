@@ -35,7 +35,7 @@ public class DBTool : ModuleRules
         PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
         MinFilesUsingPrecompiledHeaderOverride = 1;
         bUseUnity = false;
-        CppStandard = CppStandardVersion.Cpp17;
+        CppStandard = CppStandardVersion.Latest;
         //bEnforceIWYU = true;
 
         PublicDependencyModuleNames.AddRange(
