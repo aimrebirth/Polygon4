@@ -116,10 +116,19 @@ public class Polygon4 : ModuleRules
             !File.Exists(IdirsFile) ||
             !File.Exists(LibsFile))
         {
+            if (!RunSwCommand("sw", "get storage-dir", EnginePath))
+                throw new Exception("Engine build failed: cannot run sw");
+            if (stdout.Length == 0)
+                throw new Exception("Engine build failed: empty storage dir");
             bool r =
                 RunSwCommand("sw", "-static -config rwdi build", EnginePath) &&
                 RunSwCommand("sw", "-static -config rwdi -build-name " + BuildName + " generate -g swbdesc", EnginePath) &&
-                RunSwCommand("sw", "run Polygon4.Engine.tools.prepare_sw_info-0.0.1 \"" + DotSwPath + "\" \"" + JsonPath + "\" Polygon4.Engine-master", EnginePath)
+                RunSwCommand("sw", "run Polygon4.Engine.tools.prepare_sw_info-0.0.1" +
+                    " \"" + DotSwPath + "\"" +
+                    " \"" + JsonPath + "\"" +
+                    " \"" + stdout + "\"" +
+                    " " + "Polygon4.Engine-master"
+                    , EnginePath)
             ;
             if (!r)
                 throw new Exception("Engine build failed");
@@ -162,12 +171,20 @@ public class Polygon4 : ModuleRules
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
+        //process.OutputDataReceived += process_StdoutDataReceived;
         process.OutputDataReceived += (sender, args) => Console.WriteLine("sw: {0}", args.Data);
+        process.ErrorDataReceived += process_DataReceived;
         process.ErrorDataReceived += (sender, args) => Console.WriteLine("sw: {0}", args.Data);
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         process.WaitForExit();
         return process.ExitCode == 0;
+    }
+
+    string stdout;
+    void process_DataReceived(object sender, DataReceivedEventArgs e)
+    {
+        stdout += e.Data;
     }
 }
