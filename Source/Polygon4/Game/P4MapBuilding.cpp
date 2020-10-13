@@ -121,11 +121,9 @@ void P4MapBuilding::initModificationMapBuilding()
 AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W)
 {
     auto World = W;
-    TActorIterator<ALandscape> landscapeIterator(World);
-    ALandscape* landscape = *landscapeIterator;
-    auto WorldScale = landscape->GetActorScale() / 100.0f;
-
-    FVector pos(B->x * 10 * WorldScale.X + B->map->bx, B->y * 10 * WorldScale.Y + B->map->by, B->z * 10);
+    FVector indent = FVector(2050.f, 2050.f, 0.f);
+    FVector pos(B->x * 10, B->y * 10, B->z * 10);
+    pos = pos + indent;
     FRotator rot(B->pitch + B->building->pitch, B->yaw + B->building->yaw, B->roll + B->building->roll);
 
     if (!B->building->resource.empty())
@@ -137,7 +135,10 @@ AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W)
             UGameplayStatics::FinishSpawningActor(Building, { rot, pos });
 
             Building->SetStaticMesh(o);
-            FVector new_scale(B->building->scale, B->building->scale, B->building->scale);
+            FVector new_scale(
+                B->scale * B->scale_x * B->building->scale * B->building->scale_x,
+                B->scale * B->scale_y * B->building->scale * B->building->scale_y,
+                B->scale * B->scale_z * B->building->scale * B->building->scale_z);
             Building->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Building->SetFolderPath("Buildings");

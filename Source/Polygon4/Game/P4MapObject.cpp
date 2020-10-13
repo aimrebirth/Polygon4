@@ -79,11 +79,9 @@ bool P4MapObject::spawn()
 AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
 {
     auto World = W;
-    TActorIterator<ALandscape> landscapeIterator(World);
-    ALandscape* landscape = *landscapeIterator;
-    auto WorldScale = landscape->GetActorScale() / 100.0f;
-
-    FVector pos(O->x * 10 * WorldScale.X + O->map->bx, O->y * 10 * WorldScale.Y + O->map->by, O->z * 10);
+    FVector indent = FVector(2050.f, 2050.f, 0.f);
+    FVector pos(O->x * 10, O->y * 10, O->z * 10);
+    pos = pos + indent;
     FRotator rot(O->pitch + O->object->pitch, O->yaw + O->object->yaw, O->roll + O->object->roll);
 
     if (!O->object->resource.empty())
@@ -95,7 +93,10 @@ AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
             UGameplayStatics::FinishSpawningActor(Object, { rot, pos });
 
             Object->SetStaticMesh(o);
-            FVector new_scale(O->object->scale, O->object->scale, O->object->scale);
+            FVector new_scale(
+                O->scale * O->scale_x * O->object->scale * O->object->scale_x,
+                O->scale * O->scale_y * O->object->scale * O->object->scale_y,
+                O->scale * O->scale_z * O->object->scale * O->object->scale_z);
             Object->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Object->SetFolderPath("Objects");
