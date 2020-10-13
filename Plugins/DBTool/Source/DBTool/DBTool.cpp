@@ -4,6 +4,22 @@
 #include "LandscapeEdit.h"
 #include "LandscapeInfo.h"
 
+#include "AssetToolsModule.h"
+#include "IAssetTools.h"
+#include "UnrealEd.h"
+#include "IDesktopPlatform.h"
+#include "DesktopPlatformModule.h"
+#include "EditorDirectories.h"
+#include "DBReader/db.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet2/KismetEditorUtilities.h"
+
+#include "Factory/P4FoliageType_InstancedStaticMeshFactory.h"
+#include "InstancedFoliage.h"
+#include "InstancedFoliageActor.h"
+
+#include "Engine/StaticMesh.h"
+
 #include "SlateBasics.h"
 #include "SlateExtras.h"
 
@@ -98,8 +114,12 @@ void FDBToolModule::StartupModule()
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().LoadMapMechanoidsFromDB);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().SaveMapMechanoidsToDB);
         ToolBarBuilder->AddSeparator();
+        ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().ImportAndFixPathToResource);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().LoadMapObjectsFromDB);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().SaveMapObjectsToDB);
+        ToolBarBuilder->AddSeparator();
+        ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().GenerateFoliageInstancesFromDB);
+        ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().DestroyAllFoliageInstances);
         ToolBarBuilder->AddSeparator();
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().LoadMapHeightmap);
         ToolBarBuilder->AddSeparator();
@@ -113,7 +133,7 @@ void FDBToolModule::StartupModule()
     }
     catch (std::exception &e)
     {
-        UE_LOG(LogTemp, Error, TEXT("Cannot load database: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot load database: %s"), e.what());
         return;
     }
     if (!LoadDB())
@@ -223,6 +243,11 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
         FDBToolCommands::Get().SaveMapMechanoidsToDB,
         FExecuteAction::CreateRaw(this, &FDBToolModule::SaveMapMechanoidsToDB),
         FCanExecuteAction());
+    
+    PluginCommands->MapAction(
+        FDBToolCommands::Get().ImportAndFixPathToResource,
+        FExecuteAction::CreateRaw(this, &FDBToolModule::ImportAndFixPathToResource),
+        FCanExecuteAction());
 
     PluginCommands->MapAction(
         FDBToolCommands::Get().LoadMapObjectsFromDB,
@@ -231,6 +256,15 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
     PluginCommands->MapAction(
         FDBToolCommands::Get().SaveMapObjectsToDB,
         FExecuteAction::CreateRaw(this, &FDBToolModule::SaveMapObjectsToDB),
+        FCanExecuteAction());
+
+    PluginCommands->MapAction(
+        FDBToolCommands::Get().GenerateFoliageInstancesFromDB,
+        FExecuteAction::CreateRaw(this, &FDBToolModule::GenerateFoliageInstancesFromDB),
+        FCanExecuteAction());
+    PluginCommands->MapAction(
+        FDBToolCommands::Get().DestroyAllFoliageInstances,
+        FExecuteAction::CreateRaw(this, &FDBToolModule::DestroyAllFoliageInstances),
         FCanExecuteAction());
 
     PluginCommands->MapAction(
@@ -284,7 +318,7 @@ bool FDBToolModule::LoadDB()
     catch (std::exception &e)
     {
         storage.reset();
-        UE_LOG(LogTemp, Error, TEXT("Cannot load storage: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot load storage: %s"), e.what());
         return false;
     }
     if (TreeView.IsValid())
@@ -305,7 +339,7 @@ bool FDBToolModule::SaveDB()
     }
     catch (std::exception &e)
     {
-        UE_LOG(LogTemp, Error, TEXT("Cannot save database: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot save database: %s"), e.what());
         return false;
     }
     return true;
@@ -440,7 +474,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
+            UE_LOG(DBTool, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
                 Itr->Data.TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
         }
     }
@@ -471,6 +505,236 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
         spawn(m, GWorld);
     }
 }
+
+void FDBToolModule::ImportAndFixPathToResource()
+{
+    IDesktopPlatform *DesktopPlatform = FDesktopPlatformModule::Get();
+    if (!DesktopPlatform) { return; }
+
+    bool bOpenedDB = false;
+    FString DialogTitleDB = LOCTEXT("Import original DB", "Select the folder in which the original database files are located").ToString();
+    FString DefaultPathDB = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::GENERIC_IMPORT);
+    FString OutFolderDB = "";
+
+    const void *ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+    bOpenedDB = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleDB, DefaultPathDB, OutFolderDB);
+
+    if (!bOpenedDB && OutFolderDB.IsEmpty()) { return; }
+
+    FString Basename = OutFolderDB + "/" + "db";
+    FString BasenameExt = Basename + ".dat";
+    if (!FPaths::FileExists(BasenameExt))
+    {
+        UE_LOG(DBTool, Error, TEXT("DB file db.dat not found in selected folder! Path : %s"), *BasenameExt);
+        return;
+    }
+    db db;
+    polygon4::tools::db::processed_db pdb;
+    try
+    {
+        db.open(*Basename);
+        pdb = db.process();
+    }
+    catch (std::exception &e)
+    {
+        UE_LOG(DBTool, Error, TEXT("Cannot open database: %s"), UTF8_TO_TCHAR(e.what()));
+        return;
+    }
+
+    if (db.number_of_values <= 0)
+    {
+        UE_LOG(DBTool, Error, TEXT("Database empty!"));
+        return;
+    }
+
+    auto link = [](const auto &objects, const auto pdb, const FString Folder) {
+        TArray<FString> Filenames;
+        FString DestPath = "/Game/Assets/";
+        TArray<TPair<FString, FString>> *FilesAndDest = new TArray<TPair<FString, FString>>;
+        for (auto &object : objects)
+        {
+            for (auto &[tname, table] : pdb)
+            {
+                auto record = table.find(object.second->text_id);
+                if (record == table.end())
+                    continue;
+                auto value = record->second.find("MODEL");
+                if (value == record->second.end())
+                    continue;
+
+                FString Filename = UTF8_TO_TCHAR(std::get<std::string>(value->second).c_str());
+                FString FindFilename = Filename + ".fbx";
+                TArray<FString> FindedFiles;
+                IFileManager::Get().FindFilesRecursive(FindedFiles, *Folder, *FindFilename, true, false, true);
+                UE_LOG(DBTool, Warning, TEXT("Finded filename : %s"), *FindFilename);
+                if (FindedFiles.Num() <= 0) { break; }
+                UE_LOG(DBTool, Warning, TEXT("Find file : %s"), *FindedFiles[0]);
+
+                TPair<FString, FString> FileAndDest;
+                FileAndDest.Key = FindedFiles[0];
+                FString CleanFile = FPaths::GetBaseFilename(FileAndDest.Key);
+                FileAndDest.Value = DestPath + CleanFile + "/";
+                FilesAndDest->Add(FileAndDest);
+                Filenames.Add(FindedFiles[0]);
+
+                FString PredictPath = "StaticMesh'" + DestPath + CleanFile + "/" + CleanFile + "." + CleanFile + "'";
+                object.second->resource = PredictPath;
+                break;
+            }
+        }
+
+        FAssetToolsModule &AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
+        AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);
+    };
+
+    UE_LOG(DBTool, Error, TEXT("Gliders..."));
+    link(storage->gliders, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Buildings..."));
+    link(storage->buildings, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Equipments..."));
+    link(storage->equipments, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Objects..."));
+    link(storage->objects, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Weapons..."));
+    link(storage->weapons, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Projectiles..."));
+    link(storage->projectiles, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Goods..."));
+    link(storage->goods, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("End"));
+
+    SaveDB();
+}
+
+void FDBToolModule::GenerateFoliageInstancesFromDB()
+{
+#if WITH_EDITOR
+    using namespace polygon4::detail;
+
+    auto p = GetCurrentMap(TreeView.Get());
+    if (!p)
+        return;
+    auto map = std::get<IdPtr<Map>>(*p);
+
+    auto IFA = GWorld->SpawnActor<AInstancedFoliageActor>();
+    auto &AssetToolsModule = FAssetToolsModule::GetModule();
+    auto &AssetTools = AssetToolsModule.Get();
+    auto NewFactory = NewObject<UP4FoliageType_InstancedStaticMeshFactory>();
+    TMap<FString, UFoliageType_InstancedStaticMesh *> Parsed;
+    TArray<UObject *> ObjectsToSync;
+
+    for (auto &O : map->objects)
+    {
+        FString ObjName = O->object->text_id;
+        ObjName.RemoveSpacesInline();
+
+        FVector indent = FVector(2050.f, 2050.f, 0.f);
+        FVector pos(O->x * 10, O->y * 10, O->z * 10);
+        pos = pos + indent;
+        FRotator rot(O->pitch + O->object->pitch, O->yaw + O->object->yaw, O->roll + O->object->roll);
+        FVector scale(
+            O->scale * O->scale_x * O->object->scale * O->object->scale_x,
+            O->scale * O->scale_y * O->object->scale * O->object->scale_y,
+            O->scale * O->scale_z * O->object->scale * O->object->scale_z);
+
+        if (Parsed.Contains(ObjName))
+        {
+            auto NewFoliageType = *Parsed.Find(ObjName);
+            if (!NewFoliageType)
+                continue;
+            auto NewFoliageInfo = IFA->FindInfo(NewFoliageType);
+            if (NewFoliageInfo)
+            {
+                auto NewInst = new FFoliageInstance();
+                NewInst->Location = pos;
+                NewInst->Rotation = rot;
+                NewInst->DrawScale3D = scale;
+                NewFoliageInfo->AddInstance(IFA, NewFoliageType, *NewInst);
+            }
+        }
+        else
+        {
+            FString AssetName = "FT_" + ObjName;
+            FString FolderPath = "/Game/GenFoliageType/";
+            FString DefaultPathMesh = "StaticMesh'/Engine/BasicShapes/Cube.Cube'";
+            UStaticMesh *DefaultMesh;
+
+            auto NewAsset = LoadObject<UObject>(GWorld, *(FolderPath + AssetName));
+            if (!NewAsset)
+            {
+                NewAsset = AssetTools.CreateAsset(AssetName, FolderPath, NewFactory->GetSupportedClass(), NewFactory);
+                if (!NewAsset)
+                    continue;
+            }
+
+            auto NewFoliageType = Cast<UFoliageType_InstancedStaticMesh>(NewAsset);
+            if (!NewFoliageType)
+                continue;
+
+            FFoliageInfo *NewFoliageInfo;
+            auto NewInst = new FFoliageInstance();
+            NewInst->Location = pos;
+            NewInst->Rotation = rot;
+            NewInst->DrawScale3D = scale;
+
+            if (!O->object->resource.empty())
+            {
+                DefaultMesh = LoadObject<UStaticMesh>(GWorld, O->object->resource);
+                if (DefaultMesh)
+                {
+                    NewFoliageType->SetStaticMesh(DefaultMesh);
+                    NewAsset->Modify(true);
+                    NewFoliageInfo = IFA->AddMesh(NewFoliageType);
+                    if (!NewFoliageInfo)
+                        continue;
+                    NewFoliageInfo->AddInstance(IFA, NewFoliageType, *NewInst);
+                    Parsed.Add(ObjName, NewFoliageType);
+                    ObjectsToSync.Add(NewAsset);
+                    continue;
+                }
+            }
+
+            DefaultMesh = LoadObject<UStaticMesh>(GWorld, *DefaultPathMesh);
+            if (DefaultMesh)
+            {
+                NewFoliageType->SetStaticMesh(DefaultMesh);
+                NewAsset->Modify(true);
+                NewFoliageInfo = IFA->AddMesh(NewFoliageType);
+                if (!NewFoliageInfo)
+                    continue;
+                NewFoliageInfo->AddInstance(IFA, NewFoliageType, *NewInst);
+                Parsed.Add(ObjName, NewFoliageType);
+                ObjectsToSync.Add(NewAsset);
+            }
+        }
+    }
+    GEditor->SyncBrowserToObjects(ObjectsToSync);
+#endif
+}
+
+void FDBToolModule::DestroyAllFoliageInstances()
+{
+#if WITH_EDITOR
+    TArray<AActor *> IFA;
+    UGameplayStatics::GetAllActorsOfClass(GWorld, AInstancedFoliageActor::StaticClass(), IFA);
+    for (auto a : IFA)
+    {
+        if (a)
+        {
+            a->Destroy(false, true);
+            a = nullptr;
+        }
+    }
+#endif
+}
+
 
 void FDBToolModule::SaveMapObjectsToDB()
 {
@@ -521,7 +785,7 @@ void FDBToolModule::SaveMapObjectsToDB()
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
+            UE_LOG(DBTool, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
                 Itr->Data.TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
         }
     }
@@ -585,6 +849,8 @@ void FDBToolModule::SetDataCommitted()
     if (StatusBar.IsValid())
         StatusBar->SetText(LOCTEXT("DBDataCommitted", "There is no any changes"));
 }
+
+DEFINE_LOG_CATEGORY(DBTool);
 
 #undef LOCTEXT_NAMESPACE
 

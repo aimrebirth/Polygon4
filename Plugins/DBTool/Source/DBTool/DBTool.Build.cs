@@ -62,6 +62,7 @@ public class DBTool : ModuleRules
                 "Foliage",
                 //
                 "Polygon4",
+                "DesktopPlatform",
             }
         );
 
