@@ -60,6 +60,7 @@ public class DBTool : ModuleRules
                 // ... add private dependencies that you statically link with here ...
                 "Landscape",
                 "Foliage",
+                "DesktopPlatform",
                 //
                 "Polygon4",
             }
