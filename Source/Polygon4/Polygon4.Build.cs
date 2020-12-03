@@ -38,7 +38,7 @@ public class Polygon4 : ModuleRules
         CppStandard = CppStandardVersion.Latest;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
-        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "PhysicsCore", "Slate", "SlateCore" });
 
         GenerateVersion();
         LoadEngine(Target);
