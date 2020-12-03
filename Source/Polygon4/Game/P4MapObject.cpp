@@ -95,7 +95,15 @@ AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
             UGameplayStatics::FinishSpawningActor(Object, { rot, pos });
 
             Object->SetStaticMesh(o);
-            FVector new_scale(O->object->scale, O->object->scale, O->object->scale);
+            // respect:
+            // 1. global scale (O->object->scale)
+            // 2. global coordinate scale (O->object->scale_N)
+            // 3. local scale (O->scale)
+            // 4. local coordinate scale (O->scale_N)
+            FVector new_scale(
+                O->scale * O->scale_x * O->object->scale * O->object->scale_x,
+                O->scale * O->scale_y * O->object->scale * O->object->scale_y,
+                O->scale * O->scale_z * O->object->scale * O->object->scale_z);
             Object->SetActorScale3D(new_scale);
 #if WITH_EDITOR
             Object->SetFolderPath("Objects");
