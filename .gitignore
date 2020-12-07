@@ -30,3 +30,5 @@ ThirdParty
 
 sw.lock
 .sw
+
+!Plugins/DBTool/Source/ThirdParty/
