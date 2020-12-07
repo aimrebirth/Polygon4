@@ -10,7 +10,7 @@
 #include "IDesktopPlatform.h"
 #include "DesktopPlatformModule.h"
 #include "EditorDirectories.h"
-#include "DBReader/db.h"
+#include "db.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet2/KismetEditorUtilities.h"
 
