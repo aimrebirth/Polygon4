@@ -63,6 +63,8 @@ public class DBTool : ModuleRules
                 //
                 "Polygon4",
                 "DesktopPlatform",
+				"tools",
+				
             }
         );
 
