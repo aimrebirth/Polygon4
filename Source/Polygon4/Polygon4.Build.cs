@@ -118,7 +118,8 @@ public class Polygon4 : ModuleRules
         {
             if (!RunSwCommand("sw", "get storage-dir", EnginePath))
                 throw new Exception("Engine build failed: cannot run sw");
-            if (stdout.Length == 0)
+            var storage_dir = stdout;
+            if (storage_dir.Length == 0)
                 throw new Exception("Engine build failed: empty storage dir");
             bool r =
                 RunSwCommand("sw", "-static -config rwdi build", EnginePath) &&
@@ -126,7 +127,7 @@ public class Polygon4 : ModuleRules
                 RunSwCommand("sw", "run Polygon4.Engine.tools.prepare_sw_info-0.0.1" +
                     " \"" + DotSwPath + "\"" +
                     " \"" + JsonPath + "\"" +
-                    " \"" + stdout + "\"" +
+                    " \"" + storage_dir + "\"" +
                     " " + "Polygon4.Engine-master"
                     , EnginePath)
             ;
@@ -163,6 +164,7 @@ public class Polygon4 : ModuleRules
     {
         Console.WriteLine("Executing: " + Program + " " + Args);
 
+        stdout = "";
         Process process = new Process();
         process.StartInfo.FileName = Program;
         process.StartInfo.Arguments = Args;
