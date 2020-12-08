@@ -24,11 +24,6 @@ using UnrealBuildTool;
 
 public class DBTool : ModuleRules
 {
-    private string ThirdPartyPath
-    {
-        get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../ThirdParty/")); }
-    }
-
     public DBTool(ReadOnlyTargetRules Target)
         : base(Target)
     {
@@ -72,5 +67,10 @@ public class DBTool : ModuleRules
                 // ... add any modules that your module loads dynamically here ...
             }
         );
+
+        var P4Root = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../.."));
+        var loader = new SwPackageLoader(P4Root);
+        loader.LoadPackage("pub.lzwdgc.Polygon4.Tools.common-master");
+        loader.AddBuildSettings(this);
     }
 }
