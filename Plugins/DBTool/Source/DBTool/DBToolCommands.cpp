@@ -15,6 +15,8 @@ void FDBToolCommands::RegisterCommands()
     UI_COMMAND(LoadMapMechanoidsFromDB, "Load Map Mechanoids from DB", "Load Map Mechanoids from DB", EUserInterfaceActionType::Button, FInputGesture());
     UI_COMMAND(SaveMapMechanoidsToDB, "Save Map Mechanoids to DB", "Save Map Mechanoids to DB", EUserInterfaceActionType::Button, FInputGesture());
     //
+    UI_COMMAND(ImportAndFixPathToResource, "Import And Fix Path To Resource", "Import And Fix Path To Resource", EUserInterfaceActionType::Button, FInputGesture());
+    //
     UI_COMMAND(LoadMapObjectsFromDB, "Load Map Objects from DB", "Load Map Objects from DB", EUserInterfaceActionType::Button, FInputGesture());
     UI_COMMAND(SaveMapObjectsToDB, "Save Map Objects to DB", "Save Map Objects to DB", EUserInterfaceActionType::Button, FInputGesture());
     //

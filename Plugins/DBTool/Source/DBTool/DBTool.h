@@ -4,6 +4,8 @@
 
 #include <memory>
 
+DECLARE_LOG_CATEGORY_EXTERN(DBTool, Log, All);
+
 class FToolBarBuilder;
 class FMenuBuilder;
 
@@ -54,6 +56,8 @@ private:
 
     void LoadMapMechanoidsFromDB();
     void SaveMapMechanoidsToDB();
+
+    void ImportAndFixPathToResource();
 
     void LoadMapObjectsFromDB();
     void SaveMapObjectsToDB();
