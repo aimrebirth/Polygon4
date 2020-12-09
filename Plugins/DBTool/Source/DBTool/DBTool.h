@@ -4,6 +4,8 @@
 
 #include <memory>
 
+DECLARE_LOG_CATEGORY_EXTERN(DBTool, Log, All);
+
 class FToolBarBuilder;
 class FMenuBuilder;
 

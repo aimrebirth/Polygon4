@@ -113,7 +113,7 @@ void FDBToolModule::StartupModule()
     }
     catch (std::exception &e)
     {
-        UE_LOG(LogTemp, Error, TEXT("Cannot load database: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot load database: %s"), e.what());
         return;
     }
     if (!LoadDB())
@@ -284,7 +284,7 @@ bool FDBToolModule::LoadDB()
     catch (std::exception &e)
     {
         storage.reset();
-        UE_LOG(LogTemp, Error, TEXT("Cannot load storage: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot load storage: %s"), e.what());
         return false;
     }
     if (TreeView.IsValid())
@@ -305,7 +305,7 @@ bool FDBToolModule::SaveDB()
     }
     catch (std::exception &e)
     {
-        UE_LOG(LogTemp, Error, TEXT("Cannot save database: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot save database: %s"), e.what());
         return false;
     }
     return true;
@@ -440,7 +440,7 @@ void FDBToolModule::SaveMapMechanoidsToDB()
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
+            UE_LOG(DBTool, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
                 Itr->Data.TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
         }
     }
@@ -521,7 +521,7 @@ void FDBToolModule::SaveMapObjectsToDB()
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
+            UE_LOG(DBTool, Warning, TEXT("Mechanoid: TextID: '%s', Name: '%s' is not found in the database!"),
                 Itr->Data.TextID.GetCharArray().GetData(), Itr->GetName().GetCharArray().GetData());
         }
     }
@@ -585,6 +585,8 @@ void FDBToolModule::SetDataCommitted()
     if (StatusBar.IsValid())
         StatusBar->SetText(LOCTEXT("DBDataCommitted", "There is no any changes"));
 }
+
+DEFINE_LOG_CATEGORY(DBTool);
 
 #undef LOCTEXT_NAMESPACE
 
