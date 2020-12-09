@@ -258,14 +258,6 @@ void FDBToolModule::AddToolbarExtension(FToolBarBuilder& Builder)
 
 bool FDBToolModule::LoadDB()
 {
-    if (dataChanged)
-    {
-        TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("LoadMessageTitle", "Confirm load")));
-        auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("LoadMessage", "You have unsaved changes.\n Do you really want to load data from the database?"), title.Get());
-        if (r == EAppReturnType::No)
-            return false;
-    }
-
     try
     {
         storage = polygon4::initStorage(database);
@@ -313,6 +305,16 @@ bool FDBToolModule::SaveDB()
 
 void FDBToolModule::ReloadDB()
 {
+    if (dataChanged)
+    {
+        TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("LoadMessageTitle", "Confirm reload")));
+        auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("LoadMessage", "You have unsaved changes.\nDo you really want to reload data from the database?"), title.Get());
+        if (r == EAppReturnType::No)
+            return;
+    }
+
+    // also re-read db from disk, because we use in-memory dbs
+    database = std::make_shared<polygon4::Database>(database->getFullName());
     LoadDB();
 }
 
