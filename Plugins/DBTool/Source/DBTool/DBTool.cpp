@@ -243,7 +243,7 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
 
 void FDBToolModule::PluginButtonClicked()
 {
-    FGlobalTabmanager::Get()->InvokeTab(DBToolTabName);
+    FGlobalTabmanager::Get()->TryInvokeTab(DBToolTabName);
 }
 
 void FDBToolModule::AddMenuExtension(FMenuBuilder& Builder)
