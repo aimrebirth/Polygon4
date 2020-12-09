@@ -46,14 +46,16 @@ class SDBToolTreeView : public STreeView<TSharedPtr<TreeItem>>
     SLATE_BEGIN_ARGS(SDBToolTreeView) {}
         SLATE_ARGUMENT(TSharedPtr<SDBToolTableView>, TableView)
         SLATE_ARGUMENT(SPtrP4TreeItem, RootItem)
-        SLATE_ARGUMENT(std::shared_ptr<polygon4::detail::Storage>, Storage)
+        SLATE_ARGUMENT(polygon4::detail::Storage*, Storage)
     SLATE_END_ARGS()
 
 private:
     using ListItem = TSharedPtr<TreeItem>;
     using ParentType = STreeView<ListItem>;
-    
+
 public:
+    polygon4::detail::Storage* Storage;
+
     void Construct(const FArguments& InArgs);
     void Reset(SPtrP4TreeItem P4RootItem);
 
@@ -64,7 +66,6 @@ private:
     TSharedPtr<SDBToolTableView> TableView;
     ListItem RootItem;
     SPtrP4TreeItem P4RootItem;
-    std::shared_ptr<polygon4::detail::Storage> Storage;
 
     void OnSelectionChanged(ListItem Item, ESelectInfo::Type SelectInfo);
     TSharedRef<ITableRow> OnGenerateRow(ListItem InItem, const TSharedRef<STableViewBase>& OwnerTable);

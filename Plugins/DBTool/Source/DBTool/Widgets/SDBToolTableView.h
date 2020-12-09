@@ -44,16 +44,17 @@ struct ComboBoxItem
 class SDBToolTableView : public SListView<TSharedPtr<RowData>>
 {
     SLATE_BEGIN_ARGS(SDBToolTableView) {}
-        SLATE_ARGUMENT(std::shared_ptr<polygon4::detail::Storage>, Storage)
+        SLATE_ARGUMENT(polygon4::detail::Storage*, Storage)
     SLATE_END_ARGS()
 
 public:
     using ListItem = TSharedPtr<RowData>;
     using ParentType = SListView<ListItem>;
 
+    polygon4::detail::Storage* Storage;
+
 private:
     TArray<ListItem> Data;
-    std::shared_ptr<polygon4::detail::Storage> Storage;
 
 public:
     void Construct(const FArguments& InArgs);
@@ -67,7 +68,6 @@ private:
 class SButtonRowWidget : public SMultiColumnTableRow<SDBToolTableView::ListItem>
 {
     SLATE_BEGIN_ARGS(SButtonRowWidget) {}
-        SLATE_ARGUMENT(std::shared_ptr<polygon4::detail::Storage>, Storage)
         SLATE_ARGUMENT(SDBToolTableView*, TableView)
     SLATE_END_ARGS()
 
@@ -75,7 +75,6 @@ class SButtonRowWidget : public SMultiColumnTableRow<SDBToolTableView::ListItem>
 
 private:
     SDBToolTableView* TableView;
-    std::shared_ptr<polygon4::detail::Storage> Storage;
     ListItem Item;
 
 public:

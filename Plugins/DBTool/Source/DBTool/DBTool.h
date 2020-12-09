@@ -44,8 +44,8 @@ private:
     TSharedPtr<STextBlock> StatusBar;
 
 private:
-    std::shared_ptr<polygon4::Database> database;
-    std::shared_ptr<polygon4::detail::Storage> storage;
+    std::unique_ptr<polygon4::Database> database;
+    std::unique_ptr<polygon4::detail::Storage> storage;
     bool dataChanged = false;
 
     bool LoadDB();

@@ -75,7 +75,6 @@ TSharedRef<ITableRow> SDBToolTableView::OnGenerateRow(ListItem InItem, const TSh
 {
     return
         SNew(SButtonRowWidget, OwnerTable, InItem)
-        .Storage(Storage)
         .TableView(this)
         ;
 }
@@ -106,7 +105,6 @@ void SDBToolTableView::RefreshTable(TreeItem *Item)
 
 void SButtonRowWidget::Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTable, ListItem InItem)
 {
-    Storage = InArgs._Storage;
     TableView = InArgs._TableView;
     Item = InItem;
 
@@ -186,7 +184,7 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
             {
                 bool set = false;
                 OrderedObjectMap m;
-                std::tie(set, m) = Item->Data->object->getOrderedObjectMap(var.getId(), Storage.get());
+                std::tie(set, m) = Item->Data->object->getOrderedObjectMap(var.getId(), TableView->Storage);
 
                 cb_item_array_ptr Items = MakeShareable(new cb_item_array);
                 cb_item_type SelectedItem;

@@ -109,7 +109,7 @@ void FDBToolModule::StartupModule()
     FString DBFile = IPluginManager::Get().FindPlugin("DBTool")->GetBaseDir() / TEXT("../../Mods/db.sqlite");
     try
     {
-        database = std::make_shared<polygon4::Database>(TCHAR_TO_ANSI(DBFile.GetCharArray().GetData()));
+        database = std::make_unique<polygon4::Database>(TCHAR_TO_ANSI(DBFile.GetCharArray().GetData()));
     }
     catch (std::exception &e)
     {
@@ -133,7 +133,7 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
     if (storage)
         RootItem = storage->printTree();
 
-    SAssignNew(TableView, SDBToolTableView).Storage(storage);
+    SAssignNew(TableView, SDBToolTableView).Storage(storage.get());
     SAssignNew(Tab, SDockTab)
         .TabRole(ETabRole::NomadTab)
         .OnCanCloseTab_Lambda([this]()
@@ -176,7 +176,7 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
                         SAssignNew(TreeView, SDBToolTreeView)
                         .RootItem(RootItem)
                         .TableView(TableView)
-                        .Storage(storage)
+                        .Storage(storage.get())
                     ]
                 ]
                 // Table
@@ -260,8 +260,8 @@ bool FDBToolModule::LoadDB()
 {
     try
     {
-        storage = polygon4::initStorage(database);
-        storage->load();
+        storage = polygon4::initStorage();
+        storage->load(*database, {});
 
         storage->getSettings().flags.set(polygon4::gfDbTool);
 
@@ -280,9 +280,15 @@ bool FDBToolModule::LoadDB()
         return false;
     }
     if (TreeView.IsValid())
+    {
+        TreeView->Storage = storage.get();
         TreeView->Reset(storage->printTree());
+    }
     if (TableView.IsValid())
+    {
+        TableView->Storage = storage.get();
         TableView->ResetTable();
+    }
     return true;
 }
 
@@ -292,7 +298,8 @@ bool FDBToolModule::SaveDB()
         return false;
     try
     {
-        storage->save();
+        storage->save(*database, {});
+        database->save();
         SetDataCommitted();
     }
     catch (std::exception &e)
@@ -314,7 +321,7 @@ void FDBToolModule::ReloadDB()
     }
 
     // also re-read db from disk, because we use in-memory dbs
-    database = std::make_shared<polygon4::Database>(database->getFullName());
+    database = std::make_unique<polygon4::Database>(database->getFullName());
     LoadDB();
 }
 
