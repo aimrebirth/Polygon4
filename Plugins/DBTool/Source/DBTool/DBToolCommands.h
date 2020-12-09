@@ -29,6 +29,8 @@ public:
     TSharedPtr< FUICommandInfo > LoadMapMechanoidsFromDB;
     TSharedPtr< FUICommandInfo > SaveMapMechanoidsToDB;
 
+    TSharedPtr< FUICommandInfo > ImportAndFixPathToResource;
+
     TSharedPtr< FUICommandInfo > LoadMapObjectsFromDB;
     TSharedPtr< FUICommandInfo > SaveMapObjectsToDB;
 

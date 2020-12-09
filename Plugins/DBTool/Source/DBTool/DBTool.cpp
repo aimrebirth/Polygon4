@@ -4,6 +4,16 @@
 #include "LandscapeEdit.h"
 #include "LandscapeInfo.h"
 
+#include "db.h"
+#include "AssetToolsModule.h"
+#include "IAssetTools.h"
+#include "UnrealEd.h"
+#include "IDesktopPlatform.h"
+#include "DesktopPlatformModule.h"
+#include "EditorDirectories.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet2/KismetEditorUtilities.h"
+
 #include "SlateBasics.h"
 #include "SlateExtras.h"
 
@@ -98,6 +108,7 @@ void FDBToolModule::StartupModule()
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().LoadMapMechanoidsFromDB);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().SaveMapMechanoidsToDB);
         ToolBarBuilder->AddSeparator();
+        ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().ImportAndFixPathToResource);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().LoadMapObjectsFromDB);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().SaveMapObjectsToDB);
         ToolBarBuilder->AddSeparator();
@@ -224,6 +235,10 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
         FExecuteAction::CreateRaw(this, &FDBToolModule::SaveMapMechanoidsToDB),
         FCanExecuteAction());
 
+    PluginCommands->MapAction(
+        FDBToolCommands::Get().ImportAndFixPathToResource,
+        FExecuteAction::CreateRaw(this, &FDBToolModule::ImportAndFixPathToResource),
+        FCanExecuteAction());
     PluginCommands->MapAction(
         FDBToolCommands::Get().LoadMapObjectsFromDB,
         FExecuteAction::CreateRaw(this, &FDBToolModule::LoadMapObjectsFromDB),
@@ -470,6 +485,113 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
     {
         spawn(m, GWorld);
     }
+}
+
+void FDBToolModule::ImportAndFixPathToResource()
+{
+    IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+    if (!DesktopPlatform) { return; }
+
+    bool bOpenedDB = false;
+    FString DialogTitleDB = LOCTEXT("Import original DB", "Select the folder in which the original database files are located").ToString();
+    FString DefaultPathDB = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::GENERIC_IMPORT);
+    FString OutFolderDB = "";
+
+    const void* ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+    bOpenedDB = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleDB, DefaultPathDB, OutFolderDB);
+
+    if (!bOpenedDB && OutFolderDB.IsEmpty()) { return; }
+
+    FString Basename = OutFolderDB + "/" + "db";
+    FString BasenameExt = Basename + ".dat";
+    if (!FPaths::FileExists(BasenameExt))
+    {
+        UE_LOG(DBTool, Error, TEXT("DB file db.dat not found in selected folder! Path : %s"), *BasenameExt);
+        return;
+    }
+    db db;
+    polygon4::tools::db::processed_db pdb;
+    try
+    {
+        db.open(*Basename);
+        pdb = db.process();
+    }
+    catch (std::exception& e)
+    {
+        UE_LOG(DBTool, Error, TEXT("Cannot open database: %s"), UTF8_TO_TCHAR(e.what()));
+        return;
+    }
+
+    if (db.number_of_values <= 0)
+    {
+        UE_LOG(DBTool, Error, TEXT("Database empty!"));
+        return;
+    }
+
+    auto link = [](const auto& objects, const auto pdb, const FString Folder) {
+        TArray<FString> Filenames;
+        FString DestPath = "/Game/Assets/";
+        TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
+        for (auto& object : objects)
+        {
+            for (auto& [tname, table] : pdb)
+            {
+                auto record = table.find(object.second->text_id);
+                if (record == table.end())
+                    continue;
+                auto value = record->second.find("MODEL");
+                if (value == record->second.end())
+                    continue;
+
+                FString Filename = UTF8_TO_TCHAR(std::get<std::string>(value->second).c_str());
+                FString FindFilename = Filename + ".fbx";
+                TArray<FString> FindedFiles;
+                IFileManager::Get().FindFilesRecursive(FindedFiles, *Folder, *FindFilename, true, false, true);
+                UE_LOG(DBTool, Warning, TEXT("Finded filename : %s"), *FindFilename);
+                if (FindedFiles.Num() <= 0) { break; }
+                UE_LOG(DBTool, Warning, TEXT("Find file : %s"), *FindedFiles[0]);
+
+                TPair<FString, FString> FileAndDest;
+                FileAndDest.Key = FindedFiles[0];
+                FString CleanFile = FPaths::GetBaseFilename(FileAndDest.Key);
+                FileAndDest.Value = DestPath + CleanFile + "/";
+                FilesAndDest->Add(FileAndDest);
+                Filenames.Add(FindedFiles[0]);
+
+                FString PredictPath = "StaticMesh'" + DestPath + CleanFile + "/" + CleanFile + "." + CleanFile + "'";
+                object.second->resource = PredictPath;
+                break;
+            }
+        }
+
+        FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
+        AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);
+    };
+
+    UE_LOG(DBTool, Error, TEXT("Gliders..."));
+    link(storage->gliders, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Buildings..."));
+    link(storage->buildings, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Equipments..."));
+    link(storage->equipments, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Objects..."));
+    link(storage->objects, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Weapons..."));
+    link(storage->weapons, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Projectiles..."));
+    link(storage->projectiles, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("Goods..."));
+    link(storage->goods, pdb, OutFolderDB);
+
+    UE_LOG(DBTool, Error, TEXT("End"));
+
+    SaveDB();
 }
 
 void FDBToolModule::SaveMapObjectsToDB()

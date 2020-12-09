@@ -57,6 +57,8 @@ private:
     void LoadMapMechanoidsFromDB();
     void SaveMapMechanoidsToDB();
 
+    void ImportAndFixPathToResource();
+
     void LoadMapObjectsFromDB();
     void SaveMapObjectsToDB();
 
