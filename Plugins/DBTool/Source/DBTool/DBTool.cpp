@@ -109,6 +109,7 @@ void FDBToolModule::StartupModule()
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().SaveMapMechanoidsToDB);
         ToolBarBuilder->AddSeparator();
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().ImportAndFixPathToResource);
+        ToolBarBuilder->AddSeparator();
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().LoadMapObjectsFromDB);
         ToolBarBuilder->AddToolBarButton(FDBToolCommands::Get().SaveMapObjectsToDB);
         ToolBarBuilder->AddSeparator();
@@ -152,7 +153,7 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
             if (dataChanged)
             {
                 TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("ExitMessageTitle", "Confirm exit")));
-                auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("ExitMessage", "You have unsaved changes.\n Do you really want to exit?"), title.Get());
+                auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("ExitMessage", "You have unsaved changes.\nDo you really want to exit?"), title.Get());
                 if (r == EAppReturnType::No)
                     return false;
             }
@@ -499,17 +500,24 @@ void FDBToolModule::LoadMapMechanoidsFromDB()
 void FDBToolModule::ImportAndFixPathToResource()
 {
     IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
-    if (!DesktopPlatform) { return; }
+    if (!DesktopPlatform)
+        return;
 
-    bool bOpenedDB = false;
     FString DialogTitleDB = LOCTEXT("Import original DB", "Select the folder in which the original database files are located").ToString();
-    FString DefaultPathDB = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::GENERIC_IMPORT);
+    FString DialogTitleFbx = LOCTEXT("Import original DB", "Select the folder in which fbx files are located").ToString();
     FString OutFolderDB = "";
+    FString OutFolderFbx = "";
+    FString DefaultPathDB = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::GENERIC_IMPORT);
 
     const void* ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
-    bOpenedDB = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleDB, DefaultPathDB, OutFolderDB);
 
-    if (!bOpenedDB && OutFolderDB.IsEmpty()) { return; }
+    auto bOpenedDB = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleDB, DefaultPathDB, OutFolderDB);
+    if (!bOpenedDB || OutFolderDB.IsEmpty())
+        return;
+
+    auto bOpenedFbx = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleFbx, DefaultPathDB, OutFolderFbx);
+    if (!bOpenedFbx || OutFolderFbx.IsEmpty())
+        return;
 
     FString Basename = OutFolderDB + "/" + "db";
     FString BasenameExt = Basename + ".dat";
@@ -537,13 +545,14 @@ void FDBToolModule::ImportAndFixPathToResource()
         return;
     }
 
-    auto link = [](const auto& objects, const auto pdb, const FString Folder) {
-        TArray<FString> Filenames;
-        FString DestPath = "/Game/Assets/";
-        TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
-        for (auto& object : objects)
+    TArray<FString> Filenames;
+    FString DestPath = "/Game/Assets/";
+    TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
+    auto link = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest](const auto &objects, const auto &pdb, const FString &Folder)
+    {
+        for (auto &&object : objects)
         {
-            for (auto& [tname, table] : pdb)
+            for (auto &&[tname, table] : pdb)
             {
                 auto record = table.find(object.second->text_id);
                 if (record == table.end())
@@ -553,28 +562,23 @@ void FDBToolModule::ImportAndFixPathToResource()
                     continue;
 
                 FString Filename = UTF8_TO_TCHAR(std::get<std::string>(value->second).c_str());
-                FString FindFilename = Filename + ".fbx";
-                TArray<FString> FindedFiles;
-                IFileManager::Get().FindFilesRecursive(FindedFiles, *Folder, *FindFilename, true, false, true);
-                UE_LOG(DBTool, Warning, TEXT("Finded filename : %s"), *FindFilename);
-                if (FindedFiles.Num() <= 0) { break; }
-                UE_LOG(DBTool, Warning, TEXT("Find file : %s"), *FindedFiles[0]);
+                FString FindFilename = OutFolderFbx + "/" + Filename + ".fbx";
+                //UE_LOG(DBTool, Warning, TEXT("Find file : %s"), FindFilename);
+                if (!FPaths::FileExists(FindFilename))
+                    continue;
 
                 TPair<FString, FString> FileAndDest;
-                FileAndDest.Key = FindedFiles[0];
+                FileAndDest.Key = FindFilename;
                 FString CleanFile = FPaths::GetBaseFilename(FileAndDest.Key);
                 FileAndDest.Value = DestPath + CleanFile + "/";
                 FilesAndDest->Add(FileAndDest);
-                Filenames.Add(FindedFiles[0]);
+                Filenames.Add(FindFilename);
 
                 FString PredictPath = "StaticMesh'" + DestPath + CleanFile + "/" + CleanFile + "." + CleanFile + "'";
                 object.second->resource = PredictPath;
                 break;
             }
         }
-
-        FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
-        AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);
     };
 
     UE_LOG(DBTool, Error, TEXT("Gliders..."));
@@ -597,6 +601,9 @@ void FDBToolModule::ImportAndFixPathToResource()
 
     UE_LOG(DBTool, Error, TEXT("Goods..."));
     link(storage->goods, pdb, OutFolderDB);
+
+    FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
+    AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);
 
     UE_LOG(DBTool, Error, TEXT("End"));
 
