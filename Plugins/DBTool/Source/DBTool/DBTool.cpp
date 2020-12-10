@@ -556,15 +556,15 @@ void FDBToolModule::ImportAndFixPathToResource()
     TArray<FString> Filenames;
     FString DestPath = IContentBrowser.GetCurrentPath();
     TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
-    auto link = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest, &pdb](const auto &objects)
+    auto gather_models = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest, &pdb](const auto &objects)
     {
         FString Category = objects.getName().c_str();
         UE_LOG(DBTool, Error, TEXT("Proccess category : %s"), *Category);
-        for (auto &&object : objects)
+        for (auto &&[_,object] : objects)
         {
             for (auto &&[tname, table] : pdb)
             {
-                auto record = table.find(object.second->text_id);
+                auto record = table.find(object->text_id);
                 if (record == table.end())
                     continue;
                 auto value = record->second.find("MODEL");
@@ -584,20 +584,23 @@ void FDBToolModule::ImportAndFixPathToResource()
                 FilesAndDest->Add(FileAndDest);
                 Filenames.Add(FindFilename);
 
+                // we set resource in advance
+                // if operation fails, we'll have incorrect resources in db
+                // keep it for now
                 FString PredictPath = "StaticMesh'" + FileAndDest.Value + CleanFile + "." + CleanFile + "'";
-                object.second->resource = PredictPath;
+                object->resource = PredictPath;
                 break;
             }
         }
     };
 
-    link(storage->gliders);
-    link(storage->buildings);
-    link(storage->equipments);
-    link(storage->objects);
-    link(storage->weapons);
-    link(storage->projectiles);
-    link(storage->goods);
+    gather_models(storage->gliders);
+    gather_models(storage->buildings);
+    gather_models(storage->equipments);
+    gather_models(storage->objects);
+    gather_models(storage->weapons);
+    gather_models(storage->projectiles);
+    gather_models(storage->goods);
 
     FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
     AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);
