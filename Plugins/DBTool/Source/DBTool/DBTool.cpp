@@ -533,6 +533,7 @@ void FDBToolModule::ImportAndFixPathToResource()
         UE_LOG(DBTool, Error, TEXT("DB file db.dat not found in selected folder! Path : %s"), *BasenameExt);
         return;
     }
+
     db db;
     polygon4::tools::db::processed_db pdb;
     try
@@ -555,8 +556,9 @@ void FDBToolModule::ImportAndFixPathToResource()
     TArray<FString> Filenames;
     FString DestPath = IContentBrowser.GetCurrentPath();
     TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
-    auto link = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest](const auto &objects, const auto &pdb, const FString &Category)
+    auto link = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest, &pdb](const auto &objects)
     {
+        FString Category = objects.getName().c_str();
         UE_LOG(DBTool, Error, TEXT("Proccess category : %s"), *Category);
         for (auto &&object : objects)
         {
@@ -582,26 +584,20 @@ void FDBToolModule::ImportAndFixPathToResource()
                 FilesAndDest->Add(FileAndDest);
                 Filenames.Add(FindFilename);
 
-                FString PredictPath = "StaticMesh'" + DestPath + "/" + Category + "/" + CleanFile + "/" + CleanFile + "." + CleanFile + "'";
+                FString PredictPath = "StaticMesh'" + FileAndDest.Value + CleanFile + "." + CleanFile + "'";
                 object.second->resource = PredictPath;
                 break;
             }
         }
     };
 
-    link(storage->gliders, pdb, "Gliders");
-
-    link(storage->buildings, pdb, "Buildings");
-
-    link(storage->equipments, pdb, "Equipments");
-
-    link(storage->objects, pdb, "Objects");
-
-    link(storage->weapons, pdb, "Weapons");
-
-    link(storage->projectiles, pdb, "Projectiles");
-
-    link(storage->goods, pdb, "Goods");
+    link(storage->gliders);
+    link(storage->buildings);
+    link(storage->equipments);
+    link(storage->objects);
+    link(storage->weapons);
+    link(storage->projectiles);
+    link(storage->goods);
 
     FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
     AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);
