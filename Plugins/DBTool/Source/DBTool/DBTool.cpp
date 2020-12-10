@@ -11,8 +11,10 @@
 #include "IDesktopPlatform.h"
 #include "DesktopPlatformModule.h"
 #include "EditorDirectories.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet2/KismetEditorUtilities.h"
+
+#include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
 
 #include "SlateBasics.h"
 #include "SlateExtras.h"
@@ -503,21 +505,26 @@ void FDBToolModule::ImportAndFixPathToResource()
     if (!DesktopPlatform)
         return;
 
+    FContentBrowserModule &ContentBrowser = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+    IContentBrowserSingleton &IContentBrowser = ContentBrowser.Get();
+
     FString DialogTitleDB = LOCTEXT("Import original DB", "Select the folder in which the original database files are located").ToString();
-    FString DialogTitleFbx = LOCTEXT("Import original DB", "Select the folder in which fbx files are located").ToString();
+    FString DialogTitleFbx = LOCTEXT("Import models", "Select the folder in which models files are located with extension .fbx").ToString();
     FString OutFolderDB = "";
     FString OutFolderFbx = "";
-    FString DefaultPathDB = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::GENERIC_IMPORT);
+    FString DefaultPathDB = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::GENERIC_OPEN);
+    FString DefaultPathFbx = FEditorDirectories::Get().GetLastDirectory(ELastDirectory::FBX);
 
     const void* ParentWindowWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
 
     auto bOpenedDB = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleDB, DefaultPathDB, OutFolderDB);
     if (!bOpenedDB || OutFolderDB.IsEmpty())
         return;
-
-    auto bOpenedFbx = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleFbx, DefaultPathDB, OutFolderFbx);
+    FEditorDirectories::Get().SetLastDirectory(ELastDirectory::GENERIC_OPEN, OutFolderDB);
+    auto bOpenedFbx = DesktopPlatform->OpenDirectoryDialog(ParentWindowWindowHandle, DialogTitleFbx, DefaultPathFbx, OutFolderFbx);
     if (!bOpenedFbx || OutFolderFbx.IsEmpty())
         return;
+    FEditorDirectories::Get().SetLastDirectory(ELastDirectory::FBX, OutFolderFbx);
 
     FString Basename = OutFolderDB + "/" + "db";
     FString BasenameExt = Basename + ".dat";
@@ -546,10 +553,11 @@ void FDBToolModule::ImportAndFixPathToResource()
     }
 
     TArray<FString> Filenames;
-    FString DestPath = "/Game/Assets/";
+    FString DestPath = IContentBrowser.GetCurrentPath();
     TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
-    auto link = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest](const auto &objects, const auto &pdb, const FString &Folder)
+    auto link = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest](const auto &objects, const auto &pdb, const FString &Category)
     {
+        UE_LOG(DBTool, Error, TEXT("Proccess category : %s"), *Category);
         for (auto &&object : objects)
         {
             for (auto &&[tname, table] : pdb)
@@ -570,37 +578,30 @@ void FDBToolModule::ImportAndFixPathToResource()
                 TPair<FString, FString> FileAndDest;
                 FileAndDest.Key = FindFilename;
                 FString CleanFile = FPaths::GetBaseFilename(FileAndDest.Key);
-                FileAndDest.Value = DestPath + CleanFile + "/";
+                FileAndDest.Value = DestPath + "/" + Category + "/" + CleanFile + "/";
                 FilesAndDest->Add(FileAndDest);
                 Filenames.Add(FindFilename);
 
-                FString PredictPath = "StaticMesh'" + DestPath + CleanFile + "/" + CleanFile + "." + CleanFile + "'";
+                FString PredictPath = "StaticMesh'" + DestPath + "/" + Category + "/" + CleanFile + "/" + CleanFile + "." + CleanFile + "'";
                 object.second->resource = PredictPath;
                 break;
             }
         }
     };
 
-    UE_LOG(DBTool, Error, TEXT("Gliders..."));
-    link(storage->gliders, pdb, OutFolderDB);
+    link(storage->gliders, pdb, "Gliders");
 
-    UE_LOG(DBTool, Error, TEXT("Buildings..."));
-    link(storage->buildings, pdb, OutFolderDB);
+    link(storage->buildings, pdb, "Buildings");
 
-    UE_LOG(DBTool, Error, TEXT("Equipments..."));
-    link(storage->equipments, pdb, OutFolderDB);
+    link(storage->equipments, pdb, "Equipments");
 
-    UE_LOG(DBTool, Error, TEXT("Objects..."));
-    link(storage->objects, pdb, OutFolderDB);
+    link(storage->objects, pdb, "Objects");
 
-    UE_LOG(DBTool, Error, TEXT("Weapons..."));
-    link(storage->weapons, pdb, OutFolderDB);
+    link(storage->weapons, pdb, "Weapons");
 
-    UE_LOG(DBTool, Error, TEXT("Projectiles..."));
-    link(storage->projectiles, pdb, OutFolderDB);
+    link(storage->projectiles, pdb, "Projectiles");
 
-    UE_LOG(DBTool, Error, TEXT("Goods..."));
-    link(storage->goods, pdb, OutFolderDB);
+    link(storage->goods, pdb, "Goods");
 
     FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
     AssetToolsModule.Get().ImportAssets(Filenames, DestPath, nullptr, true, FilesAndDest);

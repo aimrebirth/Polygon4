@@ -56,6 +56,7 @@ public class DBTool : ModuleRules
                 "Landscape",
                 "Foliage",
                 "DesktopPlatform",
+                "ContentBrowser",
                 //
                 "Polygon4",
             }
