@@ -125,7 +125,8 @@ AP4Building *spawn(polygon4::detail::MapBuilding *B, UWorld *W)
     ALandscape* landscape = *landscapeIterator;
     auto WorldScale = landscape->GetActorScale() / 100.0f;
 
-    FVector pos(B->x * 10 * WorldScale.X + B->map->bx, B->y * 10 * WorldScale.Y + B->map->by, B->z * 10);
+    //FVector pos(B->x * 10 * WorldScale.X + B->map->bx, B->y * 10 * WorldScale.Y + B->map->by, B->z * 10);
+    FVector pos(B->x, B->y, B->z);
     FRotator rot(B->pitch + B->building->pitch, B->yaw + B->building->yaw, B->roll + B->building->roll);
 
     if (!B->building->resource.empty())
