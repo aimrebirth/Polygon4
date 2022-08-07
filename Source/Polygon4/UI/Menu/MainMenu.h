@@ -67,7 +67,7 @@ private:
     TSharedPtr<STextBlock> CurrentLangItem;
 
     template <typename F>
-    SVerticalBox::FSlot& MainMenuButton(FText Text, F function) const;
+    auto MainMenuButton(FText Text, F function) const;
 
     FReply OnNewGame() const;
     FReply OnLoadGame() const;

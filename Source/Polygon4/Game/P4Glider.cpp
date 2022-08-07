@@ -284,7 +284,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 Start,
                 End,
             };
-            auto NormPos = [](float &x, int len, float k)
+            auto NormPos = [](auto &x, int len, float k)
             {
                 int window = len * k;
                 int pos = round(x);
@@ -426,7 +426,7 @@ void AP4Glider::Tick(float DeltaSeconds)
         return;
     }
 
-    auto CalcAngle = [](const FVector &Vector1, const FVector &Vector2 = FVector::UpVector)
+    auto CalcAngle = [](auto &&Vector1, auto &&Vector2)
     {
         float dp = FVector::DotProduct(Vector1, Vector2);
         dp /= Vector1.Size() * Vector2.Size();
@@ -439,7 +439,7 @@ void AP4Glider::Tick(float DeltaSeconds)
 
     // altitude
     {
-        SlopeAngle += CalcAngle(ZTraceResults.ImpactNormal);
+        SlopeAngle += CalcAngle(ZTraceResults.ImpactNormal, FVector::UpVector);
 
         const float angle_max = 50.0f; // make angle - slow value (like average on last 5 values) - damping
         bool on_slope = SlopeAngle > angle_max;
@@ -532,7 +532,7 @@ void AP4Glider::Tick(float DeltaSeconds)
                 else
                     Position.Y = 0;
 
-                auto ScalePosition = [](float &p)
+                auto ScalePosition = [](auto &p)
                 {
                     bool sign = signbit(p);
                     p *= 1;

@@ -27,6 +27,22 @@
 
 #define LOCTEXT_NAMESPACE "PauseMenu"
 
+template <typename F>
+auto SPauseMenu::PauseMenuButton(FText Text, F function) const
+{
+    return
+        std::move(SVerticalBox::Slot()
+			.VAlign(VAlign_Top)
+			.HAlign(HAlign_Center)
+            .Padding(Padding)
+            [
+                SNew(SMenuButton)
+                .Text(Text)
+                .ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))
+            ]
+        );
+}
+
 void SPauseMenu::Construct(const FArguments& InArgs)
 {
     if (auto PlayerController = GP4Engine()->GetWorld()->GetFirstPlayerController())
@@ -179,22 +195,6 @@ void SPauseMenu::Construct(const FArguments& InArgs)
                 ]
             ]
 		];
-}
-
-template <typename F>
-SVerticalBox::FSlot& SPauseMenu::PauseMenuButton(FText Text, F function) const
-{
-    return
-        SVerticalBox::Slot()
-			.VAlign(VAlign_Top)
-			.HAlign(HAlign_Center)
-            .Padding(Padding)
-            [
-                SNew(SMenuButton)
-                .Text(Text)
-                .ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))
-            ]
-        ;
 }
 
 FReply SPauseMenu::OnContinue() const

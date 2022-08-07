@@ -29,6 +29,22 @@
 
 #define LOCTEXT_NAMESPACE "MainMenu"
 
+template <typename F>
+auto SMainMenu::MainMenuButton(FText Text, F function) const
+{
+    return
+        std::move(SVerticalBox::Slot()
+			.VAlign(VAlign_Top)
+			.HAlign(HAlign_Center)
+            .Padding(Padding)
+            [
+                SNew(SMenuButton)
+                .Text(Text)
+                .ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))
+            ]
+        );
+}
+
 void SMainMenu::Construct(const FArguments& InArgs)
 {
 	// lang combobox
@@ -117,7 +133,7 @@ void SMainMenu::Construct(const FArguments& InArgs)
                     + SVerticalBox::Slot()
                     [
                         SAssignNew(MenuVB, SVerticalBox)
-                        + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game" ), &SMainMenu::OnNewGame)
+                        + MainMenuButton(LOCTEXT("NewGameButtonLabel" , "New Game"), &SMainMenu::OnNewGame)
                         + MainMenuButton(LOCTEXT("LoadGameButtonLabel", "Load Game"), &SMainMenu::OnLoadGame)
                         //+ MainMenuButton(LOCTEXT("AuthorsButtonLabel", "Authors"), &SMainMenu::OnNotImplemented)
                         //+ MainMenuButton(LOCTEXT("OptionsButtonLabel", "Options"), &SMainMenu::OnNotImplemented)
@@ -269,22 +285,6 @@ void SMainMenu::Construct(const FArguments& InArgs)
 				]
             ]
 		];
-}
-
-template <typename F>
-SVerticalBox::FSlot& SMainMenu::MainMenuButton(FText Text, F function) const
-{
-    return
-        SVerticalBox::Slot()
-			.VAlign(VAlign_Top)
-			.HAlign(HAlign_Center)
-            .Padding(Padding)
-            [
-                SNew(SMenuButton)
-                .Text(Text)
-                .ParentArguments(SMenuButton::FParentArguments().OnClicked(this, function))
-            ]
-        ;
 }
 
 void SMainMenu::OnShow()

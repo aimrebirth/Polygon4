@@ -43,7 +43,8 @@ public class SwPackageLoader
 
     public void LoadPackage(string package)
     {
-        var BuildName = package.GetHashCode().ToString();
+        //var BuildName = package.GetHashCode().ToString();
+        var BuildName = package;//.GetHashCode().ToString();
         Func<bool> f = delegate ()
         {
             return
@@ -60,9 +61,10 @@ public class SwPackageLoader
         Load(BuildName, f);
     }
 
-    public void LoadDirectory(string target_dir, string main_target)
+    public void LoadDirectory(string target_dir, string main_target, string buildname)
     {
-        var BuildName = (target_dir + main_target).GetHashCode().ToString();
+        //var BuildName = (target_dir + main_target).GetHashCode().ToString();
+        var BuildName = buildname;
         Func<bool> f = delegate ()
         {
             return
@@ -260,7 +262,7 @@ public class Polygon4 : ModuleRules
         // sw pkgs
         var P4Root = Path.GetFullPath(Path.Combine(ModuleDirectory, "../.."));
         var loader = new SwPackageLoader(P4Root);
-        loader.LoadDirectory(Path.Combine(P4Root, "ThirdParty/Engine"), "Polygon4.Engine-master");
+        loader.LoadDirectory(Path.Combine(P4Root, "ThirdParty/Engine"), "Polygon4.Engine-master", "p4engine");
         loader.AddBuildSettings(this);
     }
 }

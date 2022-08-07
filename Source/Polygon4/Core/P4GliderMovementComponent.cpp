@@ -18,13 +18,13 @@
 #include "P4GliderMovementComponent.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "DrawDebugHelpers.h"
+//#include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "P4FunctionLibrary.h"
-#include "PhysicsEngine/PhysicsSettings.h"
+//#include "PhysicsEngine/PhysicsSettings.h"
 
 UP4GliderMovementComponent::UP4GliderMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

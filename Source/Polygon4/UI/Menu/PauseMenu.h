@@ -46,7 +46,7 @@ public:
 
 private:
     template <typename F>
-    SVerticalBox::FSlot& PauseMenuButton(FText Text, F function) const;
+    auto PauseMenuButton(FText Text, F function) const;
 
     FReply OnContinue() const;
     FReply OnExitToMenu() const;

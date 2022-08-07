@@ -31,6 +31,83 @@
 
 #define LOCTEXT_NAMESPACE "BuildingMenu"
 
+auto SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var) const
+{
+    return
+        std::move(SVerticalBox::Slot()
+        [
+            SNew(SHorizontalBox)
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Center)
+            .AutoWidth()
+            [
+                SNew(STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
+                .Text(NameIn)
+            ]
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Fill)
+            .VAlign(VAlign_Center)
+            .AutoWidth()
+            [
+                SAssignNew(Var, STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
+            ]
+        ]);
+}
+
+auto SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const
+{
+    return
+        std::move(SVerticalBox::Slot()
+        [
+            SNew(SHorizontalBox)
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Center)
+            .AutoWidth()
+            [
+                SNew(STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
+                .Text(NameIn)
+            ]
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Left)
+            .VAlign(VAlign_Center)
+            .AutoWidth()
+            [
+                SAssignNew(Var, STextBlock)
+                .ShadowColorAndOpacity(FLinearColor::Black)
+                .ColorAndOpacity(FLinearColor::White)
+                .ShadowOffset(FIntPoint(-1, 1))
+                .Font(FSlateFontInfo(RobotoFont, 18))
+            ]
+            + SHorizontalBox::Slot()
+            .HAlign(HAlign_Right)
+            .VAlign(VAlign_Center)
+            .Padding(10, 0, 0, 0)
+            //.AutoWidth()
+            [
+                SNew(SBox)
+                .WidthOverride(500)
+                .HeightOverride(25)
+                [
+                    Bar.ToSharedRef()
+                ]
+            ]
+        ]);
+}
+
 void SBuildingMenu::OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &Map)
 {
     const FString* const IdString = Map.Find(TEXT("id"));
@@ -488,83 +565,6 @@ void SBuildingMenu::Construct(const FArguments& InArgs)
             ]
         ]
     ;
-}
-
-SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var) const
-{
-    return
-        SVerticalBox::Slot()
-        [
-            SNew(SHorizontalBox)
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SNew(STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-                .Text(NameIn)
-            ]
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Fill)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SAssignNew(Var, STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-            ]
-        ];
-}
-
-SVerticalBox::FSlot& SBuildingMenu::BottomText(FText NameIn, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const
-{
-    return
-        SVerticalBox::Slot()
-        [
-            SNew(SHorizontalBox)
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SNew(STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-                .Text(NameIn)
-            ]
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Left)
-            .VAlign(VAlign_Center)
-            .AutoWidth()
-            [
-                SAssignNew(Var, STextBlock)
-                .ShadowColorAndOpacity(FLinearColor::Black)
-                .ColorAndOpacity(FLinearColor::White)
-                .ShadowOffset(FIntPoint(-1, 1))
-                .Font(FSlateFontInfo(RobotoFont, 18))
-            ]
-            + SHorizontalBox::Slot()
-            .HAlign(HAlign_Right)
-            .VAlign(VAlign_Center)
-            .Padding(10, 0, 0, 0)
-            //.AutoWidth()
-            [
-                SNew(SBox)
-                .WidthOverride(500)
-                .HeightOverride(25)
-                [
-                    Bar.ToSharedRef()
-                ]
-            ]
-        ];
 }
 
 void SBuildingMenu::refresh()

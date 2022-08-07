@@ -96,8 +96,8 @@ private:
     FReply OnSaveBack();
     FReply OnSaveDelete();
 
-    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
-    SVerticalBox::FSlot& BottomText(FText Name, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const;
+    auto BottomText(FText Name, TSharedPtr<STextBlock> &Var) const;
+    auto BottomText(FText Name, TSharedPtr<STextBlock> &Var, TSharedPtr<SBar> &Bar) const;
 
     void OnHyperlinkClick(const FSlateHyperlinkRun::FMetadata &map);
     FSlateWidgetRun::FWidgetRunInfo EditWidgetDecorator(const FTextRunInfo& RunInfo, const ISlateStyle* Style) const;

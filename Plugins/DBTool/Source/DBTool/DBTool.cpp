@@ -554,7 +554,7 @@ void FDBToolModule::ImportAndFixPathToResource()
     }
 
     TArray<FString> Filenames;
-    FString DestPath = IContentBrowser.GetCurrentPath();
+    FString DestPath = IContentBrowser.GetCurrentPath().GetVirtualPathString();
     TArray<TPair<FString, FString>>* FilesAndDest = new TArray<TPair<FString, FString>>;
     auto gather_models = [&OutFolderFbx, &Filenames, &DestPath, &FilesAndDest, &pdb](const auto &objects)
     {
