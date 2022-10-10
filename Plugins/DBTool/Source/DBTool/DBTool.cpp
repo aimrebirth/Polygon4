@@ -4,7 +4,9 @@
 #include "LandscapeEdit.h"
 #include "LandscapeInfo.h"
 
+#include "Windows/PreWindowsApi.h"
 #include "db.h"
+#include "Windows/PostWindowsApi.h"
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
 #include "UnrealEd.h"
@@ -29,25 +31,33 @@
 #include "Widgets/SDBToolTreeView.h"
 #include "Widgets/SDBToolTableView.h"
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Memory.h>
+#include "Windows/PostWindowsApi.h"
 //POLYGON4_UNREAL_MEMORY_STUB
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/DataManager/Database.h>
 #include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>
 #include <Polygon4/DataManager/StorageImpl.h>
 #include <Polygon4/DataManager/Types.h>
+#include "Windows/PostWindowsApi.h"
 
 #include <Polygon4/Game/P4Glider.h>
 #include <Polygon4/Game/P4Mechanoid.h>
 #include <Polygon4/Game/P4MapBuilding.h>
 #include <Polygon4/Game/P4MapObject.h>
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Mechanoid.h>
+#include "Windows/PostWindowsApi.h"
 
+#include "Windows/PreWindowsApi.h"
 #include <memory>
 //#include <optional>!!!
 #include <tuple>
+#include "Windows/PostWindowsApi.h"
 
 static const FName DBToolTabName("DBTool");
 FDBToolModule *GDBToolModule;

@@ -10,6 +10,7 @@ public class Polygon4EditorTarget : TargetRules
 
         ExtraModuleNames.Add("Polygon4");
 
-        DefaultBuildSettings = BuildSettingsVersion.V2;
+        DefaultBuildSettings = BuildSettingsVersion.Latest;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
     }
 }

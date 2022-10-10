@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Mechanoid.h>
+#include "Windows/PostWindowsApi.h"
 
 class AP4Glider;
 

@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/BuildingMenu.h>
+#include "Windows/PostWindowsApi.h"
 
 #include "Menu.h"
 

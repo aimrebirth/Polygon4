@@ -18,7 +18,9 @@
 
 #include "BuildingMenu.h"
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Mechanoid.h>
+#include "Windows/PostWindowsApi.h"
 
 #include "TextDecorators.h"
 #include "Widgets/MenuButton.h"

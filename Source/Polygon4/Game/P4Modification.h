@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Modification.h>
+#include "Windows/PostWindowsApi.h"
 
 struct ModificationDesc
 {

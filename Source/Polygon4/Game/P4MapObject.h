@@ -19,7 +19,9 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/DataManager/Types.h>
+#include "Windows/PostWindowsApi.h"
 #include "P4MapObject.generated.h"
 
 class P4MapObject;

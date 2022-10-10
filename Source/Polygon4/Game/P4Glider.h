@@ -21,7 +21,9 @@
 #include <queue>
 
 #include "GameFramework/Pawn.h"
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/DataManager/Types.h>
+#include "Windows/PostWindowsApi.h"
 #include "GliderMovement.h"
 #include "P4Glider.generated.h"
 

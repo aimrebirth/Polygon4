@@ -18,12 +18,16 @@
 
 #include "P4GameInstance.h"
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Hotpatch.h>
+#include "Windows/PostWindowsApi.h"
 
 #include "Game/P4Engine.h"
 #include "UI/Menu/MainMenu.h"
 
+#include "Windows/PreWindowsApi.h"
 #include <Polygon4/Memory.h>
+#include "Windows/PostWindowsApi.h"
 //POLYGON4_UNREAL_MEMORY_STUB
 
 static void HotpatchEngine()

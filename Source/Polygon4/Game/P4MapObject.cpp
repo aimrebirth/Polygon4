@@ -18,12 +18,10 @@
 
 #include "P4MapObject.h"
 
-#include "Landscape.h"
-
 #include "P4Engine.h"
 
-#include "EngineUtils.h"
 #include "Landscape.h"
+#include "EngineUtils.h"
 
 AP4Object::AP4Object()
 {

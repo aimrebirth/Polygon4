@@ -27,6 +27,7 @@ ThirdParty
 *.lnk
 *.bat
 *.sh
+.vsconfig
 
 sw.lock
 .sw
