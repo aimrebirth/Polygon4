@@ -57,6 +57,7 @@ public class DBTool : ModuleRules
                 "Foliage",
                 "DesktopPlatform",
                 "ContentBrowser",
+                "ContentBrowserData",
                 //
                 "Polygon4",
             }

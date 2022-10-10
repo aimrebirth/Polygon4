@@ -12,5 +12,9 @@ public class Polygon4EditorTarget : TargetRules
 
         DefaultBuildSettings = BuildSettingsVersion.Latest;
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+
+        bForceEnableRTTI = true;
+        bOverrideBuildEnvironment = true;
+        //BuildEnvironment = TargetBuildEnvironment.Unique;
     }
 }
