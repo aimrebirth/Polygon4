@@ -79,7 +79,7 @@ void TextDecorator::ExplodeRunInfo(const FRunInfo& InRunInfo, FSlateFontInfo& Ou
 
     if (FontFamilyString)
     {
-        FStringAssetReference Font(**FontFamilyString);
+        FSoftObjectPath Font(**FontFamilyString);
         if (UObject* FontAsset = Font.TryLoad())
         {
             OutFont.FontObject = FontAsset;
