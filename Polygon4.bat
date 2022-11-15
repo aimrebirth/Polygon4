@@ -31,7 +31,8 @@ if not defined ValueName (
 )
 
 :: mv old dbghelp, system uses newer
-move %ValueValue%\Engine\Binaries\ThirdParty\DbgHelp\dbghelp.dll %ValueValue%\Engine\Binaries\ThirdParty\DbgHelp\dbghelp_old.dll
+::echo %ValueValue%\Engine\Binaries\ThirdParty\DbgHelp\dbghelp.dll
+::move %ValueValue%\Engine\Binaries\ThirdParty\DbgHelp\dbghelp.dll %ValueValue%\Engine\Binaries\ThirdParty\DbgHelp\dbghelp_old.dll
 
 set exe=%ValueValue%\Engine\Binaries\Win64\UnrealEditor.exe
 ::start "" "%exe%" %~dp0\Polygon4.uproject -ansimalloc %*
