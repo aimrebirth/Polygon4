@@ -24,6 +24,10 @@
 #include "Windows/PreWindowsApi.h"
 #include <Polygon4/DataManager/Types.h>
 #include "Windows/PostWindowsApi.h"
+#include "Engine/HitResult.h"
+#include "Engine/World.h"
+#include "Engine/GameViewportClient.h"
+#include "Components/InputComponent.h"
 #include "GliderMovement.h"
 #include "P4Glider.generated.h"
 

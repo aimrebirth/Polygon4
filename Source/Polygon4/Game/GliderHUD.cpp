@@ -79,9 +79,9 @@ void AGliderHUD::DrawHUD()
 										   (Position.Y - (CrosshairTex->GetSurfaceHeight() * 0.5f)) );
 
 	// draw the crosshair
-	FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->GetResource(), FLinearColor::White);
+	/*FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->GetResource(), FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
-	Canvas->DrawItem( TileItem );
+	Canvas->DrawItem( TileItem );*/
 
     if (Glider)
     {

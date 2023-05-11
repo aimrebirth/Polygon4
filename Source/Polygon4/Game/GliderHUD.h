@@ -19,6 +19,7 @@
 #pragma once
 
 #include "GameFramework/HUD.h"
+#include "Engine/Texture2D.h"
 #include "GliderHUD.generated.h"
 
 class SBar;

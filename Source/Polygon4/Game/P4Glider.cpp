@@ -40,6 +40,8 @@
 #include "Components/AudioComponent.h"
 #include "Materials/Material.h"
 #include "Engine/StaticMesh.h"
+#include "UnrealClient.h"
+#include "Sound/SoundWave.h"
 
 const float k_mouse_x = 0.6;
 const float k_mouse_y = 0.8;

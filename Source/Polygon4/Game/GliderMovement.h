@@ -19,6 +19,7 @@
 #pragma once
 
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Engine/HitResult.h"
 #include "GliderMovement.generated.h"
 
 UCLASS()

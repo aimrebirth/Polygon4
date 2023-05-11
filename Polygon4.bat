@@ -1,7 +1,7 @@
 @echo off
 
 setlocal ENABLEEXTENSIONS
-set KEY_NAME=HKEY_LOCAL_MACHINE\SOFTWARE\EpicGames\Unreal Engine\5.1
+set KEY_NAME=HKEY_LOCAL_MACHINE\SOFTWARE\EpicGames\Unreal Engine\5.2
 set VALUE_NAME=InstalledDirectory
 
 FOR /F "skip=2 tokens=1,2*" %%A IN ('%windir%\Sysnative\REG QUERY "%KEY_NAME%" /v "%VALUE_NAME%" 2^>nul') DO (

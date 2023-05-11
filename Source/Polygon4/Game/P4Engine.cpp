@@ -41,6 +41,7 @@
 #include "Landscape.h"
 #include "EngineUtils.h"
 #include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 
 #define DEFINE_MENU(name)                                                           \
     TSharedPtr<S##name##Menu> P4Engine::Get##name##Menu()                           \
