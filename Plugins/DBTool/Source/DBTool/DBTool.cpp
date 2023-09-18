@@ -165,7 +165,7 @@ TSharedRef<SDockTab> FDBToolModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnT
             if (dataChanged)
             {
                 TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("ExitMessageTitle", "Confirm exit")));
-                auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("ExitMessage", "You have unsaved changes.\nDo you really want to exit?"), title.Get());
+                auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("ExitMessage", "You have unsaved changes.\nDo you really want to exit?"), *title.Get());
                 if (r == EAppReturnType::No)
                     return false;
             }
@@ -343,7 +343,7 @@ void FDBToolModule::ReloadDB()
     if (dataChanged)
     {
         TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("LoadMessageTitle", "Confirm reload")));
-        auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("LoadMessage", "You have unsaved changes.\nDo you really want to reload data from the database?"), title.Get());
+        auto r = FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("LoadMessage", "You have unsaved changes.\nDo you really want to reload data from the database?"), *title.Get());
         if (r == EAppReturnType::No)
             return;
     }
@@ -355,7 +355,7 @@ void FDBToolModule::ReloadDB()
 
 void error_text(const FText &Title, const FText &Text)
 {
-    FMessageDialog::Open(EAppMsgType::Ok, Text, &Title);
+    FMessageDialog::Open(EAppMsgType::Ok, Text, Title);
 }
 
 // make optional<>
@@ -367,7 +367,7 @@ GetCurrentMap(SDBToolTreeView *TreeView)
     auto error = []()
     {
         TSharedPtr<FText> title = MakeShareable(new FText(LOCTEXT("SaveLoadMapObjectsError", "Select a valid modification")));
-        FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("SaveLoadMapObjectsErrorMessage", "Please, select a valid modification or its child in the object tree"), title.Get());
+        FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("SaveLoadMapObjectsErrorMessage", "Please, select a valid modification or its child in the object tree"), *title.Get());
     };
 
     auto Items = TreeView->GetSelectedItems();

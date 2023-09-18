@@ -18,7 +18,6 @@
 
 #include "SBar.h"
 
-
 void SBar::Construct(const FArguments& InArgs)
 {
     Max = InArgs._Max;
@@ -50,7 +49,7 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
     FSlateDrawElement::MakeBox(
         OutDrawElements,
         LayerId,
-        AllottedGeometry.ToPaintGeometry(FVector2D::ZeroVector, FVector2D(HealthWidth, WidgetSize.Y)),
+        AllottedGeometry.ToPaintGeometry(FVector2f::ZeroVector, FVector2f(HealthWidth, WidgetSize.Y)),
         BrushResource,
         ESlateDrawEffect::None,
         Color

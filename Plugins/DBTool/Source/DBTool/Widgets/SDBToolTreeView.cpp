@@ -85,7 +85,8 @@ void SDBToolTreeView::Reset(SPtrP4TreeItem P4RootItemIn)
     P4RootItem = P4RootItemIn;
     RootItem = MakeShareable(new TreeItem());
     RootItem->Build(P4RootItem.get());
-    TreeItemsSource = &RootItem->Children;
+    SetTreeItemsSource(&RootItem->Children);
+    //TreeItemsSource = &RootItem->Children;
     ReGenerateItems(PanelGeometryLastTick);
     RequestTreeRefresh();
 }

@@ -73,7 +73,8 @@ void InfoTreeView::Reset(P4InfoTreeItem *P4RootItemIn)
     P4RootItem = P4RootItemIn;
     RootItem = MakeShareable(new InfoTreeItem());
     RootItem->Build(P4RootItem);
-    TreeItemsSource = &RootItem->Children;
+    SetTreeItemsSource(&RootItem->Children);
+    //TreeItemsSource = &RootItem->Children;
     SetExpandedItems(RootItem->Children);
     ReGenerateItems(PanelGeometryLastTick);
     RequestTreeRefresh();
