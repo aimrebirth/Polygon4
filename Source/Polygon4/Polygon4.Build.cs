@@ -106,6 +106,20 @@ public class SwPackageLoader
             || !File.Exists(DepsFile)
             )
         {
+            string sdeps = "";
+            foreach (var s in File.ReadLines(DepsFile))
+            {
+                if (false
+                    || s.StartsWith("org.")
+                    || s.StartsWith("pub.")
+                    )
+                {
+                    sdeps += s + " ";
+                }
+            }
+            if (!RunSwCommand("sw", "-static -config " + config_name + " build " + sdeps, engine_path))
+                throw new Exception("Engine build failed: cannot run sw");
+
             if (!build_function())
                 throw new Exception("Include sw package failed");
         }
@@ -117,20 +131,6 @@ public class SwPackageLoader
             idirs.Add(s);
         foreach (var s in File.ReadLines(LibsFile))
             libs.Add(s);
-
-        string sdeps = "";
-        foreach (var s in File.ReadLines(DepsFile))
-        {
-            if (false
-                || s.StartsWith("org.")
-                || s.StartsWith("pub.")
-                )
-            {
-                sdeps += s + " ";
-            }
-        }
-        if (!RunSwCommand("sw", "-static -config " + config_name + " build " + sdeps, engine_path))
-            throw new Exception("Engine build failed: cannot run sw");
     }
 
     string GetStorageDir()
