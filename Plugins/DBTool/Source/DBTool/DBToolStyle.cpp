@@ -34,7 +34,7 @@ FName FDBToolStyle::GetStyleSetName()
 #define TTF_FONT( RelativePath, ... ) FSlateFontInfo( Style->RootToContentDir( RelativePath, TEXT(".ttf") ), __VA_ARGS__ )
 #define OTF_FONT( RelativePath, ... ) FSlateFontInfo( Style->RootToContentDir( RelativePath, TEXT(".otf") ), __VA_ARGS__ )
 
-#define SET_ICON(button, filename) Style->Set("DBTool." ## #button, new IMAGE_BRUSH(TEXT(filename), Icon40x40))
+#define SET_ICON(button, filename) Style->Set("DBTool." #button, new IMAGE_BRUSH(TEXT(filename), Icon40x40))
 
 const FVector2D Icon16x16(16.0f, 16.0f);
 const FVector2D Icon20x20(20.0f, 20.0f);
