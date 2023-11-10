@@ -82,7 +82,7 @@ AP4Object *spawn(polygon4::detail::MapObject *O, UWorld *W)
     auto WorldScale = landscape->GetActorScale() / 100.0f;
 
     //FVector pos(O->x * 10 * WorldScale.X + O->map->bx, O->y * 10 * WorldScale.Y + O->map->by, O->z * 10);
-    FVector pos(O->x, O->y, O->z);
+    FVector pos(O->x * 10, O->y * 10, O->z * 10);
     FRotator rot(O->pitch + O->object->pitch, O->yaw + O->object->yaw, O->roll + O->object->roll);
 
     if (!O->object->resource.empty())
