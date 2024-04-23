@@ -103,9 +103,14 @@ public class SwPackageLoader
             || !File.Exists(DefsFile)
             || !File.Exists(IdirsFile)
             || !File.Exists(LibsFile)
-            || !File.Exists(DepsFile)
             )
         {
+            if (!File.Exists(DepsFile))
+            {
+                if (!build_function())
+                    throw new Exception("Include sw package failed");
+            }
+
             string sdeps = "";
             foreach (var s in File.ReadLines(DepsFile))
             {
