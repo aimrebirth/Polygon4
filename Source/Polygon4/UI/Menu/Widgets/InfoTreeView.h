@@ -20,10 +20,10 @@
 
 #include "SlateBasics.h"
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/DataManager/Types.h>
 #include <Polygon4/BuildingMenu.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 using P4InfoTreeItem = polygon4::InfoTreeItem;
 

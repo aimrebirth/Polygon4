@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/Map.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 class P4Map : public polygon4::Map
 {

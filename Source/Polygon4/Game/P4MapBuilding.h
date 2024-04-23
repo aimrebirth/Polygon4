@@ -20,9 +20,9 @@
 
 #include "GameFramework/Actor.h"
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/MapBuilding.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 #include "P4MapBuilding.generated.h"
 

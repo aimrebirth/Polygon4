@@ -165,8 +165,9 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
                 catch (std::exception &e)
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Cannot parse value of type '%s': %s"),
-                        polygon4::tr(Item->Var.getDataType()).c_str(),
-                        polygon4::String(e.what()).c_str());
+                        ToCStr(polygon4::tr(Item->Var.getDataType()).toFText().ToString()),
+                        ToCStr(polygon4::String(e.what()).toFText().ToString())
+                        );
                 }
             })
                 ;

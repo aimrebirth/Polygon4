@@ -4,9 +4,9 @@
 #include "LandscapeEdit.h"
 #include "LandscapeInfo.h"
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include "db.h"
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include "AssetToolsModule.h"
 #include "IAssetTools.h"
 #include "UnrealEd.h"
@@ -31,33 +31,33 @@
 #include "Widgets/SDBToolTreeView.h"
 #include "Widgets/SDBToolTableView.h"
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/Memory.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 //POLYGON4_UNREAL_MEMORY_STUB
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/DataManager/Database.h>
 #include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>
 #include <Polygon4/DataManager/StorageImpl.h>
 #include <Polygon4/DataManager/Types.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 #include <Polygon4/Game/P4Glider.h>
 #include <Polygon4/Game/P4Mechanoid.h>
 #include <Polygon4/Game/P4MapBuilding.h>
 #include <Polygon4/Game/P4MapObject.h>
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/Mechanoid.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <memory>
 //#include <optional>!!!
 #include <tuple>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 static const FName DBToolTabName("DBTool");
 FDBToolModule *GDBToolModule;
@@ -137,7 +137,7 @@ void FDBToolModule::StartupModule()
     }
     catch (std::exception &e)
     {
-        UE_LOG(DBTool, Error, TEXT("Cannot load database: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot load database: %hs"), e.what());
         return;
     }
     if (!LoadDB())
@@ -304,7 +304,7 @@ bool FDBToolModule::LoadDB()
     catch (std::exception &e)
     {
         storage.reset();
-        UE_LOG(DBTool, Error, TEXT("Cannot load storage: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot load storage: %hs"), e.what());
         return false;
     }
     if (TreeView.IsValid())
@@ -332,7 +332,7 @@ bool FDBToolModule::SaveDB()
     }
     catch (std::exception &e)
     {
-        UE_LOG(DBTool, Error, TEXT("Cannot save database: %s"), e.what());
+        UE_LOG(DBTool, Error, TEXT("Cannot save database: %hs"), e.what());
         return false;
     }
     return true;

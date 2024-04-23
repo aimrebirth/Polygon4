@@ -18,12 +18,12 @@
 
 #include "Polygon4.h"
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/Hotpatch.h>
 #include <primitives/executor.h>
 
 #include <fstream>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 #include "Modules/ModuleManager.h"
 #include "Misc/Paths.h"

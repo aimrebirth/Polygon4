@@ -49,7 +49,7 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
     FSlateDrawElement::MakeBox(
         OutDrawElements,
         LayerId,
-        AllottedGeometry.ToPaintGeometry(FVector2f::ZeroVector, FVector2f(HealthWidth, WidgetSize.Y)),
+        AllottedGeometry.ToPaintGeometry(FVector2f(HealthWidth, WidgetSize.Y), FSlateLayoutTransform(1.0f, TransformPoint(1.0f, UE::Slate::CastToVector2f(FVector2f::ZeroVector)))),
         BrushResource,
         ESlateDrawEffect::None,
         Color
@@ -66,7 +66,7 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
     FSlateDrawElement::MakeText(
         OutDrawElements,
         LayerId,
-        AllottedGeometry.ToPaintGeometry(Pos, DrawSize),
+        AllottedGeometry.ToPaintGeometry(DrawSize, FSlateLayoutTransform(1.0f, TransformPoint(1.0f, UE::Slate::CastToVector2f(Pos)))),
         TextNew,
         MyFont,
         ESlateDrawEffect::None,

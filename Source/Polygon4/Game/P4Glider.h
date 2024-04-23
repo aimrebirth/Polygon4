@@ -21,9 +21,9 @@
 #include <queue>
 
 #include "GameFramework/Pawn.h"
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/DataManager/Types.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include "Engine/HitResult.h"
 #include "Engine/World.h"
 #include "Engine/GameViewportClient.h"

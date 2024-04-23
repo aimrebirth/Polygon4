@@ -132,6 +132,9 @@ public class SwPackageLoader
         // read defs, idirs, libs
         foreach (var s in File.ReadLines(DefsFile))
             defs.Add(s);
+        // fix warnings, these are used in ue by default
+        defs.Remove("NOMINMAX");
+        defs.Remove("WIN32_LEAN_AND_MEAN");
         foreach (var s in File.ReadLines(IdirsFile))
             idirs.Add(s);
         foreach (var s in File.ReadLines(LibsFile))

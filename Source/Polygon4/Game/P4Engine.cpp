@@ -30,11 +30,11 @@
 #include <UI/Menu/BuildingMenu.h>
 #include <UI/Menu/PauseMenu.h>
 
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/Configuration.h>
 #include <Polygon4/ConfigurationWeapon.h>
 #include <Polygon4/Glider.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 #include <Game/GliderHUD.h>
 

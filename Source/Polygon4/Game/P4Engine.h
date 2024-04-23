@@ -19,9 +19,9 @@
 #pragma once
 
 #include "EngineMinimal.h"
-#include "Windows/PreWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include <Polygon4/Engine.h>
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 #include "P4Engine.generated.h"
 
 #define DECLARE_MENU(name) \

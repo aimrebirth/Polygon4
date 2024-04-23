@@ -1,5 +1,9 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "SlateBasics.h"
 
 #include "DBTool.h"
