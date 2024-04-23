@@ -549,7 +549,9 @@ void FDBToolModule::ImportAndFixPathToResource()
     try
     {
         db.open(*Basename);
-        pdb = db.process();
+        // 1251 is default encoding for db - does not matter
+        // it can be wrong for quest db, so we need to handle it
+        pdb = db.process(1251);
     }
     catch (std::exception& e)
     {
