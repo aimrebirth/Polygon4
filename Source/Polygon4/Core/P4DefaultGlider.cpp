@@ -28,7 +28,7 @@ AP4DefaultGlider::AP4DefaultGlider(const FObjectInitializer& ObjectInitializer) 
     PrimaryActorTick.bCanEverTick = true;
     bReplicates = true;
     SetReplicatingMovement(true);
-    NetUpdateFrequency = 10.f;
+    SetNetUpdateFrequency(10.f);
 
     GliderPhysicsBody = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GliderPhysicsBody"));
     GliderPhysicsBody->SetCollisionProfileName(TEXT("GliderPhysicsBody"));
