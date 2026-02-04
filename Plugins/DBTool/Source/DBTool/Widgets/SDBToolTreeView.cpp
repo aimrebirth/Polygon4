@@ -18,6 +18,7 @@
 
 #include "SDBToolTreeView.h"
 
+#include "../DBTool.h"
 #include "SDBToolTableView.h"
 
 TSharedPtr<TreeItem> TreeItem::AddChild(const SPtrP4TreeItem &P4ItemIn)

@@ -1,5 +1,3 @@
-#include "DBTool.h"
-
 #include "Landscape.h"
 #include "LandscapeEdit.h"
 #include "LandscapeInfo.h"
@@ -58,6 +56,8 @@
 //#include <optional>!!!
 #include <tuple>
 #include "Windows/WindowsHWrapper.h"
+
+#include "DBTool.h"
 
 static const FName DBToolTabName("DBTool");
 FDBToolModule *GDBToolModule;

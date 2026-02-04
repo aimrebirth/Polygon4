@@ -18,6 +18,7 @@
 
 #include "SDBToolTableView.h"
 
+#include "../DBTool.h"
 #include "SDBToolTreeView.h"
 
 #include <algorithm>

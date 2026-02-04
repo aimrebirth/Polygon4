@@ -27,7 +27,9 @@ public class DBTool : ModuleRules
     public DBTool(ReadOnlyTargetRules Target)
         : base(Target)
     {
-        PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
+        // not used atm
+        //PrivatePCHHeaderFile = "DBToolPrivatePCH.h";
+        //SharedPCHHeaderFile = "DBToolPrivatePCH.h";
         MinFilesUsingPrecompiledHeaderOverride = 1;
         bUseUnity = false;
         CppStandard = CppStandardVersion.Latest;
