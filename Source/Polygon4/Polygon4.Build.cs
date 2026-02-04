@@ -218,6 +218,8 @@ public class Polygon4 : ModuleRules
         MinFilesUsingPrecompiledHeaderOverride = 1;
         bUseUnity = false;
         CppStandard = CppStandardVersion.Latest;
+        //CppStandard = CppStandardVersion.EngineDefault;
+        //CppStandard = CppStandardVersion.Cpp23;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "AIModule" });
         PrivateDependencyModuleNames.AddRange(new string[] { "PhysicsCore", "Slate", "SlateCore" });
@@ -290,5 +292,7 @@ public class Polygon4 : ModuleRules
         var loader = new SwPackageLoader(P4Root);
         loader.LoadDirectory(Path.Combine(P4Root, "ThirdParty/Engine"), "Polygon4.Engine-master", "p4engine");
         loader.AddBuildSettings(this);
+
+        //PublicDefinitions.Add("DO_CHECK=0");
     }
 }
