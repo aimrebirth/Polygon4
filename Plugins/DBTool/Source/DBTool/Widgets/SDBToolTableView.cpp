@@ -136,7 +136,7 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
     }
     else if (ColumnName == "Type")
     {
-        auto type = FText::FromString(polygon4::tr(var.getType()->getDataType()));
+        auto type = polygon4::tr(var.getType()->getDataType()).toFText();
         SAssignNew(Widget, STextBlock)
             .Text(type)
             ;
@@ -195,7 +195,7 @@ TSharedRef<SWidget> SButtonRowWidget::GenerateWidgetForColumn(const FName& Colum
                 for (auto &v : m)
                 {
                     Items->Add(MakeShareable(new ComboBoxItem{
-                        FText::FromString(v.first),
+                        v.first,
                         v.second
                     }));
                     if (!found && Value == v.second->getName())

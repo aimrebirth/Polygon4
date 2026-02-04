@@ -64,7 +64,7 @@ AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
     auto conf = M->getConfiguration();
     auto glider = conf->glider;
 
-    FString resource = glider->resource;
+    FStringView resource = glider->resource;
     if (resource.IsEmpty())
     {
         /*auto c = LoadClass(0);
@@ -77,7 +77,7 @@ AP4Glider* spawn(polygon4::detail::Mechanoid *M, UWorld *W)
     }
 
     AP4Glider *g = nullptr;
-    auto o = LoadObject<UStaticMesh>(0, resource.GetCharArray().GetData());
+    auto o = LoadObject<UStaticMesh>(0, resource);
     if (o)
     {
         g = W->SpawnActorDeferred<AP4Glider>(AP4Glider::StaticClass(), tr);

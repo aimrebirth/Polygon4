@@ -121,9 +121,9 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
         case EObjectType::ConfigurationProjectile:
         {
             auto p = (ConfigurationProjectile *)o;
-            T += u" (";
+            T += " (";
             T += std::to_string(p->quantity);
-            T += u")"s;
+            T += ")"s;
             break;
         }
         case EObjectType::MapBuildingGood:
@@ -131,9 +131,9 @@ TSharedRef<ITableRow> InfoTreeView::OnGenerateRow(ListItem InItem, const TShared
             auto p = (MapBuildingGood *)o;
             if (p->quantity != -1)
             {
-                T += u" (";
+                T += " (";
                 T += std::to_string(p->quantity);
-                T += u")"s;
+                T += ")"s;
             }
             break;
         }
