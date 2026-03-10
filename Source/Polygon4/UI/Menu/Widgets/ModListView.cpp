@@ -42,7 +42,7 @@ void SModListView::Construct(const FArguments& InArgs)
     args
         .SelectionMode(ESelectionMode::Single)
         .AllowOverscroll(EAllowOverscroll::No)
-        .ItemHeight(40)
+        //.ItemHeight(40)
         .ListItemsSource( &AvailableMods )
         .OnGenerateRow(this, &SModListView::OnGenerateWidgetForList)
         .HeaderRow(

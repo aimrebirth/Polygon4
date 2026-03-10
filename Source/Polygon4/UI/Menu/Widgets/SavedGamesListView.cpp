@@ -41,7 +41,7 @@ void SSavedGamesListView::Construct(const FArguments& InArgs)
     args
         .SelectionMode(ESelectionMode::Single)
         .AllowOverscroll(EAllowOverscroll::No)
-        .ItemHeight(40)
+        //.ItemHeight(40)
         .ListItemsSource( &AvailableGames )
         .OnSelectionChanged(OnSelectionChanged)
         .OnGenerateRow(this, &SSavedGamesListView::OnGenerateWidgetForList)

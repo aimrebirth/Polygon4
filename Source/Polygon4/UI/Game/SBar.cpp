@@ -56,7 +56,10 @@ int32 SBar::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, c
         );
 
     // Draw text on health bar
-    FSlateFontInfo MyFont(FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Regular.ttf"), 15);
+    auto my_font_ptr = MakeShared<FCompositeFont>("Roboto-Regular.ttf", FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-Regular.ttf"),
+         EFontHinting::Default, EFontLoadingPolicy::LazyLoad
+    );
+    FSlateFontInfo MyFont(my_font_ptr, 15);
 
     const FText TextNew = FText::FromString(FString::Printf(TEXT("%s: %.0f / %.0f"), Text.ToString().GetCharArray().GetData(), Current, Max));
     const TSharedRef< FSlateFontMeasure > FontMeasureService = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
